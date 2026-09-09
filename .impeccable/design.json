@@ -1,0 +1,376 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-09T00:00:00Z",
+  "title": "Design System: OSAS Scholarship Allocation System",
+  "extensions": {
+    "colorMeta": {
+      "seal-green": {
+        "role": "primary",
+        "displayName": "Seal Green",
+        "canonical": "#0B6E4F",
+        "tonalRamp": ["oklch(15% 0.035 161)", "oklch(24% 0.055 161)", "oklch(33% 0.078 161)", "oklch(43% 0.098 161)", "oklch(55% 0.108 161)", "oklch(68% 0.095 161)", "oklch(82% 0.062 161)", "oklch(95% 0.022 161)"]
+      },
+      "deep-seal": {
+        "role": "primary",
+        "displayName": "Deep Seal",
+        "canonical": "#074A35",
+        "tonalRamp": ["oklch(15% 0.038 162)", "oklch(24% 0.060 162)", "oklch(32% 0.075 162)", "oklch(42% 0.090 162)", "oklch(54% 0.098 162)", "oklch(67% 0.085 162)", "oklch(81% 0.055 162)", "oklch(95% 0.020 162)"]
+      },
+      "signal-green": {
+        "role": "primary",
+        "displayName": "Signal Green",
+        "canonical": "#0F9D63",
+        "tonalRamp": ["oklch(15% 0.045 158)", "oklch(25% 0.070 158)", "oklch(35% 0.098 158)", "oklch(46% 0.122 158)", "oklch(58% 0.132 158)", "oklch(70% 0.115 158)", "oklch(83% 0.075 158)", "oklch(95% 0.028 158)"]
+      },
+      "citation-gold": {
+        "role": "secondary",
+        "displayName": "Citation Gold",
+        "canonical": "#FFC72C",
+        "tonalRamp": ["oklch(15% 0.050 87)", "oklch(28% 0.075 87)", "oklch(41% 0.100 87)", "oklch(54% 0.125 87)", "oklch(66% 0.145 87)", "oklch(76% 0.158 87)", "oklch(85% 0.165 87)", "oklch(95% 0.075 87)"]
+      },
+      "struck-gold": {
+        "role": "secondary",
+        "displayName": "Struck Gold",
+        "canonical": "#E6A800",
+        "tonalRamp": ["oklch(15% 0.048 85)", "oklch(27% 0.072 85)", "oklch(39% 0.096 85)", "oklch(51% 0.120 85)", "oklch(63% 0.140 85)", "oklch(76% 0.155 85)", "oklch(86% 0.130 85)", "oklch(95% 0.060 85)"]
+      },
+      "record-white": {
+        "role": "neutral",
+        "displayName": "Record White",
+        "canonical": "#FFFFFF",
+        "tonalRamp": ["#111827", "#1F2937", "#374151", "#4B5563", "#6B7280", "#9CA3AF", "#D1D5DB", "#FFFFFF"]
+      },
+      "bond-paper": {
+        "role": "neutral",
+        "displayName": "Bond Paper Gray",
+        "canonical": "#F3F4F6",
+        "tonalRamp": ["#111827", "#1F2937", "#374151", "#4B5563", "#6B7280", "#9CA3AF", "#D1D5DB", "#F9FAFB"]
+      },
+      "ledger-gray": {
+        "role": "neutral",
+        "displayName": "Ledger Gray",
+        "canonical": "#F9FAFB",
+        "tonalRamp": ["#111827", "#1F2937", "#374151", "#4B5563", "#6B7280", "#9CA3AF", "#D1D5DB", "#F9FAFB"]
+      },
+      "rule-line": {
+        "role": "neutral",
+        "displayName": "Rule Line",
+        "canonical": "#E5E7EB",
+        "tonalRamp": ["#111827", "#1F2937", "#374151", "#4B5563", "#6B7280", "#9CA3AF", "#D1D5DB", "#F9FAFB"]
+      },
+      "field-stroke": {
+        "role": "neutral",
+        "displayName": "Field Stroke",
+        "canonical": "#D1D5DB",
+        "tonalRamp": ["#111827", "#1F2937", "#374151", "#4B5563", "#6B7280", "#9CA3AF", "#D1D5DB", "#F9FAFB"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#111827",
+        "tonalRamp": ["#111827", "#1F2937", "#374151", "#4B5563", "#6B7280", "#9CA3AF", "#D1D5DB", "#F9FAFB"]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Ink Soft",
+        "canonical": "#1F2937",
+        "tonalRamp": ["#111827", "#1F2937", "#374151", "#4B5563", "#6B7280", "#9CA3AF", "#D1D5DB", "#F9FAFB"]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "#374151",
+        "tonalRamp": ["#111827", "#1F2937", "#374151", "#4B5563", "#6B7280", "#9CA3AF", "#D1D5DB", "#F9FAFB"]
+      },
+      "slate": {
+        "role": "neutral",
+        "displayName": "Slate",
+        "canonical": "#6B7280",
+        "tonalRamp": ["#111827", "#1F2937", "#374151", "#4B5563", "#6B7280", "#9CA3AF", "#D1D5DB", "#F9FAFB"]
+      },
+      "mist": {
+        "role": "neutral",
+        "displayName": "Mist",
+        "canonical": "#9CA3AF",
+        "tonalRamp": ["#111827", "#1F2937", "#374151", "#4B5563", "#6B7280", "#9CA3AF", "#D1D5DB", "#F9FAFB"]
+      },
+      "approved-wash": {
+        "role": "tertiary",
+        "displayName": "Approved Wash",
+        "canonical": "#DCFCE7",
+        "tonalRamp": ["#14532D", "#166534", "#15803D", "#16A34A", "#22C55E", "#4ADE80", "#86EFAC", "#DCFCE7"]
+      },
+      "approved-ink": {
+        "role": "tertiary",
+        "displayName": "Approved Ink",
+        "canonical": "#15803D",
+        "tonalRamp": ["#14532D", "#166534", "#15803D", "#16A34A", "#22C55E", "#4ADE80", "#86EFAC", "#DCFCE7"]
+      },
+      "rejected-wash": {
+        "role": "tertiary",
+        "displayName": "Rejected Wash",
+        "canonical": "#FEE2E2",
+        "tonalRamp": ["#7F1D1D", "#991B1B", "#B91C1C", "#DC2626", "#EF4444", "#F87171", "#FCA5A5", "#FEE2E2"]
+      },
+      "rejected-ink": {
+        "role": "tertiary",
+        "displayName": "Rejected Ink",
+        "canonical": "#B91C1C",
+        "tonalRamp": ["#7F1D1D", "#991B1B", "#B91C1C", "#DC2626", "#EF4444", "#F87171", "#FCA5A5", "#FEE2E2"]
+      },
+      "rejected-mark": {
+        "role": "tertiary",
+        "displayName": "Rejected Mark",
+        "canonical": "#F87171",
+        "tonalRamp": ["#7F1D1D", "#991B1B", "#B91C1C", "#DC2626", "#EF4444", "#F87171", "#FCA5A5", "#FEE2E2"]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Danger",
+        "canonical": "#DC2626",
+        "tonalRamp": ["#7F1D1D", "#991B1B", "#B91C1C", "#DC2626", "#EF4444", "#F87171", "#FCA5A5", "#FEE2E2"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Sign-in branding panel headline only. Never appears inside the authenticated app." },
+      "headline": { "displayName": "Headline", "purpose": "Auth form heading, one per unauthenticated screen." },
+      "title": { "displayName": "Title", "purpose": "Page header in the white header band. Exactly one per authenticated screen." },
+      "section": { "displayName": "Section", "purpose": "Card headings and the dashboard welcome line." },
+      "metric": { "displayName": "Metric", "purpose": "KPI numerals. Always between an uppercase label and a Mist caption." },
+      "body": { "displayName": "Body", "purpose": "The default: supporting copy, table cells, inputs, nav items, buttons." },
+      "label": { "displayName": "Label", "purpose": "Badges and section captions; uppercased with +0.05em tracking for table column headers." },
+      "mono": { "displayName": "Mono", "purpose": "Character disambiguation only — one-time passwords and literal CSV header names. Never decorative." }
+    },
+    "shadows": [
+      { "name": "seat", "value": "0 1px 2px 0 rgba(0, 0, 0, 0.05)", "purpose": "Default for cards, stat tiles, table containers, primary buttons, and inputs. Edge definition, not elevation." },
+      { "name": "header-band", "value": "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)", "purpose": "The white page-header strip below the nav — the only horizontal element that casts onto content." },
+      { "name": "overlay", "value": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)", "purpose": "Account dropdown, paired with a 1px black/5% ring." },
+      { "name": "dialog", "value": "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)", "purpose": "Modals only, over a 75%-opacity gray-500 scrim." },
+      { "name": "focus-ring-gold", "value": "0 0 0 2px #FFFFFF, 0 0 0 4px #FFC72C", "purpose": "The signature focus treatment on every green button: 2px Citation Gold ring with a 2px white offset. Only legible against a Seal Green fill." },
+      { "name": "focus-ring-green-control", "value": "0 0 0 2px #FFFFFF, 0 0 0 4px #0B6E4F", "purpose": "Focus on white or neutral controls — the secondary button and inline text buttons. Seal Green holds ~8.6:1 on white where gold would sit near 1.5:1." },
+      { "name": "focus-ring-green", "value": "0 0 0 1px #0B6E4F", "purpose": "Input focus — border and ring both shift to Seal Green to mark where you are." },
+      { "name": "focus-ring-danger", "value": "0 0 0 2px #FFFFFF, 0 0 0 4px #EF4444", "purpose": "Focus on the danger button, taking the control's own hue." }
+    ],
+    "motion": [
+      { "name": "state-transition", "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "The default for every hover, focus, and color state change across buttons, links, nav items, and cards." },
+      { "name": "overlay-enter", "value": "200ms cubic-bezier(0, 0, 0.2, 1)", "purpose": "Dropdown entrance, paired with opacity 0→100 and scale 0.95→1." },
+      { "name": "overlay-leave", "value": "75ms cubic-bezier(0.4, 0, 1, 1)", "purpose": "Dropdown exit — always faster than its entrance." },
+      { "name": "dialog-enter", "value": "300ms cubic-bezier(0, 0, 0.2, 1)", "purpose": "Modal entrance: opacity 0→100, translateY 16px→0, scale 0.95→1 above 640px." },
+      { "name": "dialog-leave", "value": "200ms cubic-bezier(0.4, 0, 1, 1)", "purpose": "Modal exit." },
+      { "name": "pulse", "value": "2s cubic-bezier(0.4, 0, 0.6, 1) infinite", "purpose": "Loading-skeleton placeholder bars." },
+      { "name": "spin", "value": "1s linear infinite", "purpose": "In-button submit spinner." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The committing action. Seal Green fill with the signature gold focus ring; content centered with an 8px gap so a spinner or icon sits correctly.",
+      "html": "<button class=\"ds-btn-primary\">Post Scholarship</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; background: #0B6E4F; color: #FFFFFF; border: 1px solid transparent; border-radius: 8px; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 14px; font-weight: 600; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); cursor: pointer; transition: background 150ms cubic-bezier(0.4,0,0.2,1), box-shadow 150ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-primary:hover { background: #074A35; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #FFC72C; } .ds-btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Supporting control on a tighter 6px corner. Shares the primary's 14px/600 sentence-case label; the tier reads through fill and border, not type size. Focus rings in Seal Green per the Two-Ring Rule, since gold does not survive on a white field.",
+      "html": "<button class=\"ds-btn-secondary\">Cancel</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; padding: 8px 16px; background: #FFFFFF; color: #374151; border: 1px solid #D1D5DB; border-radius: 6px; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 14px; font-weight: 600; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); cursor: pointer; transition: background 150ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-secondary:hover { background: #F9FAFB; } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #0B6E4F; } .ds-btn-secondary:disabled { opacity: 0.7; cursor: not-allowed; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "The only control permitted to carry red as a fill, used for irreversible actions such as account deletion. Focus rings in its own hue (red-500) rather than gold or green.",
+      "html": "<button class=\"ds-btn-danger\">Delete Account</button>",
+      "css": ".ds-btn-danger { display: inline-flex; align-items: center; padding: 8px 16px; background: #DC2626; color: #FFFFFF; border: 1px solid transparent; border-radius: 6px; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 150ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-danger:hover { background: #EF4444; } .ds-btn-danger:active { background: #B91C1C; } .ds-btn-danger:focus-visible { outline: none; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #EF4444; } .ds-btn-danger:disabled { opacity: 0.7; cursor: not-allowed; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-text",
+      "description": "White field on an 8px corner with a leading Mist icon inset 12px. Focus is the one place Seal Green marks a non-committing element.",
+      "html": "<div class=\"ds-field\"><span class=\"ds-field-icon\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" width=\"20\" height=\"20\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M2.25 6.75c0-.621.504-1.125 1.125-1.125h17.25c.621 0 1.125.504 1.125 1.125v10.5c0 .621-.504 1.125-1.125 1.125H3.375A1.125 1.125 0 012.25 17.25V6.75z\"/><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m3.5 6.5 8.5 6.5 8.5-6.5\"/></svg></span><input class=\"ds-input\" type=\"email\" placeholder=\"you@cvsu.edu.ph\"></div>",
+      "css": ".ds-field { position: relative; display: block; } .ds-field-icon { position: absolute; inset-block: 0; left: 0; display: flex; align-items: center; padding-left: 12px; color: #9CA3AF; pointer-events: none; } .ds-input { display: block; width: 100%; padding: 8px 12px 8px 40px; background: #FFFFFF; color: #111827; border: 1px solid #D1D5DB; border-radius: 8px; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 14px; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); } .ds-input::placeholder { color: #9CA3AF; } .ds-input:focus { outline: none; border-color: #0B6E4F; box-shadow: 0 0 0 1px #0B6E4F; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "badge-pending",
+      "description": "Read-only status pills in four variants. Never a filter, never a button, never dismissible. Pending is the only gold surface permitted in a list.",
+      "html": "<div class=\"ds-badge-row\"><span class=\"ds-badge ds-badge-pending\">Pending</span><span class=\"ds-badge ds-badge-approved\">Approved</span><span class=\"ds-badge ds-badge-rejected\">Rejected</span><span class=\"ds-badge ds-badge-neutral\">Closed</span></div>",
+      "css": ".ds-badge-row { display: flex; flex-wrap: wrap; gap: 8px; } .ds-badge { display: inline-flex; align-items: center; border-radius: 9999px; padding: 2px 10px; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 12px; font-weight: 500; } .ds-badge-pending { background: rgba(255,199,44,0.2); color: #074A35; } .ds-badge-approved { background: #DCFCE7; color: #15803D; } .ds-badge-rejected { background: #FEE2E2; color: #B91C1C; } .ds-badge-neutral { background: #F3F4F6; color: #374151; }"
+    },
+    {
+      "name": "Rail Navigation",
+      "kind": "nav",
+      "refersTo": "rail-link-active",
+      "description": "The only wayfinding surface in the system: a 240px column on the Bond Paper desk. The active item lifts onto a Record White pill matching the content sheet; idle items are Slate on no fill. No colored edge marker.",
+      "html": "<nav class=\"ds-rail\"><a class=\"ds-rail-link ds-rail-link--active\" href=\"#\" aria-current=\"page\">Dashboard</a><a class=\"ds-rail-link\" href=\"#\">Scholarships</a><a class=\"ds-rail-link\" href=\"#\">Import Students</a></nav>",
+      "css": ".ds-rail { display: flex; flex-direction: column; gap: 4px; width: 240px; padding: 8px 12px; background: #F3F4F6; border-right: 1px solid #E5E7EB; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-rail-link { display: block; border-radius: 6px; padding: 8px 12px; font-size: 14px; font-weight: 500; color: #6B7280; text-decoration: none; transition: background 150ms cubic-bezier(0.4,0,0.2,1), color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-rail-link:hover { background: rgba(229,231,235,0.6); color: #111827; } .ds-rail-link:focus-visible { outline: none; box-shadow: 0 0 0 2px #F3F4F6, 0 0 0 4px #0B6E4F; } .ds-rail-link--active { background: #FFFFFF; color: #111827; font-weight: 600; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }"
+    },
+    {
+      "name": "Record Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The system's base unit: a white record on the Bond Paper Gray desk, bordered in the same value as the ground. As a link it warms its border to Seal Green at 40% — it never lifts.",
+      "html": "<article class=\"ds-card ds-card--link\"><div class=\"ds-card-head\"><div><h3 class=\"ds-card-title\">CHED Tulong Dunong Grant</h3><p class=\"ds-card-desc\">Financial assistance for qualified undergraduate students in good academic standing.</p></div><span class=\"ds-badge ds-badge-approved\">Open</span></div><div class=\"ds-card-meta\"><span>12 slots remaining &middot; Deadline: Mar 3, 2026</span><a class=\"ds-card-link\" href=\"#\">View details &rarr;</a></div></article>",
+      "css": ".ds-card { background: #FFFFFF; border: 1px solid #F3F4F6; border-radius: 8px; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); padding: 24px; overflow: hidden; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; transition: border-color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-card--link:hover { border-color: rgba(11,110,79,0.4); } .ds-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; } .ds-card-title { margin: 0; font-size: 18px; font-weight: 600; color: #111827; } .ds-card-desc { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: #6B7280; } .ds-card-meta { margin-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 14px; color: #6B7280; } .ds-card-link { color: #0B6E4F; font-weight: 500; text-decoration: none; } .ds-card-link:hover { color: #074A35; } .ds-badge { display: inline-flex; align-items: center; border-radius: 9999px; padding: 2px 10px; font-size: 12px; font-weight: 500; flex-shrink: 0; } .ds-badge-approved { background: #DCFCE7; color: #15803D; }"
+    },
+    {
+      "name": "Stat Tile",
+      "kind": "card",
+      "refersTo": "stat-tile",
+      "description": "The admin dashboard KPI unit: uppercase Mist label, oversized Ink numeral, Mist caption. Linked tiles warm their border on hover.",
+      "html": "<a class=\"ds-stat\" href=\"#\"><p class=\"ds-stat-label\">Pending Review</p><p class=\"ds-stat-value ds-stat-value--attention\">18</p><p class=\"ds-stat-caption\">applications awaiting a decision</p></a>",
+      "css": ".ds-stat { display: block; background: #FFFFFF; border: 1px solid #F3F4F6; border-radius: 8px; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); padding: 20px; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; text-decoration: none; transition: border-color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-stat:hover { border-color: rgba(11,110,79,0.4); } .ds-stat:focus-visible { outline: none; border-color: #0B6E4F; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #FFC72C; } .ds-stat-label { margin: 0; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #9CA3AF; } .ds-stat-value { margin: 8px 0 0; font-size: 30px; line-height: 36px; font-weight: 700; color: #111827; } .ds-stat-value--attention { color: #E6A800; } .ds-stat-caption { margin: 4px 0 0; font-size: 12px; color: #9CA3AF; }"
+    },
+    {
+      "name": "The Register",
+      "kind": "custom",
+      "refersTo": "table-header",
+      "description": "The admin dashboard's whole surface: one ruled table on the white sheet, no card wrapper, ordered so scholarships needing a decision come first. Numerics are right-aligned tabular numerals; absent values are a Mist em-dash with sr-only text. Replaced the KPI tile grid and the stacked status bar.",
+      "html": "<table class=\"ds-register\"><thead><tr><th scope=\"col\">Scholarship</th><th scope=\"col\" class=\"ds-num\">Pending</th><th scope=\"col\" class=\"ds-num\">Awarded</th><th scope=\"col\" class=\"ds-num\">Oldest wait</th><th scope=\"col\">Closes</th></tr></thead><tbody><tr><td><a class=\"ds-register-link\" href=\"#\">CHED Tulong Dunong Grant</a></td><td class=\"ds-num\"><b>12</b></td><td class=\"ds-num\">4<span class=\"ds-den\"> / 20</span></td><td class=\"ds-num\"><b>11 days</b></td><td class=\"ds-urgent\">in 2 days</td></tr><tr><td><a class=\"ds-register-link\" href=\"#\">Tertiary Education Subsidy</a></td><td class=\"ds-num\"><b>6</b></td><td class=\"ds-num\">18<span class=\"ds-den\"> / 30</span></td><td class=\"ds-num ds-quiet\">9 days</td><td class=\"ds-quiet\">in 18 days</td></tr><tr><th colspan=\"5\" scope=\"colgroup\" class=\"ds-group\">Settled</th></tr><tr><td><a class=\"ds-register-link\" href=\"#\">Academic Merit Scholarship</a></td><td class=\"ds-num\"><span class=\"ds-dash\" aria-hidden=\"true\">&mdash;</span></td><td class=\"ds-num\"><span class=\"ds-full\">8</span><span class=\"ds-den\"> / 8</span></td><td class=\"ds-num\"><span class=\"ds-dash\" aria-hidden=\"true\">&mdash;</span></td><td class=\"ds-quiet\">in 9 days</td></tr></tbody></table>",
+      "css": ".ds-register { width: 100%; border-collapse: collapse; background: #FFFFFF; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 14px; color: #111827; } .ds-register thead th { border-bottom: 1px solid #E5E7EB; padding: 8px 16px 8px 0; text-align: left; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280; } .ds-register tbody td { border-bottom: 1px solid #F3F4F6; padding: 12px 16px 12px 0; } .ds-register tbody tr:hover td { background: #F9FAFB; } .ds-num { text-align: right; font-variant-numeric: tabular-nums; } .ds-den { color: #6B7280; } .ds-quiet { color: #6B7280; } .ds-dash { color: #9CA3AF; } .ds-full { font-weight: 600; color: #0B6E4F; } .ds-urgent { font-weight: 600; color: #B91C1C; } .ds-group { border-bottom: 1px solid #E5E7EB; padding: 40px 0 8px; text-align: left; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280; } .ds-register-link { font-weight: 600; color: #111827; text-decoration: none; } .ds-register-link:hover { color: #0B6E4F; } .ds-register-link:focus-visible { outline: none; box-shadow: 0 0 0 2px #0B6E4F; border-radius: 2px; }"
+    },
+    {
+      "name": "CvSU Seal",
+      "kind": "custom",
+      "refersTo": "button-primary",
+      "description": "The identity mark: a Seal Green disc ringed in 4px Citation Gold, carrying the CvSU wordmark in gold over OSAS in tracked white. Appears at 36px in the nav and 56px on the sign-in panel.",
+      "html": "<span class=\"ds-seal\"><svg viewBox=\"0 0 100 100\" xmlns=\"http://www.w3.org/2000/svg\" width=\"56\" height=\"56\"><circle cx=\"50\" cy=\"50\" r=\"48\" fill=\"#0B6E4F\" stroke=\"#FFC72C\" stroke-width=\"4\"/><text x=\"50\" y=\"45\" font-family=\"Figtree, ui-sans-serif, system-ui, sans-serif\" font-size=\"22\" font-weight=\"700\" fill=\"#FFC72C\" text-anchor=\"middle\">CvSU</text><text x=\"50\" y=\"66\" font-family=\"Figtree, ui-sans-serif, system-ui, sans-serif\" font-size=\"13\" font-weight=\"600\" letter-spacing=\"2\" fill=\"#FFFFFF\" text-anchor=\"middle\">OSAS</text></svg><span class=\"ds-seal-mark\">OSAS Scholarship<br>Allocation System</span></span>",
+      "css": ".ds-seal { display: inline-flex; align-items: center; gap: 8px; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-seal-mark { font-size: 14px; font-weight: 600; line-height: 1.25; color: #074A35; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The University Registrar",
+    "overview": "This is the interface of a well-run records office, not a product. The page ground is a quiet Bond Paper Gray desk; every unit of content is a white record card laid on it, defined by a hairline border rather than a drop shadow. Cavite State University's Seal Green carries institutional authority — it appears on the actions that commit something, the links that lead deeper into a record, and the counts that represent a settled award. Citation Gold is the office highlighter: it marks the thing you are focused on and the thing still waiting on a human decision. Nothing else is allowed to be loud.\n\nThe density is administrative but never cramped. Cards breathe at 24px internal padding, sections stack at a 24px rhythm, and pages open with 48px of air above the first card. Type stays small and disciplined — 14px body, 12px labels — because these screens are read in scanning mode by staff working a queue and by students checking one specific status. The one place the system raises its voice is the sign-in screen, where a full-height green gradient panel with the CvSU seal establishes who is behind this system before anyone types a password. That contrast is deliberate: the front door is institutional and warm; the working interior is calm and out of the way.\n\nThe system rejects the dashboard-as-spectacle idiom. No gradient cards, no glassmorphism, no floating panels, no decorative iconography, no animated counters. Financial aid is high-stakes and often anxiety-inducing for the student reading it; the design's job is to make status legible at a glance and to never let visual flourish compete with a deadline, a slot count, or a decision.",
+    "keyCharacteristics": [
+      "Flat white record cards on a Bond Paper Gray desk, separated by 1px hairlines, not shadows",
+      "One typeface (Figtree) doing every job through weight and size alone",
+      "Green for what is settled, gold for what is unresolved — a strict two-signal color language",
+      "Uniformly soft corners (8px cards and primary actions, fully round status pills)",
+      "Small, dense, uppercase-tracked labels above large plain numerals",
+      "Motion confined to 150ms state transitions and overlay entrances; nothing moves on its own"
+    ],
+    "rules": [
+      {
+        "name": "The Two-Signal Rule",
+        "body": "This system speaks with exactly two signals. Green means settled — approved, open, authoritative, committed. Gold means unresolved or focused — pending a human decision, or the element the keyboard is currently on. Gold is never decoration and never a general brand accent on an interior screen; if a new element is gold, it must be because someone still has to act on it. Everything that is neither settled nor pending is gray.",
+        "section": "colors"
+      },
+      {
+        "name": "The Seal Rule",
+        "body": "Seal Green is the university's authority, so it only ever marks a committing action or a forward path. It never colors a destructive control, a cancel, a dismissal, or a merely decorative surface. Red is the only color permitted on a destructive action.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Ground Rule",
+        "body": "Bond Paper Gray (#F3F4F6) is simultaneously the page ground and the card border. Do not introduce a third neutral between them to \"separate\" a card — the identical value is what makes the interface read as flat records on a desk. On sheet surfaces the relationship inverts: the rail takes the Bond Paper ground and the content becomes Record White.",
+        "section": "colors"
+      },
+      {
+        "name": "The Gold Is Not Ink Rule",
+        "body": "Neither gold is ever a text color. Citation Gold reaches about 1.6:1 on white and Struck Gold about 2.1:1 — both fail the 4.5:1 floor at any size the interface actually uses. Gold appears as a focus ring against a green fill, as a 20%-opacity badge wash carrying Deep Seal text, and in the seal. When a number must read as urgent, give it weight and sort position, not gold.",
+        "section": "colors"
+      },
+      {
+        "name": "The Readable Neutral Rule",
+        "body": "Only Ink, Ink Soft, Graphite, and Slate carry text. Mist (about 2.6:1) is for marks a reader never has to decode, and every such mark pairs with an sr-only word so assistive technology gets the meaning the color cannot carry.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Numerals Rule",
+        "body": "Every number a reader compares down a column sets in font-variant-numeric: tabular-nums — counts, slot ratios, waits, elapsed days. Proportional digits make a column of figures ragged, and a register whose numbers do not line up is not a register. This is the cheapest detail in the system and the one most easily lost.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Horizontal Nav Rule",
+        "body": "Wayfinding lives in the rail and nowhere else. The mobile strip is a disclosure control, not a navigation bar: it may hold the rail trigger and the seal, and it must never grow links, a search field, or an account menu. If a destination matters, it belongs in the rail.",
+        "section": "layout"
+      },
+      {
+        "name": "The Single Family Rule",
+        "body": "Figtree does every job. Do not introduce a second family for headings, numerals, or emphasis — if something needs to feel different, change its weight or its size. The one exception is character disambiguation: a value the reader must transcribe exactly, such as a one-time password or a literal CSV header, sets in the mono stack. Wanting to look technical is not disambiguation.",
+        "section": "typography"
+      },
+      {
+        "name": "The Small-Caps Perimeter Rule",
+        "body": "Uppercase with letter-spacing is reserved for the perimeter of data: table column headers and stat-tile captions. It never touches a sentence, a button, a card heading, or a badge. Every button in the system reads in sentence case at Body size.",
+        "section": "typography"
+      },
+      {
+        "name": "The Two-Ring Rule",
+        "body": "A focus ring is always 2px at a 2px offset, and its hue is decided by the surface it sits on, not by brand preference. On a Seal Green fill, the ring is Citation Gold — the system's signature pairing, legible because the gold reads against the green edge. On any white or neutral control, the ring is Seal Green, matching the input focus treatment; gold on white is roughly 1.5:1 and does not survive as an indicator. On a semantically colored control, the ring is that control's own hue (red-500 on the danger button).",
+        "section": "components"
+      },
+      {
+        "name": "The Numeral-Over-Word Rule",
+        "body": "Where a count matters, the number is the largest thing in its tile (Metric weight 700) and every word around it drops to Mist. Never let a KPI's label out-weigh its value.",
+        "section": "typography"
+      },
+      {
+        "name": "The Two-Container Rule",
+        "body": "1280px means \"this is a working surface with columns to compare.\" 1024px means \"this is a list a student reads.\" Pick the container from the reader's task, not from the amount of content.",
+        "section": "layout"
+      },
+      {
+        "name": "The Tables Don't Fold Rule",
+        "body": "On narrow screens, data tables scroll sideways; they never collapse into stacked card lists. A scholarship's slots, applicants, deadline, and status only mean something next to each other.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Desk Rule",
+        "body": "Surfaces are flat at rest and stay flat on hover. A shadow heavier than Seat is permitted only on an element that genuinely floats above the page — a dropdown or a modal. If a new component wants elevation to feel important, give it a border or a heading instead.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Nothing-Is-Square Rule",
+        "body": "No element in this system has a 0px corner. If a new component needs to feel more rigid, use a border, not a sharp corner.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do use Seal Green (#0B6E4F) for exactly three things: committing actions, forward navigation links, and settled/approved status. Deep Seal (#074A35) is its hover, never its resting state.",
+      "Do put a 2px Citation Gold focus ring with a 2px offset on every green button. It is the system's signature interaction detail and it must be consistent. On white or neutral controls the ring is Seal Green instead — see the Two-Ring Rule.",
+      "Do set every button label at 14px in 600 weight, sentence case, on every variant. Separate the tiers with fill, border, and corner radius.",
+      "Do render every disabled control at 70% opacity with a not-allowed cursor.",
+      "Do reserve gold for the unresolved and the focused — pending decisions and keyboard focus. If you are reaching for gold and neither applies, reach for a neutral.",
+      "Do border cards with the same value as the page ground (#F3F4F6). Records sit in the desk, they don't hover over it.",
+      "Do build hierarchy from Figtree's weights (400/500/600/700) and the seven type roles. Never add a second font family.",
+      "Do pick containers by task: max-w-7xl for administrative comparison surfaces, max-w-5xl for student reading lists, max-w-sm for auth forms.",
+      "Do set every compared number in tabular numerals and right-align it in its column.",
+      "Do say it in a sentence when a sentence will do. A line of prose naming what is waiting beats a row of tiles restating the same counts.",
+      "Do pair every colour-or-glyph-only signal (an em-dash for \"none\", a coloured deadline) with sr-only text carrying the same meaning.",
+      "Do write a real empty state for every list and table — a centered sentence at 14px in Mist or Slate, inside the card, saying what would appear here and what to do about it (\"Nothing needs review right now.\", \"No scholarships have been posted yet.\").",
+      "Do give every progress or status graphic an accessible text equivalent, as the status breakdown bar does with role=\"img\" and a spelled-out aria-label.",
+      "Do keep state transitions at 150ms ease-in-out, overlay entrances at 200–300ms, and overlay exits faster than their entrances (75–200ms)."
+    ],
+    "donts": [
+      "Don't reintroduce focus:ring-indigo-500. Both Laravel Breeze instances — the secondary button and the profile form's resend-verification button — have been removed; indigo belongs to no part of this palette. Pick a ring hue with the Two-Ring Rule.",
+      "Don't uppercase a button label. uppercase tracking-widest was Breeze residue on the secondary and danger buttons and has been removed; uppercase belongs only to table column headers and stat-tile captions.",
+      "Don't shrink a supporting button's type to signal that it is secondary. All three variants share 14px/600; the hierarchy lives in fill and border.",
+      "Don't disable a control below 70% opacity. The Breeze default of 25% left the label unreadable.",
+      "Don't add shadows to convey importance. Surfaces are flat at rest and stay flat on hover — deepen a border or add a heading instead. Only dropdowns and modals may exceed the Seat shadow.",
+      "Don't lift, scale, or translate a card on hover. The interactive response is a border warming to cvsu-green/40 or a Ledger Gray row fill.",
+      "Don't introduce a third neutral between the page ground and the card border to \"separate\" a card.",
+      "Don't use gold as a large surface fill or a general brand accent on interior screens. Its maximum interior footprint is a 20%-opacity pill.",
+      "Don't put Seal Green on a destructive, dismissive, or cancelling control. Destructive is red (#DC2626) and nothing else.",
+      "Don't collapse data tables into stacked cards on mobile — scroll them horizontally inside overflow-x-auto.",
+      "Don't give any element a 0px corner radius.",
+      "Don't add gradients, glass effects, decorative iconography, or animated counters to authenticated screens. The green gradient lives on the sign-in branding panel and nowhere else.",
+      "Don't build a KPI tile grid. Counts belong in a sentence, or in a column next to the row they describe.",
+      "Don't represent a distribution as a stacked bar, donut, progress ring, or sparkline. This system states quantities as aligned figures; a reader should never have to estimate a length to learn a number.",
+      "Don't put navigation in a horizontal bar. The rail is the only wayfinding surface.",
+      "Don't set gold or Mist as text. See the Gold Is Not Ink and Readable Neutral rules.",
+      "Don't wrap a table in a card. A register is the document, not something sitting on top of one.",
+      "Don't style a file input inline. Every upload surface renders the one file-input component, whose button matches the secondary button; a second treatment is drift.",
+      "Don't use diffForHumans() for a deadline. It phrases futures as \"1 day from now\" and truncates fractional days, so a date two days out reads as one. Count whole calendar days between day boundaries."
+    ]
+  }
+}

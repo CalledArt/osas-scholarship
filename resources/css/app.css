@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Alpine sets x-cloak on elements that must not paint before it initialises. */
+[x-cloak] {
+    display: none !important;
+}

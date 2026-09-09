@@ -1,0 +1,135 @@
+# Production image for Vercel's container runtime.
+#
+# Unrelated to ./Dockerfile, which is the local development runtime and
+# deliberately contains no application code (compose bind mounts it).
+# This image IS the application: Vercel builds it, stores it in its registry and
+# scales instances from it, so everything the app needs at runtime must be here.
+#
+#   vercel deploy           # preview
+#   vercel deploy --prod    # production
+#
+# FrankenPHP bundles PHP with a Caddy-based server, so there is no separate
+# php-fpm/nginx pair to keep in sync. See ./Caddyfile for the server config.
+FROM dunglas/frankenphp:1-php8.4-bookworm AS base
+
+# pdo_pgsql is what reaches Supabase; intl and zip match the development image.
+# opcache earns more here than it does there: instances are short lived, so the
+# compile cost is paid on close to every cold start.
+RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && install-php-extensions \
+        intl \
+        opcache \
+        pdo_pgsql \
+        zip
+
+WORKDIR /app
+
+# ---------------------------------------------------------------------------
+# PHP dependencies. Kept in its own stage so the asset build can borrow vendor/
+# without waiting for, or invalidating on, application source changes.
+FROM base AS vendor
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY composer.json composer.lock ./
+
+# --no-scripts because the post-autoload-dump script runs artisan, and the
+# application source is not here yet. It runs in the app stage instead.
+RUN composer install \
+        --no-dev \
+        --no-interaction \
+        --no-progress \
+        --no-scripts \
+        --optimize-autoloader \
+        --prefer-dist
+
+# ---------------------------------------------------------------------------
+# Frontend assets. public/build is gitignored and never committed, so without
+# this stage the first render dies on "Unable to locate file in Vite manifest".
+FROM node:22-bookworm-slim AS assets
+
+WORKDIR /app
+
+# .npmrc carries ignore-scripts=true. It is copied rather than skipped so the
+# image resolves dependencies the same way the documented host setup does
+# (composer.json's "setup" script runs npm install --ignore-scripts).
+COPY package.json package-lock.json .npmrc ./
+RUN npm ci
+
+# vendor/ is required, not incidental: tailwind.config.js scans Laravel's own
+# pagination views for classes, and Tailwind emits nothing for files it cannot
+# see. Omit this and the paginator ships unstyled with no build error. It comes
+# from the stage above because .dockerignore keeps vendor/ out of the context.
+COPY --from=vendor /app/vendor ./vendor
+COPY resources ./resources
+COPY vite.config.js tailwind.config.js postcss.config.js ./
+
+RUN npm run build
+
+# ---------------------------------------------------------------------------
+# Application assembly. Separate from the runtime stage so that composer, and
+# the caches it needs to write, never reach the shipped image.
+FROM vendor AS app
+
+COPY . .
+COPY --from=assets /app/public/build ./public/build
+
+# The framework writes into all of these, and .dockerignore strips the empty
+# ones out of the build context, so recreate them before anything runs.
+RUN mkdir -p \
+        bootstrap/cache \
+        storage/app/private \
+        storage/app/public \
+        storage/framework/cache/data \
+        storage/framework/sessions \
+        storage/framework/views \
+        storage/logs
+
+# Deliberately NOT config:cache or the optimize bundle that includes it.
+# Config caching resolves env() at the moment it runs, which is build time here,
+# and would freeze an empty APP_KEY and DB_URL into the image — Vercel injects
+# the real values at runtime. event:cache and view:cache read no environment.
+RUN composer dump-autoload --no-dev --classmap-authoritative \
+    && php artisan event:cache \
+    && php artisan view:cache
+
+# ---------------------------------------------------------------------------
+FROM base AS runtime
+
+COPY --from=app --chown=www-data:www-data /app /app
+COPY --chown=www-data:www-data Caddyfile /etc/frankenphp/Caddyfile
+
+RUN setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp \
+    && chown -R www-data:www-data /config/caddy /data/caddy
+
+# Defaults only. Anything set in the Vercel project environment overrides these,
+# which is where APP_KEY, APP_URL, DB_URL and the SUPABASE_STORAGE_* values go —
+# secrets must never be baked into an image.
+ENV PORT=80 \
+    APP_ENV=production \
+    APP_DEBUG=false
+
+# storage/logs is ephemeral and unreadable on Vercel; stderr reaches the runtime
+# logs. The channel is already defined in config/logging.php.
+ENV LOG_CHANNEL=stderr
+
+# NOT the array drivers the Vercel guide defaults to. This app is entirely auth
+# gated: array sessions are discarded when the request ends, so no one could stay
+# logged in and every POST would fail CSRF with a 419. The sessions and cache
+# tables already exist in the first migration.
+ENV SESSION_DRIVER=database \
+    CACHE_STORE=database
+
+# Every instance is reached over HTTPS, so the cookie must carry Secure.
+ENV SESSION_SECURE_COOKIE=true
+
+# Nothing dispatches a job today and Vercel runs no worker, so sync keeps a
+# future dispatch honest instead of queueing it into a table nobody drains.
+ENV QUEUE_CONNECTION=sync
+
+# The instance filesystem does not survive the request. Uploads already name the
+# supabase disk explicitly; this makes the default durable as well.
+ENV FILESYSTEM_DISK=supabase
+
+USER www-data
+
+CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]

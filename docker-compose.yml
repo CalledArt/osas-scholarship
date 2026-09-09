@@ -1,0 +1,38 @@
+# Development runtime for the OSAS Scholarship Allocation System.
+#
+#   docker compose up --build
+#
+# The app talks to Supabase and answers on http://localhost:8000. For offline
+# work against a local database, add the override file:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.offline.yml up
+#
+# Variables below are read from .env, which compose loads automatically.
+#
+# This is development only. Production is Vercel's container runtime, which
+# builds from Dockerfile.vercel and shares nothing with this file.
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    volumes:
+      # The source is mounted, not baked in, so host edits apply immediately.
+      - .:/var/www/html
+    environment:
+      # These override the mounted .env: Laravel's dotenv never overwrites a
+      # variable the environment already set. Everything not listed here
+      # (APP_KEY, DB_URL, mail settings) still comes from .env.
+      APP_URL: http://localhost:8000
+      ASSET_URL: http://localhost:8000
+      # Plain http on loopback, so a Secure cookie would only be dropped.
+      SESSION_SECURE_COOKIE: "false"
+    # Loopback only: nothing outside this machine reaches the container.
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8000/up"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s

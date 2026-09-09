@@ -1,0 +1,18 @@
+# FrankenPHP server config for the Vercel container (see Dockerfile.vercel).
+#
+# The PORT default must stay: Vercel assigns the port through the environment,
+# and a server listening anywhere else answers nothing, which surfaces as a 502
+# rather than as a startup error.
+:{$PORT:80} {
+	root /app/public
+	encode zstd gzip
+
+	# Vite fingerprints every filename in the manifest, so a given URL can never
+	# change content. Caching it at the edge keeps asset requests off the
+	# container entirely instead of waking an instance to serve a static file.
+	header /build/* Cache-Control "public, max-age=31536000, immutable"
+
+	php_server {
+		try_files {path} index.php
+	}
+}
