@@ -50,5 +50,3 @@ boost.json
 skills-lock.json
 *.md
 
-# Windows shell artifact committed by accident: a psysh error dump.
-delete('connectivity-check.txt'))
