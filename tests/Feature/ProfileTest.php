@@ -28,7 +28,9 @@ class ProfileTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->patch('/profile', [
-                'name' => 'Test User',
+                'first_name' => 'Maria',
+                'middle_name' => 'Santos',
+                'last_name' => 'Reyes',
                 'email' => 'test@example.com',
             ]);
 
@@ -38,7 +40,10 @@ class ProfileTest extends TestCase
 
         $user->refresh();
 
-        $this->assertSame('Test User', $user->name);
+        $this->assertSame('Maria', $user->first_name);
+        $this->assertSame('Santos', $user->middle_name);
+        $this->assertSame('Reyes', $user->last_name);
+        $this->assertSame('Maria Santos Reyes', $user->name);
         $this->assertSame('test@example.com', $user->email);
         $this->assertNull($user->email_verified_at);
     }
@@ -50,7 +55,9 @@ class ProfileTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->patch('/profile', [
-                'name' => 'Test User',
+                'first_name' => 'Maria',
+                'middle_name' => 'Santos',
+                'last_name' => 'Reyes',
                 'email' => $user->email,
             ]);
 
@@ -59,6 +66,41 @@ class ProfileTest extends TestCase
             ->assertRedirect('/profile');
 
         $this->assertNotNull($user->refresh()->email_verified_at);
+    }
+
+    public function test_middle_name_is_optional(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->patch('/profile', [
+                'first_name' => 'Juan',
+                'middle_name' => '',
+                'last_name' => 'Dela Cruz',
+                'email' => $user->email,
+            ]);
+
+        $response->assertSessionHasNoErrors();
+
+        $this->assertSame('Juan Dela Cruz', $user->refresh()->name);
+    }
+
+    public function test_rejects_a_profile_update_with_no_first_or_last_name(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/profile')
+            ->patch('/profile', [
+                'first_name' => '',
+                'middle_name' => 'Santos',
+                'last_name' => '',
+                'email' => $user->email,
+            ]);
+
+        $response->assertSessionHasErrors(['first_name', 'last_name']);
     }
 
     public function test_user_can_delete_their_account(): void

@@ -10,7 +10,7 @@
             <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-100">
                 <div class="p-6">
                     <h3 class="text-lg font-semibold text-gray-900">
-                        {{ __('Welcome, :name!', ['name' => Auth::user()->name]) }}
+                        {{ __('Welcome, :name!', ['name' => Auth::user()->full_name]) }}
                     </h3>
                     <p class="mt-1 text-sm text-gray-500">
                         {{ __("You're signed in as a Student. Your scholarship applications and awards will appear here.") }}

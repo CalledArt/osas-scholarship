@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Enums\UserRole;
 use App\Models\User;
 use App\Support\Csv;
+use App\Support\PersonName;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -145,6 +146,7 @@ class ImportStudentsFromCsv
 
         User::create([
             'name' => trim($name),
+            ...PersonName::split($name),
             'email' => $email,
             'password' => Hash::make($password),
             'role' => UserRole::Student,

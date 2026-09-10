@@ -36,6 +36,25 @@ class ImportStudentsFromCsvTest extends TestCase
         $this->assertTrue($juan->must_change_password);
     }
 
+    /**
+     * The CSV carries one full name, so the parts are seeded by splitting it.
+     * "Dela Cruz" is split wrongly on purpose — the student corrects it on the
+     * profile screen, which is why the parts are stored rather than derived.
+     */
+    public function test_seeds_name_parts_from_the_imported_full_name(): void
+    {
+        $csv = "name,email\nMaria Santos Reyes,maria@cvsu.edu.ph\n";
+
+        (new ImportStudentsFromCsv)->handle($this->csvFile($csv));
+
+        $maria = User::where('email', 'maria@cvsu.edu.ph')->sole();
+
+        $this->assertSame('Maria', $maria->first_name);
+        $this->assertSame('Santos', $maria->middle_name);
+        $this->assertSame('Reyes', $maria->last_name);
+        $this->assertSame('Maria Santos Reyes', $maria->full_name);
+    }
+
     public function test_generated_password_actually_authenticates(): void
     {
         $csv = "name,email\nJuan Dela Cruz,juan@cvsu.edu.ph\n";

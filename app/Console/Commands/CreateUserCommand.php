@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Support\PersonName;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -52,6 +53,7 @@ class CreateUserCommand extends Command
 
         $user = User::create([
             'name' => $name,
+            ...PersonName::split($name),
             'email' => $email,
             'password' => Hash::make($plainPassword),
             'role' => UserRole::from($role),

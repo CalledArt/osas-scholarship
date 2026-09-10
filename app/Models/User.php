@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\UserRole;
+use App\Support\PersonName;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'email_verified_at', 'must_change_password', 'date_of_birth', 'student_number', 'course', 'year_level', 'contact_number', 'address'])]
+#[Fillable(['name', 'first_name', 'middle_name', 'last_name', 'email', 'password', 'role', 'email_verified_at', 'must_change_password', 'date_of_birth', 'student_number', 'course', 'year_level', 'contact_number', 'address'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -45,6 +46,18 @@ class User extends Authenticatable
     public function isStudent(): bool
     {
         return $this->role === UserRole::Student;
+    }
+
+    /**
+     * The student's name as "first middle last", falling back to the stored
+     * full name for records whose parts have not been filled in yet.
+     */
+    protected function fullName(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => PersonName::assemble($this->first_name, $this->middle_name, $this->last_name)
+                ?: (string) $this->name,
+        );
     }
 
     protected function age(): Attribute

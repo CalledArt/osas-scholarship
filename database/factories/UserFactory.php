@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Support\PersonName;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -27,6 +28,11 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            // Derived from `name` so that overriding the full name alone, which
+            // most tests in this suite do, still yields consistent parts.
+            'first_name' => fn (array $attributes): ?string => PersonName::split($attributes['name'])['first_name'],
+            'middle_name' => fn (array $attributes): ?string => PersonName::split($attributes['name'])['middle_name'],
+            'last_name' => fn (array $attributes): ?string => PersonName::split($attributes['name'])['last_name'],
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
@@ -39,6 +45,22 @@ class UserFactory extends Factory
             'contact_number' => fake()->numerify('09#########'),
             'address' => fake()->address(),
         ];
+    }
+
+    /**
+     * Give the user an exact set of name parts, with the full name to match.
+     *
+     * Use this rather than overriding the parts individually, which would leave
+     * the derived `name` disagreeing with them.
+     */
+    public function named(string $firstName, ?string $middleName, string $lastName): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'name' => PersonName::assemble($firstName, $middleName, $lastName),
+            'first_name' => $firstName,
+            'middle_name' => $middleName,
+            'last_name' => $lastName,
+        ]);
     }
 
     /**

@@ -37,7 +37,7 @@
 
     <div class="border-t border-gray-200 px-3 py-3">
         <div class="px-3 pb-2">
-            <p class="truncate text-sm font-medium text-gray-900">{{ Auth::user()->name }}</p>
+            <p class="truncate text-sm font-medium text-gray-900">{{ Auth::user()->full_name }}</p>
             <p class="truncate text-xs text-gray-500">{{ Auth::user()->role->label() }}</p>
         </div>
 

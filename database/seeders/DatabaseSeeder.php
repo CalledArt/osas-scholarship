@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@cvsu.edu.ph'],
             [
                 'name' => 'OSAS Administrator',
+                'first_name' => 'OSAS',
+                'last_name' => 'Administrator',
                 'password' => 'password',
                 'role' => UserRole::Admin,
                 'email_verified_at' => now(),
@@ -30,6 +32,8 @@ class DatabaseSeeder extends Seeder
             ['email' => 'student@cvsu.edu.ph'],
             [
                 'name' => 'Juan Dela Cruz',
+                'first_name' => 'Juan',
+                'last_name' => 'Dela Cruz',
                 'password' => 'password',
                 'role' => UserRole::Student,
                 'email_verified_at' => now(),
