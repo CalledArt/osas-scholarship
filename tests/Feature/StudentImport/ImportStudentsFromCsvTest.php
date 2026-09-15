@@ -4,11 +4,14 @@ namespace Tests\Feature\StudentImport;
 
 use App\Actions\ImportStudentsFromCsv;
 use App\Enums\UserRole;
+use App\Mail\StudentAccountCreated;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 use Tests\TestCase;
 
 class ImportStudentsFromCsvTest extends TestCase
@@ -65,6 +68,57 @@ class ImportStudentsFromCsvTest extends TestCase
             'email' => 'juan@cvsu.edu.ph',
             'password' => $results[0]['password'],
         ]));
+    }
+
+    public function test_emails_each_created_student_the_password_it_generated(): void
+    {
+        Mail::fake();
+
+        $csv = "name,email\n"
+            ."Juan Dela Cruz,juan@cvsu.edu.ph\n"
+            ."Maria Santos,maria@cvsu.edu.ph\n";
+
+        $results = (new ImportStudentsFromCsv)->handle($this->csvFile($csv));
+
+        $this->assertTrue($results[0]['emailed']);
+        $this->assertTrue($results[1]['emailed']);
+        Mail::assertSent(StudentAccountCreated::class, fn (StudentAccountCreated $mail) => $mail->hasTo('juan@cvsu.edu.ph')
+            && $mail->password === $results[0]['password']);
+        Mail::assertSent(StudentAccountCreated::class, fn (StudentAccountCreated $mail) => $mail->hasTo('maria@cvsu.edu.ph')
+            && $mail->password === $results[1]['password']);
+    }
+
+    public function test_does_not_email_anyone_for_a_skipped_row(): void
+    {
+        Mail::fake();
+        User::factory()->create(['email' => 'taken@cvsu.edu.ph']);
+
+        $csv = "name,email\nMaria Santos,taken@cvsu.edu.ph\n";
+
+        $results = (new ImportStudentsFromCsv)->handle($this->csvFile($csv));
+
+        $this->assertSame('skipped', $results[0]['status']);
+        $this->assertFalse($results[0]['emailed']);
+        Mail::assertNothingSent();
+    }
+
+    /**
+     * The account is already created by the time the message goes out, so a
+     * refused mail server must not roll the row back or abort the batch — it
+     * only costs that student the notification.
+     */
+    public function test_still_creates_the_account_when_the_email_cannot_be_sent(): void
+    {
+        Mail::shouldReceive('to')->once()->andThrow(new RuntimeException('Connection to smtp.gmail.com refused.'));
+
+        $csv = "name,email\nJuan Dela Cruz,juan@cvsu.edu.ph\n";
+
+        $results = (new ImportStudentsFromCsv)->handle($this->csvFile($csv));
+
+        $this->assertSame('created', $results[0]['status']);
+        $this->assertFalse($results[0]['emailed']);
+        $this->assertNotNull($results[0]['password']);
+        $this->assertDatabaseHas('users', ['email' => 'juan@cvsu.edu.ph']);
     }
 
     public function test_skips_a_row_missing_a_required_field(): void

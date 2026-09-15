@@ -3,14 +3,18 @@
 namespace App\Actions;
 
 use App\Enums\UserRole;
+use App\Mail\StudentAccountCreated;
 use App\Models\User;
 use App\Support\Csv;
 use App\Support\PersonName;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class ImportStudentsFromCsv
 {
@@ -69,9 +73,11 @@ class ImportStudentsFromCsv
      * Each row is validated independently so one bad row does not abort
      * the rest of the batch. Every created account gets a random password,
      * returned here in plaintext exactly once — it is never persisted or
-     * logged, since the hashed value is all the database ever stores.
+     * logged, since the hashed value is all the database ever stores. The
+     * same password is emailed to the student, and each row reports whether
+     * that message got out.
      *
-     * @return array<int, array{row: int, status: string, name: ?string, email: ?string, student_number: ?string, password: ?string, error: ?string}>
+     * @return array<int, array{row: int, status: string, name: ?string, email: ?string, student_number: ?string, password: ?string, emailed: bool, error: ?string}>
      */
     public function handle(UploadedFile $file): array
     {
@@ -114,7 +120,7 @@ class ImportStudentsFromCsv
     /**
      * @param  array<string, mixed>  $data
      * @param  array<int, string>  $seenEmails
-     * @return array{row: int, status: string, name: ?string, email: ?string, student_number: ?string, password: ?string, error: ?string}
+     * @return array{row: int, status: string, name: ?string, email: ?string, student_number: ?string, password: ?string, emailed: bool, error: ?string}
      */
     private function processRow(int $rowNumber, array $data, array &$seenEmails): array
     {
@@ -144,7 +150,7 @@ class ImportStudentsFromCsv
         $seenEmails[] = $email;
         $password = Str::password(12);
 
-        User::create([
+        $student = User::create([
             'name' => trim($name),
             ...PersonName::split($name),
             'email' => $email,
@@ -167,12 +173,36 @@ class ImportStudentsFromCsv
             'email' => $email,
             'student_number' => $studentNumber,
             'password' => $password,
+            'emailed' => $this->emailCredentials($student, $password),
             'error' => null,
         ];
     }
 
     /**
-     * @return array{row: int, status: string, name: ?string, email: ?string, student_number: ?string, password: ?string, error: ?string}
+     * Email a newly created student the credentials to sign in with.
+     *
+     * A mail failure must not cost the admin the rest of the batch: the
+     * account exists either way, so the row still reports as created and the
+     * password stays on screen to hand over by some other route.
+     */
+    private function emailCredentials(User $student, string $password): bool
+    {
+        try {
+            Mail::to($student)->send(new StudentAccountCreated($student, $password));
+
+            return true;
+        } catch (Throwable $exception) {
+            Log::warning('Could not email credentials to an imported student.', [
+                'user_id' => $student->id,
+                'exception' => $exception,
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
+     * @return array{row: int, status: string, name: ?string, email: ?string, student_number: ?string, password: ?string, emailed: bool, error: ?string}
      */
     private function skipped(int $rowNumber, ?string $name, ?string $email, ?string $studentNumber, string $error): array
     {
@@ -183,6 +213,7 @@ class ImportStudentsFromCsv
             'email' => $email,
             'student_number' => $studentNumber,
             'password' => null,
+            'emailed' => false,
             'error' => $error,
         ];
     }

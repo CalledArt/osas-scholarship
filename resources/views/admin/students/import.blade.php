@@ -2,6 +2,7 @@
     $results = $results ?? null;
     $created = collect($results ?? [])->where('status', 'created');
     $skipped = collect($results ?? [])->where('status', 'skipped');
+    $unemailed = $created->where('emailed', false);
 
     // Presentational shorthand for the constraints processRow() enforces.
     $rules = [
@@ -22,7 +23,7 @@
                 @if ($results === null)
                     <span class="font-semibold tabular-nums text-gray-900">{{ number_format($studentCount) }}</span>
                     {{ trans_choice('student account exists.|student accounts exist.', $studentCount) }}
-                    {{ __('Each row you upload creates one more, with a one-time password the student must change when they first sign in.') }}
+                    {{ __('Each row you upload creates one more and emails the student a one-time password, which the portal makes them change when they first sign in.') }}
                 @elseif ($created->isEmpty() && $skipped->isEmpty())
                     {{ __('That file had no data rows.') }}
                 @elseif ($skipped->isEmpty())
@@ -46,8 +47,18 @@
 
             @if ($created->isNotEmpty())
                 <div class="mt-6 rounded-lg border border-cvsu-gold/50 bg-cvsu-gold/15 px-4 py-3 text-sm text-cvsu-green-dark">
-                    {{ __('These passwords are shown once and are never stored. Download them now, or copy them out before you leave this page.') }}
+                    {{ __('Each student has been emailed their password. It is shown here once and never stored, so download it now, or copy it out before you leave this page.') }}
                 </div>
+
+                @if ($unemailed->isNotEmpty())
+                    <div class="mt-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                        {{ trans_choice(
+                            'The email to :count student could not be sent, so their account exists but they have not been told. Pass the password below to them yourself.|The emails to :count students could not be sent, so their accounts exist but they have not been told. Pass the passwords below to them yourself.',
+                            $unemailed->count(),
+                            ['count' => $unemailed->count()],
+                        ) }}
+                    </div>
+                @endif
 
                 <section class="mt-10">
                     <div class="flex flex-wrap items-center justify-between gap-3">
@@ -61,14 +72,15 @@
                     </div>
 
                     <div class="mt-2 overflow-x-auto">
-                        <table class="w-full min-w-[46rem] text-sm">
+                        <table class="w-full min-w-[52rem] text-sm">
                             <thead>
                                 <tr class="border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500">
                                     <th scope="col" class="py-2 pr-4 text-right font-medium">{{ __('Row') }}</th>
                                     <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Name') }}</th>
                                     <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Student no.') }}</th>
                                     <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Email') }}</th>
-                                    <th scope="col" class="py-2 pl-4 text-left font-medium">{{ __('One-time password') }}</th>
+                                    <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('One-time password') }}</th>
+                                    <th scope="col" class="py-2 pl-4 text-left font-medium">{{ __('Emailed') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -89,8 +101,15 @@
                                             @endunless
                                         </td>
                                         <td class="px-4 py-3 text-gray-500">{{ $result['email'] }}</td>
-                                        <td class="py-3 pl-4">
+                                        <td class="px-4 py-3">
                                             <span class="select-all font-mono text-[13px] text-gray-900">{{ $result['password'] }}</span>
+                                        </td>
+                                        <td class="py-3 pl-4">
+                                            @if ($result['emailed'])
+                                                <span class="text-gray-500">{{ __('Sent') }}</span>
+                                            @else
+                                                <span class="font-medium text-red-700">{{ __('Not sent') }}</span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach

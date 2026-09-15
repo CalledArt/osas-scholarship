@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\StudentImport;
 
+use App\Mail\StudentAccountCreated;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class AdminStudentImportTest extends TestCase
@@ -51,6 +53,21 @@ class AdminStudentImportTest extends TestCase
         $response->assertSee('1 account created');
         $response->assertSee('One-time password');
         $this->assertDatabaseHas('users', ['email' => 'juan@cvsu.edu.ph', 'role' => 'student']);
+    }
+
+    public function test_the_results_page_reports_whether_each_student_was_emailed(): void
+    {
+        Mail::fake();
+        $admin = User::factory()->admin()->create();
+        $csv = $this->csvFile("name,email\nJuan Dela Cruz,juan@cvsu.edu.ph\n");
+
+        $response = $this->actingAs($admin)->post(route('admin.students.import.store'), [
+            'file' => $csv,
+        ]);
+
+        $response->assertSee('Emailed');
+        $response->assertSee('Sent');
+        Mail::assertSent(StudentAccountCreated::class, fn (StudentAccountCreated $mail) => $mail->hasTo('juan@cvsu.edu.ph'));
     }
 
     public function test_skipped_rows_are_listed_separately_with_their_reason(): void
