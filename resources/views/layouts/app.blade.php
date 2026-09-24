@@ -20,7 +20,7 @@
         <div x-data="{ navOpen: false }" @keydown.escape.window="navOpen = false" class="min-h-screen bg-gray-100 lg:flex">
             @include('layouts.rail')
 
-            <div class="flex min-w-0 flex-1 flex-col {{ $sheet ? 'bg-white' : 'bg-gray-100' }}">
+            <div class="flex min-h-screen min-w-0 flex-1 flex-col {{ $sheet ? 'bg-white' : 'bg-gray-100' }}">
                 <!-- Rail trigger, below the rail's own breakpoint -->
                 <div class="flex items-center gap-2 border-b border-gray-200 bg-white px-4 py-3 lg:hidden">
                     <button type="button"

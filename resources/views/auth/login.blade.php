@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="mb-8">
         <h2 class="text-2xl font-bold text-gray-900">{{ __('Sign in') }}</h2>
-        <p class="mt-1 text-sm text-gray-500">{{ __('Sign in to manage your scholarship applications.') }}</p>
+        <p class="mt-1 text-sm text-gray-500">{{ __('Enter your OSAS-issued credentials to continue.') }}</p>
     </div>
 
     <!-- Session Status -->
@@ -76,6 +76,6 @@
 
     <p class="mt-8 text-center text-sm text-gray-500">
         {{ __("Don't have an account?") }}
-        <a class="font-medium text-cvsu-green hover:text-cvsu-green-dark" href="{{ route('register') }}">{{ __('Create one') }}</a>
+        <span class="font-medium text-gray-700">{{ __('Contact the OSAS office to get one created.') }}</span>
     </p>
 </x-guest-layout>

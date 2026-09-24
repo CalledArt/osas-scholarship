@@ -35,6 +35,7 @@ class User extends Authenticatable
             'date_of_birth' => 'date',
             'year_level' => 'integer',
             'must_change_password' => 'boolean',
+            'tutorial_completed_at' => 'datetime',
         ];
     }
 

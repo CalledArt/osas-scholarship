@@ -22,3 +22,6 @@ Vercel Functions default to `iad1` (Washington DC) and Supabase is in `ap-northe
 
 ## Migrations do not run at container start
 Vercel starts instances concurrently, so an entrypoint migration races itself. Run `php artisan migrate --force` from a workstation against the session-mode port (`:5432`), separately from the deploy.
+
+## Vercel uses the transaction pooler (6543), never DB_PERSISTENT
+Session mode (:5432) caps clients at pool_size 15. With DB_PERSISTENT every PHP thread of every Vercel instance (frozen ones included) pins a slot forever; once 15 are held, requests hang or 500 with `EMAXCONNSESSION max clients reached in session mode` — seen in production 2026-09-24 as "login does nothing, works on the second click". Production DB_URL points at :6543 with DB_EMULATE_PREPARES=true and DB_PERSISTENT unset. The workstation-only ~950ms connect cost that motivated DB_PERSISTENT (controllers.md) does not apply in hnd1, next to the database. Migrations still go through :5432 from a workstation.

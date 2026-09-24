@@ -5,10 +5,13 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ScholarshipApplicationController as AdminScholarshipApplicationController;
 use App\Http\Controllers\Admin\ScholarshipController as AdminScholarshipController;
 use App\Http\Controllers\Admin\ScholarshipRequiredDocumentController;
+use App\Http\Controllers\Admin\StudentImportController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScholarshipApplicationController;
 use App\Http\Controllers\ScholarshipApplicationDocumentController;
 use App\Http\Controllers\ScholarshipController;
+use App\Http\Controllers\TutorialController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -21,9 +24,9 @@ Route::get('/', function () {
         : redirect()->route('dashboard');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified', 'role:student'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'role:student'])
+    ->name('dashboard');
 
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'role:admin'])
@@ -37,6 +40,8 @@ Route::middleware('auth')->group(function () {
 
         return view('auth.force-password-change');
     })->name('password.force-change');
+
+    Route::post('/tutorial/complete', TutorialController::class)->name('tutorial.complete');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -59,6 +64,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     Route::post('scholarships/{scholarship}/applications/import-decisions', [AdminScholarshipApplicationController::class, 'importDecisions'])
         ->name('scholarships.applications.import-decisions');
+
+    Route::get('students/import', [StudentImportController::class, 'create'])->name('students.import.create');
+    Route::post('students/import', [StudentImportController::class, 'store'])->name('students.import.store');
+    Route::get('students/import/template', [StudentImportController::class, 'template'])->name('students.import.template');
 });
 
 Route::middleware(['auth', 'verified', 'role:student'])->group(function () {

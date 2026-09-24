@@ -10,7 +10,7 @@ web
 
 Two roles at a single college's Office of Student Affairs and Services (OSAS):
 
-- **OSAS admin staff** — post and manage scholarships, review applications, approve/reject decisions, and import bulk decisions.
+- **OSAS admin staff** — post and manage scholarships, review applications, approve/reject decisions, import students and bulk decisions.
 - **Students** — enrolled students who browse open scholarships, apply with required supporting documents, and track their application status.
 
 ## Product Purpose
@@ -19,13 +19,13 @@ Digitizes a single college's scholarship administration cycle end to end: OSAS p
 
 ## Positioning
 
-Not a generic forms/CMS tool — it models the specific scholarship lifecycle (slots, deadlines, required-document sets per scholarship, approval counts against slot limits) and the two-role workflow (post → apply → review → decide) native to one institution's OSAS office, including bulk decision import for handling a full cohort at once.
+Not a generic forms/CMS tool — it models the specific scholarship lifecycle (slots, deadlines, required-document sets per scholarship, approval counts against slot limits) and the two-role workflow (post → apply → review → decide) native to one institution's OSAS office, including bulk student import and bulk decision import for handling a full cohort at once.
 
 ## Operating Context
 
-- Admin: creates a scholarship (title, description, slots, deadline, status), attaches required documents, reviews submitted applications per scholarship, updates application status, and can import decisions in bulk (the pass list).
+- Admin: creates a scholarship (title, description, slots, deadline, status), attaches required documents, reviews submitted applications per scholarship, updates application status, and can import decisions in bulk. Also imports/manages the student roster (`students/import`, with a downloadable template).
 - Student: views open scholarships, applies to one (subject to deadline/slot/status eligibility via `isOpenForApplications()`), uploads required documents, and views their own applications and status.
-- Students self-register at `/register`, restricted to `@cvsu.edu.ph` addresses; the school domain stands in for email verification, so no mail is sent at signup. The forced password-change flow (`must_change_password`) remains for the admin accounts `CreateUserCommand` provisions with a generated password.
+- Auth includes a forced password-change flow (`must_change_password`), suggesting admin-provisioned/imported student accounts rather than open self-registration.
 - Application statuses and scholarship statuses are enum-driven (`ApplicationStatus`, `ScholarshipStatus`); slots are enforced against the count of approved applications, not just submitted ones.
 
 ## Capabilities and Constraints
@@ -40,6 +40,6 @@ Not a generic forms/CMS tool — it models the specific scholarship lifecycle (s
 ## Product Principles
 
 1. Model the real scholarship lifecycle (slots, deadlines, required documents, approval-gated slot counts), not a generic form builder.
-2. Keep the admin and student experiences distinctly scoped to their role's job — admins administer at cohort scale (bulk decision import), students act on their own applications.
+2. Keep the admin and student experiences distinctly scoped to their role's job — admins administer at cohort scale (bulk import), students act on their own applications.
 3. Favor transparency and speed over the paper process it replaces: clear status at every step, less back-and-forth between OSAS and applicants.
 4. Treat eligibility and status as computed truth (deadlines, slots, approval counts), never a value the UI just displays without checking.

@@ -27,8 +27,6 @@ class Scholarship extends Model
         return [
             'deadline' => 'date',
             'status' => ScholarshipStatus::class,
-            // Not a column: supplied by a subquery select on the admin register.
-            'oldest_pending_at' => 'datetime',
         ];
     }
 

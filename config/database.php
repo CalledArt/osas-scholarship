@@ -98,14 +98,20 @@ return [
             'search_path' => env('DB_SEARCH_PATH'),
             'sslmode' => env('DB_SSLMODE', 'prefer'),
 
-            // Opening a connection to a hosted database costs a TLS handshake plus
-            // auth — roughly three round trips before the first query runs. Reusing
-            // the connection across requests removes that from every page load.
-            // Safe on Supabase's session-mode pooler (port 5432); do NOT enable
-            // against a transaction-mode pooler (port 6543).
-            'options' => env('DB_PERSISTENT', false) ? [
-                PDO::ATTR_PERSISTENT => true,
-            ] : [],
+            // DB_PERSISTENT reuses a connection across requests, which saves the
+            // connect cost on a workstation far from the database. Never enable it
+            // on Vercel: in session mode (port 5432) every PHP thread of every
+            // instance pins one of the pooler's 15 slots for good, and once they
+            // are gone requests hang or fail with EMAXCONNSESSION.
+            //
+            // Vercel uses the transaction-mode pooler (port 6543) instead, which
+            // hands a backend out per transaction. Consecutive transactions may run
+            // on different backends, so Supabase recommends not relying on
+            // server-side prepared statements there: set DB_EMULATE_PREPARES.
+            'options' => array_filter([
+                PDO::ATTR_PERSISTENT => (bool) env('DB_PERSISTENT', false),
+                PDO::ATTR_EMULATE_PREPARES => (bool) env('DB_EMULATE_PREPARES', false),
+            ]),
         ],
 
         'sqlsrv' => [

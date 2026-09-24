@@ -22,7 +22,7 @@ class DashboardTest extends TestCase
         $response->assertForbidden();
     }
 
-    public function test_admin_sees_an_empty_register_when_nothing_is_posted(): void
+    public function test_admin_is_told_when_nothing_is_posted(): void
     {
         $admin = User::factory()->admin()->create();
 
@@ -30,27 +30,25 @@ class DashboardTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('No scholarships have been posted yet.');
-        $response->assertSee('No applications have been submitted yet.');
+        $response->assertSee(route('admin.scholarships.create'));
     }
 
-    public function test_scholarships_awaiting_a_decision_come_before_settled_ones(): void
+    public function test_only_scholarships_awaiting_a_decision_are_listed(): void
     {
         $admin = User::factory()->admin()->create();
 
-        // Closes sooner, but every application is already decided.
-        $settled = Scholarship::factory()->create(['title' => 'Settled Grant', 'deadline' => now()->addDay()]);
+        $settled = Scholarship::factory()->create(['title' => 'Settled Grant']);
         ScholarshipApplication::factory()->approved()->for($settled)->create();
 
-        $waiting = Scholarship::factory()->create(['title' => 'Waiting Grant', 'deadline' => now()->addMonth()]);
+        $waiting = Scholarship::factory()->create(['title' => 'Waiting Grant']);
         ScholarshipApplication::factory()->for($waiting)->create();
 
         $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
         $response->assertOk();
-        $response->assertViewHas('needsDecisionCount', 1);
-        $response->assertViewHas('register', function (Collection $register) use ($waiting, $settled): bool {
-            return $register->first()->is($waiting) && $register->last()->is($settled);
-        });
+        $response->assertSee('Waiting Grant');
+        $response->assertDontSee('Settled Grant');
+        $response->assertSee('View all 2 scholarships');
     }
 
     public function test_scholarships_awaiting_a_decision_are_ordered_by_soonest_deadline(): void
@@ -69,12 +67,12 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
         $response->assertOk();
-        $response->assertViewHas('register', function (Collection $register): bool {
-            return $register->pluck('title')->all() === ['Sooner Grant', 'Later Grant', 'Open Ended Grant'];
+        $response->assertViewHas('needsDecision', function (Collection $needsDecision): bool {
+            return $needsDecision->pluck('title')->all() === ['Sooner Grant', 'Later Grant', 'Open Ended Grant'];
         });
     }
 
-    public function test_register_counts_pending_and_awarded_applications_per_scholarship(): void
+    public function test_each_scholarship_shows_its_pending_count_and_filled_slots(): void
     {
         $admin = User::factory()->admin()->create();
         $scholarship = Scholarship::factory()->create(['slots' => 10]);
@@ -85,25 +83,12 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
         $response->assertOk();
-        $response->assertViewHas('register', function (Collection $register): bool {
-            $row = $register->first();
-
-            return (int) $row->pending_count === 2 && (int) $row->approved_applications_count === 1;
+        $response->assertViewHas('needsDecision', function (Collection $needsDecision): bool {
+            return (int) $needsDecision->first()->pending_count === 2;
         });
+        $response->assertSee('1 of 10 slots filled');
         $response->assertViewHas('pendingTotal', 2);
-    }
-
-    public function test_register_reports_the_wait_on_the_oldest_undecided_application(): void
-    {
-        $admin = User::factory()->admin()->create();
-        $scholarship = Scholarship::factory()->create();
-        ScholarshipApplication::factory()->for($scholarship)->create(['submitted_at' => now()->subDays(9)]);
-        ScholarshipApplication::factory()->for($scholarship)->create(['submitted_at' => now()->subDay()]);
-
-        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
-
-        $response->assertOk();
-        $response->assertSee('9 days');
+        $response->assertSee('applications need your decision.');
     }
 
     public function test_deadlines_are_counted_in_whole_calendar_days(): void
@@ -120,36 +105,18 @@ class DashboardTest extends TestCase
 
         $response->assertOk();
         // Counted between day boundaries, so the time of day never rounds this down.
-        $response->assertSee('in 2 days');
-        $response->assertSee('20 days ago');
+        $response->assertSee('Closes in 2 days');
+        $response->assertSee('Closed 20 days ago');
     }
 
-    public function test_standing_line_summarises_what_is_waiting(): void
+    public function test_admin_is_told_when_nothing_needs_a_decision(): void
     {
         $admin = User::factory()->admin()->create();
-        $scholarship = Scholarship::factory()->create(['title' => 'Tulong Dunong Grant', 'deadline' => now()->addDays(3)]);
-        ScholarshipApplication::factory()->count(2)->for($scholarship)->create();
+        ScholarshipApplication::factory()->approved()->create();
 
         $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
         $response->assertOk();
-        $response->assertSee('applications are waiting on you across');
-        $response->assertSee('Tulong Dunong Grant');
-        $response->assertViewHas('nextToClose', fn (?Scholarship $next): bool => $next?->is($scholarship) ?? false);
-    }
-
-    public function test_dashboard_lists_recent_submissions(): void
-    {
-        $admin = User::factory()->admin()->create();
-        $scholarship = Scholarship::factory()->create();
-        ScholarshipApplication::factory()->for($scholarship)
-            ->for(User::factory()->create(['name' => 'Juan Dela Cruz']))
-            ->create();
-
-        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
-
-        $response->assertOk();
-        $response->assertSee('Juan Dela Cruz');
-        $response->assertSee($scholarship->title);
+        $response->assertSee('No applications need a decision.');
     }
 }

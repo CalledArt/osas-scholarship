@@ -16,17 +16,20 @@
             <x-rail-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                 {{ __('Dashboard') }}
             </x-rail-link>
-            <x-rail-link :href="route('admin.scholarships.index')" :active="request()->routeIs('admin.scholarships.*')">
+            <x-rail-link :href="route('admin.scholarships.index')" :active="request()->routeIs('admin.scholarships.*')" data-tour="nav-scholarships">
                 {{ __('Scholarships') }}
+            </x-rail-link>
+            <x-rail-link :href="route('admin.students.import.create')" :active="request()->routeIs('admin.students.*')" data-tour="nav-import">
+                {{ __('Import Students') }}
             </x-rail-link>
         @else
             <x-rail-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-rail-link>
-            <x-rail-link :href="route('scholarships.index')" :active="request()->routeIs('scholarships.*')">
+            <x-rail-link :href="route('scholarships.index')" :active="request()->routeIs('scholarships.*')" data-tour="nav-scholarships">
                 {{ __('Scholarships') }}
             </x-rail-link>
-            <x-rail-link :href="route('scholarship-applications.index')" :active="request()->routeIs('scholarship-applications.*')">
+            <x-rail-link :href="route('scholarship-applications.index')" :active="request()->routeIs('scholarship-applications.*')" data-tour="nav-applications">
                 {{ __('My Applications') }}
             </x-rail-link>
         @endif
@@ -38,7 +41,14 @@
             <p class="truncate text-xs text-gray-500">{{ Auth::user()->role->label() }}</p>
         </div>
 
-        <x-rail-link :href="route('profile.edit')" :active="request()->routeIs('profile.*')">
+        {{-- Replays in place on a dashboard; from anywhere else it opens the dashboard, which starts the tour. --}}
+        <x-rail-link :href="route($isAdmin ? 'admin.dashboard' : 'dashboard', ['tutorial' => 1])"
+                     data-tour="nav-tutorial"
+                     x-on:click="if (window.tutorialAvailable) { $event.preventDefault(); navOpen = false; $dispatch('tutorial-start'); }">
+            {{ __('Tutorial') }}
+        </x-rail-link>
+
+        <x-rail-link :href="route('profile.edit')" :active="request()->routeIs('profile.*')" data-tour="nav-profile">
             {{ __('Profile') }}
         </x-rail-link>
 
