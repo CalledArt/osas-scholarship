@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Enums\UserRole;
+use App\Support\GoogleIdTokenVerifier;
+use Google\Auth\AccessToken;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -15,7 +17,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(GoogleIdTokenVerifier::class, fn (): GoogleIdTokenVerifier => new GoogleIdTokenVerifier(
+            new AccessToken,
+            (string) config('services.google.client_id'),
+        ));
     }
 
     /**

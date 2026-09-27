@@ -36,13 +36,19 @@ class LoginRequest extends FormRequest
     /**
      * Attempt to authenticate the request's credentials.
      *
+     * Passwords are for OSAS staff only. Students sign in with Google, where
+     * the roster is checked on every sign-in; letting a student in by password
+     * would skip that check, so a correct student password is still refused.
+     * The refusal comes only after the password matched, so it reveals nothing
+     * about which emails have accounts.
+     *
      * @throws ValidationException
      */
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        if (! Auth::validate($this->only('email', 'password'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -51,6 +57,16 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        $user = Auth::getLastAttempted();
+
+        if ($user->isStudent()) {
+            throw ValidationException::withMessages([
+                'email' => __('Students sign in with their CvSU Google account using the Sign in with Google button.'),
+            ]);
+        }
+
+        Auth::login($user, $this->boolean('remember'));
     }
 
     /**

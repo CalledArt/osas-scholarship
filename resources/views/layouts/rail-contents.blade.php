@@ -19,8 +19,8 @@
             <x-rail-link :href="route('admin.scholarships.index')" :active="request()->routeIs('admin.scholarships.*')" data-tour="nav-scholarships">
                 {{ __('Scholarships') }}
             </x-rail-link>
-            <x-rail-link :href="route('admin.students.import.create')" :active="request()->routeIs('admin.students.*')" data-tour="nav-import">
-                {{ __('Import Students') }}
+            <x-rail-link :href="route('admin.roster.index')" :active="request()->routeIs('admin.roster.*')" data-tour="nav-roster">
+                {{ __('Student Roster') }}
             </x-rail-link>
         @else
             <x-rail-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">

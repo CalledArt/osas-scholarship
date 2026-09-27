@@ -17,17 +17,41 @@ class AuthenticationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_users_can_authenticate_using_the_login_screen(): void
+    public function test_staff_can_authenticate_with_their_password(): void
     {
-        $user = User::factory()->create();
+        $admin = User::factory()->admin()->create();
 
         $response = $this->post('/login', [
-            'email' => $user->email,
+            'email' => $admin->email,
             'password' => 'password',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $this->assertAuthenticatedAs($admin);
+        $response->assertRedirect(route('admin.dashboard', absolute: false));
+    }
+
+    public function test_a_student_cannot_sign_in_with_a_password_even_a_correct_one(): void
+    {
+        $student = User::factory()->create();
+
+        $response = $this->from('/login')->post('/login', [
+            'email' => $student->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertGuest();
+        $response->assertRedirect('/login');
+        $response->assertSessionHasErrors(['email' => 'Students sign in with their CvSU Google account using the Sign in with Google button.']);
+    }
+
+    public function test_a_wrong_password_for_a_student_gets_the_generic_failure(): void
+    {
+        $student = User::factory()->create();
+
+        $this->post('/login', ['email' => $student->email, 'password' => 'wrong-password'])
+            ->assertSessionHasErrors(['email' => trans('auth.failed')]);
+
+        $this->assertGuest();
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void

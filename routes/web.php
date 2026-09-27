@@ -5,7 +5,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ScholarshipApplicationController as AdminScholarshipApplicationController;
 use App\Http\Controllers\Admin\ScholarshipController as AdminScholarshipController;
 use App\Http\Controllers\Admin\ScholarshipRequiredDocumentController;
-use App\Http\Controllers\Admin\StudentImportController;
+use App\Http\Controllers\Admin\StudentRosterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScholarshipApplicationController;
@@ -65,9 +65,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('scholarships/{scholarship}/applications/import-decisions', [AdminScholarshipApplicationController::class, 'importDecisions'])
         ->name('scholarships.applications.import-decisions');
 
-    Route::get('students/import', [StudentImportController::class, 'create'])->name('students.import.create');
-    Route::post('students/import', [StudentImportController::class, 'store'])->name('students.import.store');
-    Route::get('students/import/template', [StudentImportController::class, 'template'])->name('students.import.template');
+    Route::get('roster', [StudentRosterController::class, 'index'])->name('roster.index');
+    Route::post('roster/import', [StudentRosterController::class, 'import'])->name('roster.import');
+    Route::get('roster/template', [StudentRosterController::class, 'template'])->name('roster.template');
+    Route::delete('roster/{entry}', [StudentRosterController::class, 'destroy'])->name('roster.destroy');
 });
 
 Route::middleware(['auth', 'verified', 'role:student'])->group(function () {

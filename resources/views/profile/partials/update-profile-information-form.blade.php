@@ -47,7 +47,13 @@
 
         <div>
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
+            @if ($user->isStudent())
+                {{-- A student's email is the Google identity matched against the roster, so it is not theirs to change here. --}}
+                <x-text-input id="email" type="email" class="mt-1 block w-full bg-gray-50 text-gray-500" :value="$user->email" disabled />
+                <p class="mt-1 text-xs text-gray-400">{{ __('You sign in with this Google account. Contact OSAS if it needs to change.') }}</p>
+            @else
+                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
+            @endif
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())

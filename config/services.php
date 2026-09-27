@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'google' => [
+        // The OAuth "Web application" client ID from Google Cloud Console. It
+        // is public (the sign-in button needs it) and is also the audience
+        // every ID token must carry. No client secret is used.
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+    ],
+
 ];

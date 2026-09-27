@@ -31,9 +31,9 @@
                 'body' => __('Inside each scholarship, approve or reject applicants one at a time, or import decisions from a CSV. Each approval fills one slot.'),
             ],
             [
-                'targets' => ['nav-import'],
-                'title' => __('Create student accounts'),
-                'body' => __('Import Students creates accounts from a CSV. Each student is emailed a temporary password and sets their own the first time they sign in.'),
+                'targets' => ['nav-roster'],
+                'title' => __('Keep the student roster current'),
+                'body' => __('Students sign in with their CvSU Google account, and only emails on the roster get in. Upload the roster as a CSV; removing someone locks them out at their next sign-in.'),
             ],
             [
                 'targets' => ['nav-tutorial'],
