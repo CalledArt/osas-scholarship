@@ -36,9 +36,8 @@ class LoginRequest extends FormRequest
     /**
      * Attempt to authenticate the request's credentials.
      *
-     * Passwords are for OSAS staff only. Students sign in with Google, where
-     * the roster is checked on every sign-in; letting a student in by password
-     * would skip that check, so a correct student password is still refused.
+     * Passwords are for OSAS staff only. Students verify their CvSU Google
+     * account on every sign-in, so a correct student password is still refused.
      * The refusal comes only after the password matched, so it reveals nothing
      * about which emails have accounts.
      *

@@ -25,7 +25,7 @@ class GoogleIdTokenVerifier
     /**
      * Return the token's identity claims, or null if the token is not one to trust.
      *
-     * @return array{sub: string, email: string, name: ?string}|null
+     * @return array{sub: string, email: string, name: ?string, hosted_domain: ?string}|null
      */
     public function verify(string $idToken): ?array
     {
@@ -57,6 +57,7 @@ class GoogleIdTokenVerifier
             'sub' => (string) $claims['sub'],
             'email' => mb_strtolower((string) $claims['email']),
             'name' => isset($claims['name']) ? (string) $claims['name'] : null,
+            'hosted_domain' => isset($claims['hd']) ? mb_strtolower((string) $claims['hd']) : null,
         ];
     }
 }

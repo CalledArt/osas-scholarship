@@ -13,9 +13,8 @@ class ProfileUpdateRequest extends FormRequest
      * Get the validation rules that apply to the request.
      *
      * A student's email is left out entirely, so any email sent is ignored:
-     * it is the Google identity the roster is checked against, and letting a
-     * student rewrite it would let them take a classmate's roster email and
-     * lock that classmate out of their own first sign-in.
+     * it belongs to their verified Google identity. Letting a student rewrite
+     * it could let them claim a classmate's email and block registration.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */

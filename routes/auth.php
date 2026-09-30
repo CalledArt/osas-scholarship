@@ -8,10 +8,17 @@ use App\Http\Controllers\Auth\GoogleSignInController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\StudentRegistrationController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Middleware\EnsureGoogleRegistration;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
+    Route::middleware(EnsureGoogleRegistration::class)->group(function () {
+        Route::get('register', [StudentRegistrationController::class, 'create'])->name('register');
+        Route::post('register', [StudentRegistrationController::class, 'store']);
+    });
+
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 

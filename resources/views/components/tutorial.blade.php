@@ -33,7 +33,7 @@
             [
                 'targets' => ['nav-roster'],
                 'title' => __('Keep the student roster current'),
-                'body' => __('Students sign in with their CvSU Google account, and only emails on the roster get in. Upload the roster as a CSV; removing someone locks them out at their next sign-in.'),
+                'body' => __('Students verify their CvSU Google account and complete a registration form. The roster is an optional reference for OSAS; importing or removing entries does not change student sign-in access.'),
             ],
             [
                 'targets' => ['nav-tutorial'],

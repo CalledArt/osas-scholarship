@@ -50,7 +50,7 @@ class ProfileTest extends TestCase
 
     public function test_a_student_cannot_change_their_email(): void
     {
-        $student = User::factory()->create(['email' => 'juan@cvsu.edu.ph']);
+        $student = User::factory()->named('Pedro', null, 'Reyes')->create(['email' => 'juan@cvsu.edu.ph']);
 
         $response = $this
             ->actingAs($student)

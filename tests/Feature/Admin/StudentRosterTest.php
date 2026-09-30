@@ -48,7 +48,9 @@ class StudentRosterTest extends TestCase
             ->get(route('admin.roster.index'))
             ->assertOk()
             ->assertSee('juan@cvsu.edu.ph')
-            ->assertSee('Juan Cruz');
+            ->assertSee('Juan Cruz')
+            ->assertSee('Roster entries are kept for OSAS reference and do not control sign-in.')
+            ->assertDontSee('They will not be able to sign in again.');
     }
 
     public function test_the_roster_can_be_searched(): void

@@ -48,7 +48,7 @@
         <div>
             <x-input-label for="email" :value="__('Email')" />
             @if ($user->isStudent())
-                {{-- A student's email is the Google identity matched against the roster, so it is not theirs to change here. --}}
+                {{-- A student's email belongs to their verified Google identity. --}}
                 <x-text-input id="email" type="email" class="mt-1 block w-full bg-gray-50 text-gray-500" :value="$user->email" disabled />
                 <p class="mt-1 text-xs text-gray-400">{{ __('You sign in with this Google account. Contact OSAS if it needs to change.') }}</p>
             @else

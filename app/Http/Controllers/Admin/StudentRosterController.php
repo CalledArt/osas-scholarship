@@ -64,7 +64,7 @@ class StudentRosterController extends Controller
     }
 
     /**
-     * Take a student off the roster, so their next Google sign-in is refused.
+     * Remove an OSAS reference entry without changing the student's account.
      */
     public function destroy(StudentRosterEntry $entry): RedirectResponse
     {

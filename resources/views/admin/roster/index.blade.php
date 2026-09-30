@@ -22,7 +22,7 @@
                 @if ($results === null)
                     <span class="font-semibold tabular-nums text-gray-900">{{ number_format($entries->total()) }}</span>
                     {{ trans_choice('student is|students are', $entries->total()) }}
-                    {{ __('on the roster. Only these emails can sign in with Google, and each student\'s account is created from their row the first time they do.') }}
+                    {{ __('on the roster. Students register with their verified CvSU Google account and enter their own details. Roster entries are kept for OSAS reference and do not control sign-in.') }}
                 @elseif ($imported->isEmpty() && $skipped->isEmpty())
                     {{ __('That file had no data rows.') }}
                 @else
@@ -112,7 +112,7 @@
                                     </td>
                                     <td class="py-3 pl-4 text-right">
                                         <form method="POST" action="{{ route('admin.roster.destroy', $entry) }}"
-                                              onsubmit="return confirm(@js(__('Remove :email from the roster? They will not be able to sign in again.', ['email' => $entry->email])))">
+                                              onsubmit="return confirm(@js(__('Remove :email from the roster? This does not delete their account or prevent sign-in.', ['email' => $entry->email])))">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-sm font-medium text-red-700 hover:text-red-900 focus:outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-red-600">
@@ -124,7 +124,7 @@
                             @empty
                                 <tr>
                                     <td colspan="5" class="py-8 text-center text-gray-500">
-                                        {{ $search !== '' ? __('No roster entries match that search.') : __('The roster is empty. Upload a CSV below so students can sign in.') }}
+                                        {{ $search !== '' ? __('No roster entries match that search.') : __('The roster is empty. Students can still register with their CvSU Google account.') }}
                                     </td>
                                 </tr>
                             @endforelse
@@ -140,7 +140,7 @@
             <section class="mt-12 border-t border-gray-200 pt-8">
                 <h2 class="text-sm font-semibold text-gray-900">{{ __('Add students from a file') }}</h2>
                 <p class="mt-1 text-sm text-gray-500">
-                    {{ __('CSV, up to :rows rows. An email already on the roster has its details updated, so re-uploading a corrected list is safe. Nobody is emailed and no accounts are created until each student signs in.', ['rows' => number_format($maxRows)]) }}
+                    {{ __('CSV, up to :rows rows. An email already on the roster has its roster details updated. Importing does not create accounts, change registered student details, or send email.', ['rows' => number_format($maxRows)]) }}
                 </p>
 
                 <form method="POST" action="{{ route('admin.roster.import') }}" enctype="multipart/form-data" class="mt-4">

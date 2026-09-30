@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="mb-8">
         <h2 class="text-2xl font-bold text-gray-900">{{ __('Sign in') }}</h2>
-        <p class="mt-1 text-sm text-gray-500">{{ __('Students sign in with their CvSU Google account.') }}</p>
+        <p class="mt-1 text-sm text-gray-500">{{ __('Students sign in or register with their @cvsu.edu.ph Google account.') }}</p>
     </div>
 
     <!-- Session Status -->
@@ -14,7 +14,8 @@
         @if (config('services.google.client_id'))
             <div id="g_id_onload"
                  data-client_id="{{ config('services.google.client_id') }}"
-                 data-context="signin"
+                 data-context="use"
+                 data-hd="cvsu.edu.ph"
                  data-ux_mode="popup"
                  data-callback="handleGoogleCredential"
                  data-auto_prompt="false"></div>
@@ -24,7 +25,7 @@
                      data-type="standard"
                      data-shape="rectangular"
                      data-theme="outline"
-                     data-text="signin_with"
+                     data-text="continue_with"
                      data-size="large"
                      data-logo_alignment="left"
                      data-width="320"></div>
@@ -53,7 +54,7 @@
         <x-input-error :messages="$errors->get('google')" class="mt-3 text-center" />
 
         <p class="mt-3 text-center text-xs text-gray-500">
-            {{ __('Your account is created the first time you sign in, if your email is on the OSAS student roster.') }}
+            {{ __('New students complete a registration form after Google verification.') }}
         </p>
     </section>
 
