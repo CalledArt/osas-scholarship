@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 #[Fillable(['title', 'description', 'slots', 'deadline', 'status'])]
 class Scholarship extends Model
@@ -95,5 +97,28 @@ class Scholarship extends Model
         return $this->status === ScholarshipStatus::Open
             && ! $this->hasPassedDeadline()
             && $this->remainingSlots() > 0;
+    }
+
+    /**
+     * Delete the scholarship along with every file stored for it.
+     *
+     * Foreign keys cascade the delete to its required documents, applications
+     * and their document rows, but not to storage. Applicants' uploads and
+     * OSAS's samples are looked up first and removed once the rows are gone,
+     * so students' personal documents are not left behind in the bucket.
+     */
+    public function deleteWithStoredFiles(): void
+    {
+        $applicantUploads = ScholarshipApplicationDocument::query()
+            ->whereIn('scholarship_application_id', $this->applications()->select('id'))
+            ->get(['disk', 'path']);
+        $samples = $this->requiredDocuments()->whereNotNull('sample_path')->get();
+
+        $this->delete();
+
+        $applicantUploads->groupBy('disk')->each(
+            fn (Collection $uploads, string $disk) => Storage::disk($disk)->delete($uploads->pluck('path')->all())
+        );
+        $samples->each->deleteSampleFile();
     }
 }

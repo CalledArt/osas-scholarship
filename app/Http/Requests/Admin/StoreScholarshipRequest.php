@@ -31,6 +31,19 @@ class StoreScholarshipRequest extends FormRequest
             'required_documents' => ['nullable', 'array'],
             'required_documents.*.name' => ['required', 'string', 'max:255'],
             'required_documents.*.description' => ['nullable', 'string', 'max:1000'],
+            'required_documents.*.sample' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+        ];
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'required_documents.*.sample' => 'sample',
         ];
     }
 }

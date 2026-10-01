@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\UpdateScholarshipRequest;
 use App\Models\Scholarship;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
@@ -52,9 +53,15 @@ class ScholarshipController extends Controller
             $request->safe()->only(['title', 'description', 'slots', 'deadline'])
         );
 
-        $scholarship->requiredDocuments()->createMany(
-            $request->validated('required_documents', [])
-        );
+        foreach ($request->validated('required_documents', []) as $index => $document) {
+            $requiredDocument = $scholarship->requiredDocuments()->make(Arr::only($document, ['name', 'description']));
+
+            if ($request->hasFile("required_documents.{$index}.sample")) {
+                $requiredDocument->attachSample($request->file("required_documents.{$index}.sample"));
+            } else {
+                $requiredDocument->save();
+            }
+        }
 
         return redirect()->route('admin.scholarships.show', $scholarship)
             ->with('status', 'Scholarship posted.');
@@ -89,6 +96,8 @@ class ScholarshipController extends Controller
     {
         Gate::authorize('update', $scholarship);
 
+        $scholarship->loadCount('applications');
+
         return view('admin.scholarships.edit', [
             'scholarship' => $scholarship,
         ]);
@@ -112,7 +121,7 @@ class ScholarshipController extends Controller
     {
         Gate::authorize('delete', $scholarship);
 
-        $scholarship->delete();
+        $scholarship->deleteWithStoredFiles();
 
         return redirect()->route('admin.scholarships.index')
             ->with('status', 'Scholarship deleted.');

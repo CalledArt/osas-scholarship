@@ -5,12 +5,14 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ScholarshipApplicationController as AdminScholarshipApplicationController;
 use App\Http\Controllers\Admin\ScholarshipController as AdminScholarshipController;
 use App\Http\Controllers\Admin\ScholarshipRequiredDocumentController;
+use App\Http\Controllers\Admin\ScholarshipRequiredDocumentSampleController as AdminScholarshipRequiredDocumentSampleController;
 use App\Http\Controllers\Admin\StudentRosterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScholarshipApplicationController;
 use App\Http\Controllers\ScholarshipApplicationDocumentController;
 use App\Http\Controllers\ScholarshipController;
+use App\Http\Controllers\ScholarshipRequiredDocumentSampleController;
 use App\Http\Controllers\TutorialController;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +51,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/scholarship-applications/{application}/documents/{document}', [ScholarshipApplicationDocumentController::class, 'show'])
         ->name('scholarship-applications.documents.show');
+
+    Route::get('/scholarships/{scholarship}/required-documents/{requiredDocument}/sample', [ScholarshipRequiredDocumentSampleController::class, 'show'])
+        ->name('scholarships.required-documents.sample');
+    Route::get('/scholarships/{scholarship}/required-documents/{requiredDocument}/sample/download', [ScholarshipRequiredDocumentSampleController::class, 'download'])
+        ->name('scholarships.required-documents.sample.download');
 });
 
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -58,6 +65,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
         ->name('scholarships.required-documents.store');
     Route::delete('scholarships/{scholarship}/required-documents/{requiredDocument}', [ScholarshipRequiredDocumentController::class, 'destroy'])
         ->name('scholarships.required-documents.destroy');
+    Route::put('scholarships/{scholarship}/required-documents/{requiredDocument}/sample', [AdminScholarshipRequiredDocumentSampleController::class, 'update'])
+        ->name('scholarships.required-documents.sample.update');
+    Route::delete('scholarships/{scholarship}/required-documents/{requiredDocument}/sample', [AdminScholarshipRequiredDocumentSampleController::class, 'destroy'])
+        ->name('scholarships.required-documents.sample.destroy');
 
     Route::post('scholarships/{scholarship}/applications/import-decisions', [AdminScholarshipApplicationController::class, 'importDecisions'])
         ->name('scholarships.applications.import-decisions');

@@ -8,9 +8,10 @@
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-100">
-                <form method="POST" action="{{ route('admin.scholarships.store') }}" class="p-6 space-y-6" x-data="{
+                <form method="POST" action="{{ route('admin.scholarships.store') }}" enctype="multipart/form-data" class="p-6 space-y-6" x-data="{
                     documents: [],
-                    addDocument() { this.documents.push({ name: '', description: '' }) },
+                    nextKey: 0,
+                    addDocument() { this.documents.push({ key: this.nextKey++, name: '', description: '' }) },
                     removeDocument(index) { this.documents.splice(index, 1) },
                 }">
                     @csrf
@@ -53,11 +54,16 @@
                         </div>
 
                         <div class="mt-4 space-y-4">
-                            <template x-for="(document, index) in documents" :key="index">
+                            {{-- Keyed by a stable id, not the index: a file input cannot be x-model'd, so removing a row must take that row's own input with it. --}}
+                            <template x-for="(document, index) in documents" :key="document.key">
                                 <div class="flex items-start gap-3 rounded-lg border border-gray-200 p-4">
                                     <div class="flex-1 space-y-2">
                                         <input type="text" :name="'required_documents[' + index + '][name]'" x-model="document.name" placeholder="{{ __('Document name (e.g. 2x2 Picture)') }}" class="block w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-cvsu-green focus:ring-cvsu-green" required>
                                         <input type="text" :name="'required_documents[' + index + '][description]'" x-model="document.description" placeholder="{{ __('Notes for applicants (optional)') }}" class="block w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-cvsu-green focus:ring-cvsu-green">
+                                        <div>
+                                            <label class="text-xs font-medium text-gray-600" :for="'document-sample-' + document.key">{{ __('Sample for applicants (optional): JPG, PNG, or PDF, max 5MB') }}</label>
+                                            <x-file-input ::id="'document-sample-' + document.key" ::name="'required_documents[' + index + '][sample]'" accept=".jpg,.jpeg,.png,.pdf" class="mt-1 w-full" />
+                                        </div>
                                     </div>
                                     <button type="button" @click="removeDocument(index)" class="text-gray-400 hover:text-red-600" title="{{ __('Remove') }}">
                                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -69,7 +75,8 @@
 
                             <p x-show="documents.length === 0" class="text-sm text-gray-400">{{ __('No documents required yet.') }}</p>
                         </div>
-                        <x-input-error :messages="$errors->get('required_documents.*.name')" class="mt-2" />
+                        <x-input-error :messages="\Illuminate\Support\Arr::flatten($errors->get('required_documents.*.name'))" class="mt-2" />
+                        <x-input-error :messages="\Illuminate\Support\Arr::flatten($errors->get('required_documents.*.sample'))" class="mt-2" />
                     </div>
 
                     <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-6">

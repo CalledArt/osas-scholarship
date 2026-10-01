@@ -93,7 +93,12 @@
                             <h4 class="text-sm font-semibold text-gray-900">{{ __('Required Documents') }}</h4>
                             <ul class="mt-1 list-disc list-inside text-sm text-gray-600">
                                 @foreach ($scholarship->requiredDocuments as $document)
-                                    <li>{{ $document->name }}</li>
+                                    <li>
+                                        {{ $document->name }}
+                                        @if ($document->hasSample())
+                                            <x-sample-link :document="$document" class="ms-1" />
+                                        @endif
+                                    </li>
                                 @endforeach
                             </ul>
                         </div>

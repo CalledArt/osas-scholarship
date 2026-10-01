@@ -269,15 +269,15 @@ class GoogleSignInTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_the_login_page_renders_googles_sign_in_button(): void
+    public function test_the_login_page_renders_googles_sign_up_button_below_the_password_form(): void
     {
         $this->get(route('login'))
             ->assertOk()
-            ->assertSee('https://accounts.google.com/gsi/client', false)
-            ->assertSee('data-client_id="'.self::CLIENT_ID.'"', false)
-            ->assertSee('class="g_id_signin"', false)
-            ->assertSee('data-text="continue_with"', false)
-            ->assertSee('New students complete a registration form after Google verification.')
+            ->assertSee('https://accounts.google.com/gsi/client?hl=en', false)
+            ->assertSee("client_id: '".self::CLIENT_ID."'", false)
+            ->assertSee("text: 'signup_with'", false)
+            ->assertSeeInOrder(['Sign in with password', 'id="google-sign-up"'], false)
+            ->assertDontSee('role="separator"', false)
             ->assertDontSee('if your email is on the OSAS student roster');
     }
 

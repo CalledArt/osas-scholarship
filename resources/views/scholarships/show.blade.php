@@ -31,6 +31,9 @@
                                         @if ($document->description)
                                             <span class="text-gray-400">— {{ $document->description }}</span>
                                         @endif
+                                        @if ($document->hasSample())
+                                            <x-sample-link :document="$document" class="ms-1" />
+                                        @endif
                                     </li>
                                 @endforeach
                             </ul>

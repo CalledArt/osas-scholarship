@@ -25,6 +25,7 @@ class StoreScholarshipRequiredDocumentRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
+            'sample' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ];
     }
 }

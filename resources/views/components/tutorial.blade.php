@@ -18,7 +18,7 @@
             [
                 'targets' => ['post-scholarship'],
                 'title' => __('Post a scholarship'),
-                'body' => __('Set the title, number of slots and deadline, then add the documents students must upload.'),
+                'body' => __('Set the title, number of slots and deadline, then add the documents students must upload. You can attach a sample of each so students know what a correct one looks like.'),
             ],
             [
                 'targets' => ['needs-decision', 'dashboard-summary'],

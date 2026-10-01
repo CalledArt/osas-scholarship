@@ -65,7 +65,12 @@
                             <div class="mt-4 space-y-4">
                                 @foreach ($scholarship->requiredDocuments as $document)
                                     <div>
-                                        <x-input-label :for="'document-'.$document->id" :value="$document->name" />
+                                        <div class="flex items-baseline justify-between gap-3">
+                                            <x-input-label :for="'document-'.$document->id" :value="$document->name" />
+                                            @if ($document->hasSample())
+                                                <x-sample-link :document="$document" class="shrink-0 text-xs" />
+                                            @endif
+                                        </div>
                                         @if ($document->description)
                                             <p class="text-xs text-gray-500">{{ $document->description }}</p>
                                         @endif

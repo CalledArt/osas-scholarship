@@ -24,4 +24,16 @@ class ScholarshipRequiredDocumentFactory extends Factory
             'description' => fake()->optional()->sentence(),
         ];
     }
+
+    /**
+     * Indicate that OSAS has posted a sample of the document for applicants.
+     */
+    public function withSample(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'sample_disk' => 'supabase',
+            'sample_path' => 'scholarship-samples/'.fake()->uuid().'.pdf',
+            'sample_original_name' => 'sample.pdf',
+        ]);
+    }
 }

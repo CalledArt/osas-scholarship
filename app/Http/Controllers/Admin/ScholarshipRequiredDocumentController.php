@@ -16,7 +16,13 @@ class ScholarshipRequiredDocumentController extends Controller
      */
     public function store(StoreScholarshipRequiredDocumentRequest $request, Scholarship $scholarship): RedirectResponse
     {
-        $scholarship->requiredDocuments()->create($request->validated());
+        $requiredDocument = $scholarship->requiredDocuments()->make($request->safe()->only(['name', 'description']));
+
+        if ($request->hasFile('sample')) {
+            $requiredDocument->attachSample($request->file('sample'));
+        } else {
+            $requiredDocument->save();
+        }
 
         return redirect()->route('admin.scholarships.show', $scholarship)
             ->with('status', 'Required document added.');
@@ -32,6 +38,7 @@ class ScholarshipRequiredDocumentController extends Controller
         abort_unless($requiredDocument->scholarship_id === $scholarship->id, 404);
 
         $requiredDocument->delete();
+        $requiredDocument->deleteSampleFile();
 
         return redirect()->route('admin.scholarships.show', $scholarship)
             ->with('status', 'Required document removed.');

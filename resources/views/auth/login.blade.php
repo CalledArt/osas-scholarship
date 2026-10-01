@@ -7,63 +7,6 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <!-- Students: Sign in with Google -->
-    <section aria-labelledby="student-sign-in">
-        <h3 id="student-sign-in" class="sr-only">{{ __('Student sign-in') }}</h3>
-
-        @if (config('services.google.client_id'))
-            <div id="g_id_onload"
-                 data-client_id="{{ config('services.google.client_id') }}"
-                 data-context="use"
-                 data-hd="cvsu.edu.ph"
-                 data-ux_mode="popup"
-                 data-callback="handleGoogleCredential"
-                 data-auto_prompt="false"></div>
-
-            <div class="flex justify-center">
-                <div class="g_id_signin"
-                     data-type="standard"
-                     data-shape="rectangular"
-                     data-theme="outline"
-                     data-text="continue_with"
-                     data-size="large"
-                     data-logo_alignment="left"
-                     data-width="320"></div>
-            </div>
-
-            {{-- Relays Google's ID token to the server; nothing else about the student is sent. --}}
-            <form id="google-sign-in" method="POST" action="{{ route('login.google') }}" hidden>
-                @csrf
-                <input type="hidden" name="credential">
-            </form>
-
-            <script>
-                function handleGoogleCredential(response) {
-                    var form = document.getElementById('google-sign-in');
-                    form.elements.credential.value = response.credential;
-                    form.submit();
-                }
-            </script>
-            <script src="https://accounts.google.com/gsi/client" async></script>
-        @else
-            <p class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                {{ __('Google sign-in is not configured yet. Set GOOGLE_CLIENT_ID to enable it.') }}
-            </p>
-        @endif
-
-        <x-input-error :messages="$errors->get('google')" class="mt-3 text-center" />
-
-        <p class="mt-3 text-center text-xs text-gray-500">
-            {{ __('New students complete a registration form after Google verification.') }}
-        </p>
-    </section>
-
-    <div class="my-8 flex items-center gap-3" role="separator">
-        <span class="h-px flex-1 bg-gray-200"></span>
-        <span class="text-xs font-medium uppercase tracking-wide text-gray-500">{{ __('OSAS staff') }}</span>
-        <span class="h-px flex-1 bg-gray-200"></span>
-    </div>
-
     <form method="POST" action="{{ route('login') }}" x-data="{ loading: false, showPassword: false }" @submit="loading = true" class="space-y-5">
         @csrf
 
@@ -131,4 +74,57 @@
         </button>
     </form>
 
+    <!-- Students: Sign up with Google -->
+    <section aria-labelledby="student-sign-up" class="mt-8">
+        <h3 id="student-sign-up" class="sr-only">{{ __('Student sign-up') }}</h3>
+
+        @if (config('services.google.client_id'))
+            {{-- Drawn by Google at the column's own width so it lines up with the password button at every screen size; the reserved height stops the page jumping when it arrives. --}}
+            <div id="google-sign-up" class="flex min-h-10 justify-center"></div>
+
+            {{-- Relays Google's ID token to the server; nothing else about the student is sent. --}}
+            <form id="google-sign-in" method="POST" action="{{ route('login.google') }}" hidden>
+                @csrf
+                <input type="hidden" name="credential">
+            </form>
+
+            <script>
+                function handleGoogleCredential(response) {
+                    var form = document.getElementById('google-sign-in');
+                    form.elements.credential.value = response.credential;
+                    form.submit();
+                }
+
+                function renderGoogleSignUp() {
+                    var container = document.getElementById('google-sign-up');
+
+                    google.accounts.id.initialize({
+                        client_id: @js(config('services.google.client_id')),
+                        callback: handleGoogleCredential,
+                        context: 'signup',
+                        ux_mode: 'popup',
+                        hd: 'cvsu.edu.ph',
+                    });
+
+                    google.accounts.id.renderButton(container, {
+                        type: 'standard',
+                        theme: 'outline',
+                        size: 'large',
+                        text: 'signup_with',
+                        shape: 'rectangular',
+                        logo_alignment: 'left',
+                        width: Math.min(400, container.clientWidth),
+                        locale: 'en',
+                    });
+                }
+            </script>
+            <script src="https://accounts.google.com/gsi/client?hl=en" async onload="renderGoogleSignUp()"></script>
+        @else
+            <p class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                {{ __('Google sign-in is not configured yet. Set GOOGLE_CLIENT_ID to enable it.') }}
+            </p>
+        @endif
+
+        <x-input-error :messages="$errors->get('google')" class="mt-3 text-center" />
+    </section>
 </x-guest-layout>

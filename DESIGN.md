@@ -172,7 +172,7 @@ components:
 
 This is the interface of a well-run records office, not a product. The page ground is a quiet Bond Paper Gray desk; every unit of content is a white record card laid on it, defined by a hairline border rather than a drop shadow. Cavite State University's Seal Green carries institutional authority — it appears on the actions that commit something, the links that lead deeper into a record, and the counts that represent a settled award. Citation Gold is the office highlighter: it marks the thing you are focused on and the thing still waiting on a human decision. Nothing else is allowed to be loud.
 
-The density is administrative but never cramped. Cards breathe at 24px internal padding, sections stack at a 24px rhythm, and pages open with 48px of air above the first card. Type stays small and disciplined — 14px body, 12px labels — because these screens are read in scanning mode by staff working a queue and by students checking one specific status. The one place the system raises its voice is the sign-in screen, where a full-height green gradient panel with the CvSU seal establishes who is behind this system before anyone types a password. That contrast is deliberate: the front door is institutional and warm; the working interior is calm and out of the way.
+The density is administrative but never cramped. Cards breathe at 24px internal padding, sections stack at a 24px rhythm, and pages open with 48px of air above the first card. Type stays small and disciplined — 14px body, 12px labels — because these screens are read in scanning mode by staff working a queue and by students checking one specific status. The one place the system raises its voice is the sign-in screen, set like the title page of a record: a full-height Deep Seal panel lit from one corner, the CvSU seal blind-embossed into it, the system's name at full display strength, and the scholarship cycle laid out as a ruled register — establishing who is behind this system before anyone types a password. That contrast is deliberate: the front door is institutional and warm; the working interior is calm and out of the way.
 
 The system rejects the dashboard-as-spectacle idiom. No gradient cards, no glassmorphism, no floating panels, no decorative iconography, no animated counters. Financial aid is high-stakes and often anxiety-inducing for the student reading it; the design's job is to make status legible at a glance and to never let visual flourish compete with a deadline, a slot count, or a decision.
 
@@ -191,7 +191,7 @@ An institutional two-note palette — a deep muted forest green and a warm satur
 ### Primary
 - **Seal Green** (#0B6E4F): The university's authority color and the system's only action color. It fills primary buttons ("Post Scholarship", "Sign in"), colors every inline navigational link ("View details →", "View"), underlines the active desktop nav item, fills the approved segment of the status bar, and states the awarded count on the admin dashboard. Also the input focus border.
 - **Deep Seal** (#074A35): The hover partner for every Seal Green surface, and the text color for the wordmark and for anything set on a gold wash (the pending badge, the role chip in the account menu). Never used as a fill for a resting element.
-- **Signal Green** (#0F9D63): Reserved almost entirely for the sign-in branding panel, as the bright terminus of the `from-deep-seal via-seal-green to-signal-green` diagonal gradient. It is a lighting effect, not a UI color.
+- **Signal Green** (#0F9D63): Reserved almost entirely for the sign-in branding panel, as the light source of a radial glow falling from its top-right corner across a Deep Seal field. It is a lighting effect, not a UI color. Text on that panel sits on the Deep Seal end, where white at 70% opacity still clears 4.5:1.
 
 ### Secondary
 - **Citation Gold** (#FFC72C): The attention marker. It appears as the focus ring on Seal Green buttons, as a 20%-opacity wash behind pending badges, and as the lettering in the CvSU seal. It is never a background for a large surface, and never a text color — see the Gold Is Not Ink Rule.
@@ -237,7 +237,7 @@ Status semantics, used only inside badges, flash messages, and the status bar. T
 **Character:** Figtree is a geometric humanist sans with open apertures and a tall x-height — clear at 12px, friendly rather than corporate at 36px. Using one family for everything is a deliberate institutional choice: hierarchy is built entirely from weight (400/500/600/700) and size, never from a contrasting face. The result reads like a well-set official form rather than a marketing page. Authenticated screens load weights 400/500/600; the sign-in screen additionally loads 700 for its headline.
 
 ### Hierarchy
-- **Display** (700, 2.25rem/36px, leading-tight): The sign-in branding panel headline ("Scholarship Allocation System") only. It does not appear anywhere inside the authenticated app.
+- **Display** (700, 3rem → 3.75rem → 4.5rem across `lg`/`xl`/`2xl`, leading 1.05, tracking -0.02em): The sign-in branding panel headline ("Scholarship Allocation System"), stacked one word per line on desktop and set at 1.875rem in the mobile band. It does not appear anywhere inside the authenticated app.
 - **Headline** (700, 1.5rem/24px, 2rem): The auth form heading ("Sign in", "Reset password"). One per screen, on unauthenticated pages only.
 - **Title** (600, 1.25rem/20px, leading-tight): The page header inside the white header bar — the persistent "what screen am I on" label. Exactly one per authenticated screen.
 - **Section** (600, 1.125rem/18px, 1.75rem): Card headings and the dashboard welcome line.
@@ -265,7 +265,7 @@ The application is a two-column shell: a fixed 240px (`w-60`) rail on the left a
 
 **Grids.** The admin KPI row runs 1 column → 2 at 640px → 5 at 1024px. Paired detail panels run 1 column → 2 at 1024px with a 24px gutter. Only two breakpoints do real work: `sm` (640px) and `lg` (1024px).
 
-**Responsive behavior.** Below 1024px the rail leaves the flow and becomes a slide-over over a 40%-opacity scrim, opened by a single icon button in a minimal 56px strip that carries nothing but that button and the seal. Tables do not restructure — they scroll horizontally inside `overflow-x-auto`, keeping column relationships intact. The sign-in screen's green branding panel is hidden entirely below 1024px and replaced by a compact centered seal-and-wordmark block above the form.
+**Responsive behavior.** Below 1024px the rail leaves the flow and becomes a slide-over over a 40%-opacity scrim, opened by a single icon button in a minimal 56px strip that carries nothing but that button and the seal. Tables do not restructure — they scroll horizontally inside `overflow-x-auto`, keeping column relationships intact. The sign-in screen's branding panel collapses below 1024px into a compact Deep Seal band above the form, carrying the seal, wordmark, headline, and one-line lede, so phones meet the same front door. The cycle register shows only on desktop screens at least 820px tall; shorter laptops keep the headline and lede with room to breathe.
 
 ### Named Rules
 
@@ -300,7 +300,7 @@ Uniformly soft, never sharp, never fully organic. The corner radius encodes what
 - **4px (`rounded`)** — loading-skeleton bars only.
 - **Fully round (`rounded-full`)** — status pills, legend dots, the status breakdown bar, the circular seal, and skeleton avatars. Roundness here means "this is a state, not a control."
 
-Borders are always exactly 1px and always a neutral, with three deliberate exceptions that use thickness to mark selection: the **2px bottom border** on the active desktop nav item, the **4px left border** on the active mobile nav item, and the **4px gold ring** on the CvSU seal. The sign-in panel's two large blurred circles (`h-96 w-96` gold at 10%, `h-80 w-80` white at 5%) are the only free-form geometry in the system, and they exist solely to give that gradient panel depth.
+Borders are always exactly 1px and always a neutral, with three deliberate exceptions that use thickness to mark selection: the **2px bottom border** on the active desktop nav item, the **4px left border** on the active mobile nav item, and the **4px gold ring** on the CvSU seal. The sign-in panel's blind-embossed seal — concentric rings with "Cavite State University" on the top arc and "Office of Student Affairs and Services" upright on the bottom arc, in white at 8%, cropped off the top-right corner — is the only free-form geometry in the system. It exists to press the institution into the page the way a seal is pressed into an official record, and its center stays empty so it never competes with the headline.
 
 ### Named Rules
 

@@ -3,9 +3,12 @@
 namespace Tests\Feature\Scholarship;
 
 use App\Models\Scholarship;
+use App\Models\ScholarshipApplication;
+use App\Models\ScholarshipApplicationDocument;
 use App\Models\ScholarshipRequiredDocument;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AdminScholarshipManagementTest extends TestCase
@@ -99,6 +102,64 @@ class AdminScholarshipManagementTest extends TestCase
 
         $response->assertRedirect(route('admin.scholarships.index'));
         $this->assertModelMissing($scholarship);
+    }
+
+    public function test_deleting_a_scholarship_removes_its_applicants_uploads_and_samples_from_storage(): void
+    {
+        Storage::fake('supabase');
+        $admin = User::factory()->admin()->create();
+        $scholarship = Scholarship::factory()->create();
+        $requiredDocument = ScholarshipRequiredDocument::factory()->for($scholarship)->withSample()->create();
+        $upload = ScholarshipApplicationDocument::factory()
+            ->for(ScholarshipApplication::factory()->for($scholarship), 'application')
+            ->for($requiredDocument, 'requiredDocument')
+            ->create();
+        $otherScholarshipsUpload = ScholarshipApplicationDocument::factory()->create();
+        Storage::disk('supabase')->put($requiredDocument->sample_path, 'sample');
+        Storage::disk('supabase')->put($upload->path, 'upload');
+        Storage::disk('supabase')->put($otherScholarshipsUpload->path, 'other upload');
+
+        $response = $this->actingAs($admin)->delete(route('admin.scholarships.destroy', $scholarship));
+
+        $response->assertRedirect(route('admin.scholarships.index'));
+        $this->assertModelMissing($scholarship);
+        $this->assertModelMissing($upload);
+        Storage::disk('supabase')->assertMissing($upload->path);
+        Storage::disk('supabase')->assertMissing($requiredDocument->sample_path);
+        Storage::disk('supabase')->assertExists($otherScholarshipsUpload->path);
+    }
+
+    public function test_student_cannot_delete_a_scholarship(): void
+    {
+        $student = User::factory()->create();
+        $scholarship = Scholarship::factory()->create();
+
+        $response = $this->actingAs($student)->delete(route('admin.scholarships.destroy', $scholarship));
+
+        $response->assertForbidden();
+        $this->assertModelExists($scholarship);
+    }
+
+    public function test_delete_confirmation_states_how_many_applications_will_be_lost(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $scholarship = Scholarship::factory()->create();
+        ScholarshipApplication::factory()->count(2)->for($scholarship)->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.scholarships.edit', $scholarship));
+
+        $response->assertSee(route('admin.scholarships.destroy', $scholarship));
+        $response->assertSee('This also deletes 2 student applications and every document uploaded with them.');
+    }
+
+    public function test_delete_confirmation_says_when_no_one_has_applied(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $scholarship = Scholarship::factory()->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.scholarships.edit', $scholarship));
+
+        $response->assertSee('No students have applied yet.');
     }
 
     public function test_admin_can_add_and_remove_a_required_document(): void
