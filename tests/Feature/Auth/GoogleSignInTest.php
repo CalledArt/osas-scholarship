@@ -3,7 +3,6 @@
 namespace Tests\Feature\Auth;
 
 use App\Enums\UserRole;
-use App\Models\StudentRosterEntry;
 use App\Models\User;
 use App\Support\GoogleIdTokenVerifier;
 use Firebase\JWT\JWT;
@@ -99,18 +98,8 @@ class GoogleSignInTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_a_new_student_must_complete_registration_even_when_on_the_roster(): void
+    public function test_a_new_student_must_complete_registration_before_an_account_exists(): void
     {
-        StudentRosterEntry::factory()->create([
-            'email' => self::EMAIL,
-            'student_number' => '21-00123',
-            'first_name' => 'Juan',
-            'middle_name' => 'Santos',
-            'last_name' => 'Dela Cruz',
-            'course' => 'BS Information Technology',
-            'year_level' => 3,
-        ]);
-
         $response = $this->signInWith($this->idToken());
 
         $response->assertRedirect('/register');
@@ -156,7 +145,7 @@ class GoogleSignInTest extends TestCase
         $this->assertDatabaseCount('users', 1);
     }
 
-    public function test_a_new_cvsu_student_can_start_registration_without_a_roster(): void
+    public function test_a_new_cvsu_student_is_sent_to_registration(): void
     {
         $response = $this->signInWith($this->idToken());
 
@@ -164,39 +153,22 @@ class GoogleSignInTest extends TestCase
             ->assertSessionHas('google_registration.identity.email', self::EMAIL);
         $this->assertGuest();
         $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('student_roster_entries', 0);
         $this->get(route('dashboard'))->assertRedirect(route('login'));
     }
 
     public function test_an_email_posted_alongside_the_token_is_ignored(): void
     {
-        StudentRosterEntry::factory()->create(['email' => 'rostered@cvsu.edu.ph']);
-
         $response = $this->post(route('login.google'), [
-            'credential' => $this->idToken(['email' => 'not.rostered@gmail.com']),
-            'email' => 'rostered@cvsu.edu.ph',
+            'credential' => $this->idToken(['email' => 'someone.else@gmail.com']),
+            'email' => 'juan.delacruz@cvsu.edu.ph',
         ]);
 
         $this->assertRefused($response);
         $this->assertDatabaseCount('users', 0);
     }
 
-    public function test_removing_a_roster_entry_does_not_block_a_registered_student(): void
-    {
-        $student = User::factory()->create(['email' => self::EMAIL]);
-        $entry = StudentRosterEntry::factory()->create(['email' => self::EMAIL]);
-        $this->signInWith($this->idToken());
-        $this->post(route('logout'));
-        $entry->delete();
-
-        $this->signInWith($this->idToken())->assertRedirect(route('dashboard'));
-        $this->assertAuthenticatedAs($student);
-    }
-
     public function test_a_token_not_signed_by_google_is_refused(): void
     {
-        StudentRosterEntry::factory()->create(['email' => self::EMAIL]);
-
         $response = $this->signInWith($this->idToken(signingKey: $this->newRsaKey()));
 
         $this->assertRefused($response, 'Google sign-in could not be verified. Please try again.');
@@ -205,22 +177,16 @@ class GoogleSignInTest extends TestCase
 
     public function test_a_token_issued_to_another_app_is_refused(): void
     {
-        StudentRosterEntry::factory()->create(['email' => self::EMAIL]);
-
         $this->assertRefused($this->signInWith($this->idToken(['aud' => 'another-app.apps.googleusercontent.com'])));
     }
 
     public function test_a_token_from_another_issuer_is_refused(): void
     {
-        StudentRosterEntry::factory()->create(['email' => self::EMAIL]);
-
         $this->assertRefused($this->signInWith($this->idToken(['iss' => 'https://evil.example.com'])));
     }
 
     public function test_an_expired_token_is_refused(): void
     {
-        StudentRosterEntry::factory()->create(['email' => self::EMAIL]);
-
         $response = $this->signInWith($this->idToken([
             'iat' => now()->subHours(2)->getTimestamp(),
             'exp' => now()->subHour()->getTimestamp(),
@@ -231,14 +197,11 @@ class GoogleSignInTest extends TestCase
 
     public function test_a_token_whose_email_google_has_not_verified_is_refused(): void
     {
-        StudentRosterEntry::factory()->create(['email' => self::EMAIL]);
-
         $this->assertRefused($this->signInWith($this->idToken(['email_verified' => false])));
     }
 
     public function test_sign_in_is_refused_while_no_client_id_is_configured(): void
     {
-        StudentRosterEntry::factory()->create(['email' => self::EMAIL]);
         $this->app->instance(GoogleIdTokenVerifier::class, new GoogleIdTokenVerifier(new AccessToken, ''));
 
         $this->assertRefused($this->signInWith($this->idToken()));
@@ -247,8 +210,6 @@ class GoogleSignInTest extends TestCase
     public function test_google_never_signs_in_to_an_admin_account(): void
     {
         User::factory()->admin()->create(['email' => self::EMAIL]);
-        StudentRosterEntry::factory()->create(['email' => self::EMAIL]);
-
         $response = $this->signInWith($this->idToken());
 
         $this->assertRefused($response, 'This is an OSAS staff account. Staff sign in with their email and password.');
@@ -259,8 +220,6 @@ class GoogleSignInTest extends TestCase
     public function test_an_existing_student_account_is_linked_on_first_google_sign_in(): void
     {
         $student = User::factory()->create(['email' => self::EMAIL, 'must_change_password' => true]);
-        StudentRosterEntry::factory()->create(['email' => self::EMAIL]);
-
         $this->signInWith($this->idToken())->assertRedirect(route('dashboard'));
 
         $this->assertAuthenticatedAs($student);
@@ -273,22 +232,10 @@ class GoogleSignInTest extends TestCase
     public function test_an_account_linked_to_another_google_account_is_refused(): void
     {
         User::factory()->create(['email' => self::EMAIL, 'google_id' => 'another-google-account']);
-        StudentRosterEntry::factory()->create(['email' => self::EMAIL]);
-
         $this->assertRefused(
             $this->signInWith($this->idToken()),
             'This student account is linked to a different Google account.',
         );
-    }
-
-    public function test_roster_details_do_not_create_an_account_or_skip_the_registration_form(): void
-    {
-        User::factory()->create(['student_number' => '21-00123']);
-        StudentRosterEntry::factory()->create(['email' => self::EMAIL, 'student_number' => '21-00123']);
-
-        $this->signInWith($this->idToken())->assertRedirect('/register');
-        $this->assertGuest();
-        $this->assertDatabaseCount('users', 1);
     }
 
     #[TestWith(['student@gmail.com', null])]
@@ -298,8 +245,6 @@ class GoogleSignInTest extends TestCase
     #[TestWith([self::EMAIL, 'other.edu.ph'])]
     public function test_only_cvsu_google_workspace_accounts_can_continue(string $email, ?string $domain): void
     {
-        StudentRosterEntry::factory()->create(['email' => $email]);
-
         $response = $this->signInWith($this->idToken(['email' => $email, 'hd' => $domain]));
 
         $this->assertRefused($response, 'Please continue with your @cvsu.edu.ph Google account.');

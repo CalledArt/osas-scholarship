@@ -59,16 +59,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::delete('scholarships/{scholarship}/required-documents/{requiredDocument}', [ScholarshipRequiredDocumentController::class, 'destroy'])
         ->name('scholarships.required-documents.destroy');
 
-    Route::patch('scholarships/{scholarship}/applications/{application}', [AdminScholarshipApplicationController::class, 'update'])
-        ->name('scholarships.applications.update');
-
     Route::post('scholarships/{scholarship}/applications/import-decisions', [AdminScholarshipApplicationController::class, 'importDecisions'])
         ->name('scholarships.applications.import-decisions');
 
     Route::get('roster', [StudentRosterController::class, 'index'])->name('roster.index');
-    Route::post('roster/import', [StudentRosterController::class, 'import'])->name('roster.import');
-    Route::get('roster/template', [StudentRosterController::class, 'template'])->name('roster.template');
-    Route::delete('roster/{entry}', [StudentRosterController::class, 'destroy'])->name('roster.destroy');
 });
 
 Route::middleware(['auth', 'verified', 'role:student'])->group(function () {

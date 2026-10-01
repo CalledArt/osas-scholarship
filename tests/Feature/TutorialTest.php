@@ -46,13 +46,13 @@ class TutorialTest extends TestCase
     {
         $this->actingAs(User::factory()->admin()->create())
             ->get(route('admin.dashboard'))
-            ->assertSee('Approve or reject applicants')
+            ->assertSee('Upload the pass list')
             ->assertDontSee('Follow your applications');
 
         $this->actingAs(User::factory()->create())
             ->get(route('dashboard'))
             ->assertSee('Follow your applications')
-            ->assertDontSee('Approve or reject applicants');
+            ->assertDontSee('Upload the pass list');
     }
 
     public function test_rail_offers_the_tutorial_from_any_page(): void

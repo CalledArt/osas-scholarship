@@ -52,7 +52,7 @@
                                         <li>{{ $row['name'] }} ({{ __(':count applicants', ['count' => $row['count']]) }})</li>
                                     @endforeach
                                 </ul>
-                                <p class="mt-1 text-xs text-gray-400">{{ __('Resolve these manually using the Approve/Reject buttons below.') }}</p>
+                                <p class="mt-1 text-xs text-gray-400">{{ __('Add their student numbers to the pass list and upload it again.') }}</p>
                             </div>
                         @endif
 
@@ -174,23 +174,6 @@
                                             {{ $document->requiredDocument->name }}
                                         </a>
                                     @endforeach
-                                </div>
-                            @endif
-
-                            @if ($application->status->value === 'pending')
-                                <div class="flex gap-3">
-                                    <form method="POST" action="{{ route('admin.scholarships.applications.update', [$scholarship, $application]) }}">
-                                        @csrf
-                                        @method('PATCH')
-                                        <input type="hidden" name="status" value="approved">
-                                        <button type="submit" class="text-sm font-medium text-green-600 hover:text-green-700">{{ __('Approve') }}</button>
-                                    </form>
-                                    <form method="POST" action="{{ route('admin.scholarships.applications.update', [$scholarship, $application]) }}">
-                                        @csrf
-                                        @method('PATCH')
-                                        <input type="hidden" name="status" value="rejected">
-                                        <button type="submit" class="text-sm font-medium text-red-600 hover:text-red-700">{{ __('Reject') }}</button>
-                                    </form>
                                 </div>
                             @endif
                         </li>

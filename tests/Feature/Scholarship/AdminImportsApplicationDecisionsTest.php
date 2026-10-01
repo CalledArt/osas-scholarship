@@ -50,7 +50,7 @@ class AdminImportsApplicationDecisionsTest extends TestCase
         $response->assertDontSee('Apply Decisions');
     }
 
-    public function test_upload_pass_list_form_is_visible_when_applicants_are_pending(): void
+    public function test_the_pass_list_is_the_only_decision_offered_for_pending_applicants(): void
     {
         $admin = User::factory()->admin()->create();
         $scholarship = Scholarship::factory()->for($admin, 'postedBy')->create();
@@ -60,6 +60,23 @@ class AdminImportsApplicationDecisionsTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Apply Decisions');
+        $response->assertDontSee('Approve');
+        $response->assertDontSee('Reject');
+    }
+
+    public function test_an_application_cannot_be_decided_one_at_a_time(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $scholarship = Scholarship::factory()->for($admin, 'postedBy')->create();
+        $application = ScholarshipApplication::factory()->for($scholarship)->create();
+
+        $response = $this->actingAs($admin)->patch(
+            "/admin/scholarships/{$scholarship->id}/applications/{$application->id}",
+            ['status' => 'approved']
+        );
+
+        $response->assertNotFound();
+        $this->assertSame(ApplicationStatus::Pending, $application->fresh()->status);
     }
 
     public function test_student_is_forbidden_from_uploading_a_pass_list(): void

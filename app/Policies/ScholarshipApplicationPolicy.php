@@ -41,14 +41,6 @@ class ScholarshipApplicationPolicy
     }
 
     /**
-     * Determine whether the user can update the model's status.
-     */
-    public function update(User $user, ScholarshipApplication $scholarshipApplication): bool
-    {
-        return $user->isAdmin();
-    }
-
-    /**
      * Determine whether the user can delete the model.
      */
     public function delete(User $user, ScholarshipApplication $scholarshipApplication): bool

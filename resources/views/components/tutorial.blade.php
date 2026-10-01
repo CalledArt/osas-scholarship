@@ -27,13 +27,13 @@
             ],
             [
                 'targets' => ['nav-scholarships'],
-                'title' => __('Approve or reject applicants'),
-                'body' => __('Inside each scholarship, approve or reject applicants one at a time, or import decisions from a CSV. Each approval fills one slot.'),
+                'title' => __('Upload the pass list'),
+                'body' => __('Inside each scholarship, upload a CSV of who passed. Matched applicants are approved, each filling one slot, and every other pending applicant is rejected.'),
             ],
             [
                 'targets' => ['nav-roster'],
-                'title' => __('Keep the student roster current'),
-                'body' => __('Students verify their CvSU Google account and complete a registration form. The roster is an optional reference for OSAS; importing or removing entries does not change student sign-in access.'),
+                'title' => __('See registered students'),
+                'body' => __('Students join the roster by verifying their CvSU Google account and completing the registration form. There is nothing to import.'),
             ],
             [
                 'targets' => ['nav-tutorial'],
