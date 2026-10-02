@@ -130,7 +130,7 @@ class GoogleSignInTest extends TestCase
         $this->assertNull($user->password);
         $this->assertNotNull($user->email_verified_at);
         $this->assertFalse($user->must_change_password);
-        $this->get(route('dashboard'))->assertOk();
+        $this->get(route('dashboard'))->assertRedirect(route('tutorial'));
     }
 
     public function test_a_returning_student_signs_in_to_the_same_account(): void

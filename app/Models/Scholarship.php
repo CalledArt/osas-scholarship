@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ApplicationStatus;
+use App\Enums\ScholarshipAvailability;
 use App\Enums\ScholarshipStatus;
 use Database\Factories\ScholarshipFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -94,9 +95,23 @@ class Scholarship extends Model
 
     public function isOpenForApplications(): bool
     {
-        return $this->status === ScholarshipStatus::Open
-            && ! $this->hasPassedDeadline()
-            && $this->remainingSlots() > 0;
+        return $this->availability() === ScholarshipAvailability::Open;
+    }
+
+    /**
+     * Whether students can apply and, if not, the first reason they can't.
+     *
+     * The slot count is checked last because it is the only check that may
+     * cost a query when `approved_applications_count` was not loaded.
+     */
+    public function availability(): ScholarshipAvailability
+    {
+        return match (true) {
+            $this->status !== ScholarshipStatus::Open => ScholarshipAvailability::ClosedByOsas,
+            $this->hasPassedDeadline() => ScholarshipAvailability::PastDeadline,
+            $this->remainingSlots() === 0 => ScholarshipAvailability::Full,
+            default => ScholarshipAvailability::Open,
+        };
     }
 
     /**

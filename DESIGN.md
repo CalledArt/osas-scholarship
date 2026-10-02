@@ -21,7 +21,6 @@ colors:
   approved-ink: "#15803D"
   rejected-wash: "#FEE2E2"
   rejected-ink: "#B91C1C"
-  rejected-mark: "#F87171"
   danger: "#DC2626"
 typography:
   display:
@@ -47,12 +46,6 @@ typography:
     fontSize: "1.125rem"
     fontWeight: 600
     lineHeight: 1.75rem
-    letterSpacing: "normal"
-  metric:
-    fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.875rem"
-    fontWeight: 700
-    lineHeight: 2.25rem
     letterSpacing: "normal"
   body:
     fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
@@ -117,11 +110,6 @@ components:
     textColor: "{colors.ink}"
     rounded: "{rounded.lg}"
     padding: "24px"
-  stat-tile:
-    backgroundColor: "{colors.record-white}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.lg}"
-    padding: "20px"
   badge-pending:
     backgroundColor: "rgba(255, 199, 44, 0.2)"
     textColor: "{colors.deep-seal}"
@@ -189,7 +177,7 @@ The system rejects the dashboard-as-spectacle idiom. No gradient cards, no glass
 An institutional two-note palette — a deep muted forest green and a warm saturated academic gold — set against a strictly neutral cool-gray document stack that does all the structural work.
 
 ### Primary
-- **Seal Green** (#0B6E4F): The university's authority color and the system's only action color. It fills primary buttons ("Post Scholarship", "Sign in"), colors every inline navigational link ("View details →", "View"), underlines the active desktop nav item, fills the approved segment of the status bar, and states the awarded count on the admin dashboard. Also the input focus border.
+- **Seal Green** (#0B6E4F): The university's authority color and the system's only action color. It fills primary buttons ("Post Scholarship", "Sign in"), colors every inline navigational link ("View details →", "View"), and underlines the active desktop nav item. Also the input focus border.
 - **Deep Seal** (#074A35): The hover partner for every Seal Green surface, and the text color for the wordmark and for anything set on a gold wash (the pending badge, the role chip in the account menu). Never used as a fill for a resting element.
 - **Signal Green** (#0F9D63): Reserved almost entirely for the sign-in branding panel, as the light source of a radial glow falling from its top-right corner across a Deep Seal field. It is a lighting effect, not a UI color. Text on that panel sits on the Deep Seal end, where white at 70% opacity still clears 4.5:1.
 
@@ -203,17 +191,17 @@ An institutional two-note palette — a deep muted forest green and a warm satur
 - **Ledger Gray** (#F9FAFB): Table header rows, table row hover, and secondary-button hover. The faintest possible tonal shift.
 - **Rule Line** (#E5E7EB): Table head/body dividers and the mobile nav section separator.
 - **Field Stroke** (#D1D5DB): Input and checkbox borders at rest, and the secondary button's edge.
-- **Ink** (#111827): Card headings, table cell primary text, KPI numerals — the highest-contrast text.
+- **Ink** (#111827): Card headings, table cell primary text, the pending counts in the decision queue — the highest-contrast text.
 - **Ink Soft** (#1F2937): Page header titles in the white header bar.
 - **Graphite** (#374151): Form field labels and secondary-button text.
 - **Slate** (#6B7280): Body copy, supporting descriptions, table cell secondary values, idle nav items.
 - **Mist** (#9CA3AF): Decorative marks only — input icons and the em-dash that stands in for an absent value. At ≈2.6:1 on white it is **not** a text color; anything a reader must actually read is Slate or darker.
 
 ### Tertiary
-Status semantics, used only inside badges, flash messages, and the status bar. They never appear as page furniture.
+Status semantics, used only inside badges and flash messages, plus the one red deadline below. They never appear as page furniture.
 
 - **Approved** (#DCFCE7 wash / #15803D ink): Approved application badges and success flash messages.
-- **Rejected** (#FEE2E2 wash / #B91C1C ink): Rejected application badges. **Rejected Mark** (#F87171) is the rejected segment of the status breakdown bar.
+- **Rejected** (#FEE2E2 wash / #B91C1C ink): Rejected application badges. On the student dashboard, a deadline inside three days sets in Rejected Ink at 600 weight — the one place red appears outside a badge or a destructive control. The admin decision queue never uses it.
 - **Danger** (#DC2626): Destructive buttons only (account deletion). It is the one red that is ever a fill.
 
 ### Named Rules
@@ -241,15 +229,14 @@ Status semantics, used only inside badges, flash messages, and the status bar. T
 - **Headline** (700, 1.5rem/24px, 2rem): The auth form heading ("Sign in", "Reset password"). One per screen, on unauthenticated pages only.
 - **Title** (600, 1.25rem/20px, leading-tight): The page header inside the white header bar — the persistent "what screen am I on" label. Exactly one per authenticated screen.
 - **Section** (600, 1.125rem/18px, 1.75rem): Card headings and the dashboard welcome line.
-- **Metric** (700, 1.875rem/30px, 2.25rem): KPI numerals on the admin dashboard. Always paired with a Label above and a Mist caption below.
 - **Body** (400, 0.875rem/14px, 1.25rem): All supporting copy, table cells, form inputs, nav items, buttons. The default.
-- **Label** (500, 0.75rem/12px, +0.025em tracking): Badges, KPI captions, and — uppercased with wider tracking (+0.05em) — table column headers and stat-tile labels.
+- **Label** (500, 0.75rem/12px, +0.025em tracking): Badges and, uppercased with wider tracking (+0.05em), table column headers.
 
 ### Named Rules
 
 **The Single Family Rule.** Figtree does every job. Do not introduce a second family for headings, numerals, or emphasis — if something needs to feel different, change its weight or its size. The one exception is character disambiguation: a value the reader must transcribe exactly, such as a one-time password or a literal CSV header, sets in the mono stack. Wanting to look technical is not disambiguation.
 
-**The Small-Caps Perimeter Rule.** Uppercase with letter-spacing is reserved for the perimeter of data: table column headers and stat-tile captions. It never touches a sentence, a button, a card heading, or a badge. Every button in the system reads in sentence case at Body size.
+**The Small-Caps Perimeter Rule.** Uppercase with letter-spacing is reserved for the perimeter of data: table column headers. It never touches a sentence, a button, a card heading, or a badge. Every button in the system reads in sentence case at Body size.
 
 **The Tabular Numerals Rule.** Every number a reader compares down a column sets in `font-variant-numeric: tabular-nums` — counts, slot ratios, waits, elapsed days. Proportional digits make a column of figures ragged, and a register whose numbers do not line up is not a register. This is the cheapest detail in the system and the one most easily lost.
 
@@ -259,11 +246,11 @@ Status semantics, used only inside badges, flash messages, and the status bar. T
 
 The application is a two-column shell: a fixed 240px (`w-60`) rail on the left and a content column that takes the rest. There is no horizontal navigation bar at any breakpoint. Content sits on the Bond Paper desk by default; surfaces that *are* the document opt into a Record White sheet instead.
 
-**Containers.** Widths are chosen semantically inside the content column: **1024px (`max-w-5xl`)** for the register and for the student's scholarship list, where rows are read top-to-bottom; **1280px (`max-w-7xl`)** for wide administrative tables that need every column; and **384px (`max-w-sm`)** for auth forms, centered in their half of the split. Content gutters step 24px → 40px (`px-6 lg:px-10`); older card surfaces keep 16px → 24px → 32px.
+**Containers.** Widths are chosen semantically inside the content column: **1024px (`max-w-5xl`)** for the admin decision queue and the student's scholarship list, where rows are read top-to-bottom; **1280px (`max-w-7xl`)** for wide administrative tables that need every column; and **384px (`max-w-sm`)** for auth forms, centered in their half of the split. Content gutters step 24px → 40px (`px-6 lg:px-10`); older card surfaces keep 16px → 24px → 32px.
 
-**Vertical rhythm.** Content regions open with 48px of top and bottom padding (`py-12`). Sibling cards and sections stack at 24px (`space-y-6`); tighter lists — the student scholarship feed — stack at 16px (`space-y-4`). Card interiors are 24px (`p-6`); stat tiles are 20px (`p-5`); list rows inside a card are 24px horizontal by 12px vertical. Form fields stack at 20px (`space-y-5`), with 4px between a label and its input and 8px before an error message.
+**Vertical rhythm.** Content regions open with 48px of top and bottom padding (`py-12`). Sibling cards and sections stack at 24px (`space-y-6`); tighter lists — the student scholarship feed — stack at 16px (`space-y-4`). Card interiors are 24px (`p-6`); list rows inside a card are 24px horizontal by 12px vertical. Form fields stack at 20px (`space-y-5`), with 4px between a label and its input and 8px before an error message.
 
-**Grids.** The admin KPI row runs 1 column → 2 at 640px → 5 at 1024px. Paired detail panels run 1 column → 2 at 1024px with a 24px gutter. Only two breakpoints do real work: `sm` (640px) and `lg` (1024px).
+**Grids.** Paired detail panels run 1 column → 2 at 1024px with a 24px gutter. Only two breakpoints do real work: `sm` (640px) and `lg` (1024px).
 
 **Responsive behavior.** Below 1024px the rail leaves the flow and becomes a slide-over over a 40%-opacity scrim, opened by a single icon button in a minimal 56px strip that carries nothing but that button and the seal. Tables do not restructure — they scroll horizontally inside `overflow-x-auto`, keeping column relationships intact. The sign-in screen's branding panel collapses below 1024px into a compact Deep Seal band above the form, carrying the seal, wordmark, headline, and one-line lede, so phones meet the same front door. The cycle register shows only on desktop screens at least 820px tall; shorter laptops keep the headline and lede with room to breathe.
 
@@ -282,7 +269,7 @@ The application is a two-column shell: a fixed 240px (`w-60`) rail on the left a
 Hover never lifts. Interactive cards respond by warming their border to 40%-opacity Seal Green (`hover:border-cvsu-green/40`) and list rows respond with a Ledger Gray fill — the surface stays exactly where it is.
 
 ### Shadow Vocabulary
-- **Seat** (`box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05)`): The default for every card, stat tile, table container, primary button, and input. Barely perceptible; its job is edge definition, not elevation.
+- **Seat** (`box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05)`): The default for every card, table container, primary button, and input. Barely perceptible; its job is edge definition, not elevation.
 - **Header band** (`box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)`): The white page-header strip below the nav, the one horizontal element that casts onto the content beneath it.
 - **Overlay** (`box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)`): The account dropdown, paired with a `ring-1 ring-black/5` edge.
 - **Dialog** (`box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)`): Modals only, over a 75%-opacity gray-500 scrim.
@@ -295,10 +282,10 @@ Hover never lifts. Interactive cards respond by warming their border to 40%-opac
 
 Uniformly soft, never sharp, never fully organic. The corner radius encodes what a thing is:
 
-- **8px (`rounded-lg`)** — the system's signature radius. Cards, stat tiles, table containers, primary buttons, text inputs, flash-message banners, and modals. If it holds content or commits an action, it is 8px.
+- **8px (`rounded-lg`)** — the system's signature radius. Cards, table containers, primary buttons, text inputs, flash-message banners, and modals. If it holds content or commits an action, it is 8px.
 - **6px (`rounded-md`)** — secondary and danger buttons, the account dropdown panel, and icon buttons. A subtly tighter corner that quietly separates supporting controls from primary ones.
 - **4px (`rounded`)** — loading-skeleton bars only.
-- **Fully round (`rounded-full`)** — status pills, legend dots, the status breakdown bar, the circular seal, and skeleton avatars. Roundness here means "this is a state, not a control."
+- **Fully round (`rounded-full`)** — status pills, the circular seal, and skeleton avatars. Roundness here means "this is a state, not a control."
 
 Borders are always exactly 1px and always a neutral, with three deliberate exceptions that use thickness to mark selection: the **2px bottom border** on the active desktop nav item, the **4px left border** on the active mobile nav item, and the **4px gold ring** on the CvSU seal. The sign-in panel's blind-embossed seal — concentric rings with "Cavite State University" on the top arc and "Office of Student Affairs and Services" upright on the bottom arc, in white at 8%, cropped off the top-right corner — is the only free-form geometry in the system. It exists to press the institution into the page the way a seal is pressed into an official record, and its center stays empty so it never competes with the headline.
 
@@ -333,7 +320,7 @@ Components are **quiet, bordered, and unambiguous**. They state their status pla
 - **Background:** Record White on the Bond Paper Gray page ground.
 - **Shadow Strategy:** Seat only — see Elevation & Depth.
 - **Border:** 1px Bond Paper Gray, identical to the page ground.
-- **Internal Padding:** 24px for content cards, 20px for stat tiles. Cards with a titled head use a divided structure instead: a 24px × 16px header block with a 1px bottom rule, then a `divide-y` list whose rows are 24px × 12px.
+- **Internal Padding:** 24px for content cards. Cards with a titled head use a divided structure instead: a 24px × 16px header block with a 1px bottom rule, then a `divide-y` list whose rows are 24px × 12px.
 - **Interactive variant:** A card that is itself a link warms its border to Seal Green at 40% opacity on hover, with no movement and no shadow change.
 
 ### Inputs / Fields
@@ -351,12 +338,12 @@ Components are **quiet, bordered, and unambiguous**. They state their status pla
 - **Account block:** Name in Ink, role beneath in Slate as plain text, then Profile and Log Out as ordinary rail items. Log Out is a real submit button styled to match, so the destructive-ish action is never a bare link.
 - **Below 1024px:** the identical rail contents render inside a slide-over; the two instances never appear at once, so only one is ever in the accessibility tree.
 
-### The Register (signature component)
-The admin dashboard's whole surface: one ruled table on the Record White sheet with **no card wrapper**, ordered so the scholarships needing a decision come first, soonest deadline leading. Columns run Scholarship · Pending · Awarded · Oldest wait · Closes · Status, with every numeric column right-aligned in tabular numerals. Rows are separated by a 1px `divide-y`-weight hairline and fill Ledger Gray on hover without moving. The scholarship title is the link; the row does not fake a click target it cannot give keyboard users.
+### The Decision Queue (signature component)
+The admin dashboard's working surface: the scholarships that still have applicants waiting, as ruled lists on the Record White sheet with **no card wrapper**, split by whether a pass list can settle them yet. A pass list rejects every pending applicant it does not name, so a scholarship belongs under **Ready for a pass list** only once students can no longer apply — OSAS closed it, its deadline passed, or every slot is filled. Those rows lead, longest wait first. The rest sit under **Still taking applications**, soonest deadline first, beneath one Slate line warning that a pass list rejects everyone not on it. Scholarships with nothing pending are left to the Scholarships index: the dashboard is a queue of work, not a register of the whole cycle.
 
-Absent values render as a Mist em-dash paired with an `sr-only` word. Awarded shows `filled / slots` and turns Seal Green at 600 weight only when the last slot is taken. A deadline inside three days on a row that still has pending applications turns Rejected Ink at 600 weight — the one place red appears outside a destructive control. When both groups exist, a single `scope="colgroup"` header row labelled "Settled" divides them.
+Each row is a single link. The title sets in Ink at 600 weight and turns Seal Green on hover; beneath it a Slate meta line states availability first — "Closed by OSAS", "Closed 4 days ago", "Full", or "Closes in 9 days" — then "3 of 10 slots filled". Availability comes from the same check that stops applications, so a full or closed scholarship never reads as closing later. On the right, the pending count is an 18px Ink numeral at 600 weight in tabular figures over the word "pending", then "Review →" in Seal Green, which becomes a Slate chevron below 640px. Rows are divided by hairlines, fill Ledger Gray on hover without moving, and bleed 12px past the text column so the fill frames the text rather than clipping it. No row is red: the students' deadline is not the office's, so urgency is carried by group and position.
 
-Above it sits **the standing line**: one sentence of ordinary prose stating what is waiting and what closes next, with only the numbers and the scholarship name emphasised. It replaces a KPI tile grid outright — the counts a dashboard would have tiled are either in that sentence or in the column beside the row they describe.
+Above the queue sits **the standing line**: one sentence of ordinary prose with only the numbers emphasised. It counts pass lists due, not applications — "2 scholarships are ready for a pass list. 2 more are still taking applications." — or says plainly that no pass lists are due yet, that the office is caught up, or that nothing has been posted. It replaces a KPI tile grid outright.
 
 ### Page Loading Skeleton
 A full-screen white overlay that intercepts same-origin link clicks and form submits, showing a nav-bar stub and three pulsing card placeholders in gray-200. It reproduces the real layout's proportions — 64px bar, `max-w-7xl` container, 24px-padded cards — so the transition doesn't jump. It self-clears on `pageshow` when the user returns via the back-forward cache.
@@ -370,18 +357,18 @@ A full-screen white overlay that intercepts same-origin link clicks and form sub
 - **Do** render every disabled control at 70% opacity with a not-allowed cursor.
 - **Do** reserve gold for the unresolved and the focused — pending decisions and keyboard focus. If you are reaching for gold and neither applies, reach for a neutral.
 - **Do** border cards with the same value as the page ground (#F3F4F6). Records sit in the desk, they don't hover over it.
-- **Do** build hierarchy from Figtree's weights (400/500/600/700) and the seven type roles. Never add a second font family.
-- **Do** pick containers by task: `max-w-7xl` for administrative comparison surfaces, `max-w-5xl` for student reading lists, `max-w-sm` for auth forms.
+- **Do** build hierarchy from Figtree's weights (400/500/600/700) and the six type roles. Never add a second font family.
+- **Do** pick containers by task: `max-w-7xl` for administrative comparison surfaces, `max-w-5xl` for lists read top to bottom (the student's scholarship list, the admin decision queue), `max-w-sm` for auth forms.
 - **Do** set every compared number in tabular numerals and right-align it in its column.
 - **Do** say it in a sentence when a sentence will do. A line of prose naming what is waiting beats a row of tiles restating the same counts.
 - **Do** pair every colour-or-glyph-only signal (an em-dash for "none", a coloured deadline) with `sr-only` text carrying the same meaning.
 - **Do** write a real empty state for every list and table — a centered sentence at 14px in Mist or Slate, inside the card, saying what would appear here and what to do about it ("Nothing needs review right now.", "No scholarships have been posted yet.").
-- **Do** give every progress or status graphic an accessible text equivalent, as the status breakdown bar does with `role="img"` and a spelled-out aria-label.
+- **Do** give every progress or status graphic an accessible text equivalent, such as `role="img"` with a spelled-out aria-label.
 - **Do** keep state transitions at 150ms `ease-in-out`, overlay entrances at 200–300ms, and overlay exits faster than their entrances (75–200ms).
 
 ### Don't:
 - **Don't** reintroduce `focus:ring-indigo-500`. Both Laravel Breeze instances — the secondary button and the profile form's resend-verification button — have been removed; indigo belongs to no part of this palette. Pick a ring hue with the Two-Ring Rule.
-- **Don't** uppercase a button label. `uppercase tracking-widest` was Breeze residue on the secondary and danger buttons and has been removed; uppercase belongs only to table column headers and stat-tile captions.
+- **Don't** uppercase a button label. `uppercase tracking-widest` was Breeze residue on the secondary and danger buttons and has been removed; uppercase belongs only to table column headers.
 - **Don't** shrink a supporting button's type to signal that it is secondary. All three variants share 14px/600; the hierarchy lives in fill and border.
 - **Don't** disable a control below 70% opacity. The Breeze default of 25% left the label unreadable.
 - **Don't** add shadows to convey importance. Surfaces are flat at rest and stay flat on hover — deepen a border or add a heading instead. Only dropdowns and modals may exceed the Seat shadow.
@@ -396,5 +383,5 @@ A full-screen white overlay that intercepts same-origin link clicks and form sub
 - **Don't** represent a distribution as a stacked bar, donut, progress ring, or sparkline. This system states quantities as aligned figures; a reader should never have to estimate a length to learn a number.
 - **Don't** put navigation in a horizontal bar. The rail is the only wayfinding surface.
 - **Don't** set gold or Mist as text. See the Gold Is Not Ink and Readable Neutral rules.
-- **Don't** wrap a table in a card. A register is the document, not something sitting on top of one.
+- **Don't** wrap a table or the decision queue in a card. A list of records is the document, not something sitting on top of one.
 - **Don't** use `diffForHumans()` for a deadline. It phrases futures as "1 day from now" and truncates fractional days, so a date two days out reads as one. Count whole calendar days between day boundaries.

@@ -13,17 +13,17 @@
 
     <nav class="flex-1 space-y-1 px-3 pt-2" aria-label="{{ __('Main navigation') }}">
         @if ($isAdmin)
-            <x-rail-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+            <x-rail-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" data-tour="nav-dashboard">
                 {{ __('Dashboard') }}
             </x-rail-link>
             <x-rail-link :href="route('admin.scholarships.index')" :active="request()->routeIs('admin.scholarships.*')" data-tour="nav-scholarships">
                 {{ __('Scholarships') }}
             </x-rail-link>
             <x-rail-link :href="route('admin.roster.index')" :active="request()->routeIs('admin.roster.*')" data-tour="nav-roster">
-                {{ __('Student Roster') }}
+                {{ __('Search Student') }}
             </x-rail-link>
         @else
-            <x-rail-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+            <x-rail-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" data-tour="nav-dashboard">
                 {{ __('Dashboard') }}
             </x-rail-link>
             <x-rail-link :href="route('scholarships.index')" :active="request()->routeIs('scholarships.*')" data-tour="nav-scholarships">
@@ -41,10 +41,7 @@
             <p class="truncate text-xs text-gray-500">{{ Auth::user()->role->label() }}</p>
         </div>
 
-        {{-- Replays in place on a dashboard; from anywhere else it opens the dashboard, which starts the tour. --}}
-        <x-rail-link :href="route($isAdmin ? 'admin.dashboard' : 'dashboard', ['tutorial' => 1])"
-                     data-tour="nav-tutorial"
-                     x-on:click="if (window.tutorialAvailable) { $event.preventDefault(); navOpen = false; $dispatch('tutorial-start'); }">
+        <x-rail-link :href="route('tutorial')" :active="request()->routeIs('tutorial')" data-tour="nav-tutorial">
             {{ __('Tutorial') }}
         </x-rail-link>
 

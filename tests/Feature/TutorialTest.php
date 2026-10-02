@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Js;
 use Illuminate\Support\Str;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 class TutorialTest extends TestCase
@@ -13,46 +13,110 @@ class TutorialTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * The fragment of the tour's config that says whether it starts on its own,
-     * encoded exactly as @js writes it into the page.
+     * Every distinct place a form on the page can post to, sorted.
+     *
+     * @return list<string>
      */
-    private function autostart(bool $value): string
+    private function formActions(TestResponse $response): array
     {
-        return Str::between((string) Js::from(['autostart' => $value]), '{', '}');
+        preg_match_all('/<form\b[^>]*\baction="([^"]*)"/', $response->getContent(), $matches);
+        $actions = array_values(array_unique(array_map('html_entity_decode', $matches[1])));
+        sort($actions);
+
+        return $actions;
     }
 
-    public function test_tutorial_starts_on_its_own_until_the_user_completes_it(): void
+    public function test_a_newcomers_dashboard_opens_the_practice_tour_first(): void
+    {
+        $this->actingAs(User::factory()->newcomer()->create())
+            ->get(route('dashboard'))
+            ->assertRedirect(route('tutorial'));
+
+        $this->actingAs(User::factory()->admin()->newcomer()->create())
+            ->get(route('admin.dashboard'))
+            ->assertRedirect(route('tutorial'));
+    }
+
+    public function test_the_dashboard_opens_normally_once_the_tour_has_been_seen(): void
     {
         $student = User::factory()->create();
 
-        $this->actingAs($student)->get(route('dashboard'))->assertSee($this->autostart(true), false);
+        $response = $this->actingAs($student)->get(route('dashboard'));
 
-        $this->actingAs($student)->post(route('tutorial.complete'))->assertNoContent();
+        $response->assertOk();
+    }
+
+    public function test_completing_the_tour_records_it_and_returns_to_the_dashboard(): void
+    {
+        $student = User::factory()->newcomer()->create();
+        $admin = User::factory()->admin()->newcomer()->create();
+
+        $this->actingAs($student)->post(route('tutorial.complete'))->assertRedirect(route('dashboard'));
+        $this->actingAs($admin)->post(route('tutorial.complete'))->assertRedirect(route('admin.dashboard'));
 
         $this->assertNotNull($student->fresh()->tutorial_completed_at);
-        $this->actingAs($student->fresh())->get(route('dashboard'))->assertSee($this->autostart(false), false);
+        $this->assertNotNull($admin->fresh()->tutorial_completed_at);
     }
 
-    public function test_tutorial_link_replays_a_completed_tutorial(): void
+    public function test_replaying_the_tour_keeps_the_first_completion(): void
     {
-        $admin = User::factory()->admin()->create(['tutorial_completed_at' => now()]);
+        $student = User::factory()->create(['tutorial_completed_at' => '2026-09-01 08:00:00']);
 
-        $response = $this->actingAs($admin)->get(route('admin.dashboard', ['tutorial' => 1]));
+        $this->actingAs($student)->post(route('tutorial.complete'));
 
-        $response->assertSee($this->autostart(true), false);
+        $this->assertSame('2026-09-01 08:00:00', $student->fresh()->tutorial_completed_at->toDateTimeString());
     }
 
-    public function test_each_role_gets_its_own_tour(): void
+    public function test_each_role_practices_its_own_flow(): void
     {
         $this->actingAs(User::factory()->admin()->create())
-            ->get(route('admin.dashboard'))
+            ->get(route('tutorial'))
             ->assertSee('Upload the pass list')
-            ->assertDontSee('Follow your applications');
+            ->assertDontSee('Follow your application');
 
         $this->actingAs(User::factory()->create())
-            ->get(route('dashboard'))
-            ->assertSee('Follow your applications')
+            ->get(route('tutorial'))
+            ->assertSee('Follow your application')
             ->assertDontSee('Upload the pass list');
+    }
+
+    public function test_the_student_tour_fills_the_practice_form_from_their_own_account(): void
+    {
+        $student = User::factory()->create([
+            'student_number' => '22-04567',
+            'course' => 'BS Agriculture',
+            'contact_number' => '09171234567',
+        ]);
+
+        $response = $this->actingAs($student)->get(route('tutorial'));
+
+        $response->assertSee('22-04567');
+        $response->assertSee('BS Agriculture');
+        $response->assertSee('09171234567');
+    }
+
+    public function test_every_menu_item_the_tour_points_at_is_in_the_menu(): void
+    {
+        foreach ([User::factory()->admin()->create(), User::factory()->create()] as $user) {
+            $page = $this->actingAs($user)->get(route('tutorial'))->getContent();
+            $config = Str::between($page, 'x-data="tutorial(', ')"');
+            preg_match_all('/nav-[a-z]+/', $config, $matches);
+
+            $this->assertNotEmpty($matches[0]);
+
+            foreach (array_unique($matches[0]) as $menuItem) {
+                $this->assertStringContainsString('data-tour="'.$menuItem.'"', $page, "The tour points at {$menuItem}, which the menu lacks.");
+            }
+        }
+    }
+
+    public function test_the_practice_tour_can_only_mark_itself_seen(): void
+    {
+        foreach ([User::factory()->admin()->create(), User::factory()->create()] as $user) {
+            $response = $this->actingAs($user)->get(route('tutorial'));
+
+            $this->assertSame([route('logout'), route('tutorial.complete')], $this->formActions($response));
+        }
     }
 
     public function test_rail_offers_the_tutorial_from_any_page(): void
@@ -61,12 +125,12 @@ class TutorialTest extends TestCase
 
         $response = $this->actingAs($student)->get(route('profile.edit'));
 
-        $response->assertSee(route('dashboard', ['tutorial' => 1]), false);
-        $response->assertSee('Tutorial');
+        $response->assertSee(route('tutorial'));
     }
 
-    public function test_guest_cannot_complete_the_tutorial(): void
+    public function test_guest_cannot_open_or_complete_the_tutorial(): void
     {
+        $this->get(route('tutorial'))->assertRedirect(route('login'));
         $this->post(route('tutorial.complete'))->assertRedirect(route('login'));
     }
 }

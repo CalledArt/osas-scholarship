@@ -51,7 +51,7 @@ class DashboardTest extends TestCase
         $response->assertSee('View all 2 scholarships');
     }
 
-    public function test_scholarships_awaiting_a_decision_are_ordered_by_soonest_deadline(): void
+    public function test_scholarships_still_taking_applications_are_ordered_by_soonest_deadline(): void
     {
         $admin = User::factory()->admin()->create();
 
@@ -66,10 +66,115 @@ class DashboardTest extends TestCase
 
         $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
-        $response->assertOk();
-        $response->assertViewHas('needsDecision', function (Collection $needsDecision): bool {
-            return $needsDecision->pluck('title')->all() === ['Sooner Grant', 'Later Grant', 'Open Ended Grant'];
+        $response->assertViewHas('takingApplications', function (Collection $takingApplications): bool {
+            return $takingApplications->pluck('title')->all() === ['Sooner Grant', 'Later Grant', 'Open Ended Grant'];
         });
+        $response->assertViewHas('readyForPassList', fn (Collection $readyForPassList): bool => $readyForPassList->isEmpty());
+    }
+
+    public function test_scholarships_students_can_no_longer_apply_to_are_ready_for_a_pass_list(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $closedEarly = Scholarship::factory()->closed()->create(['title' => 'Closed Early Grant', 'deadline' => now()->addMonth()]);
+        $pastDeadline = Scholarship::factory()->create(['title' => 'Past Deadline Grant', 'deadline' => now()->subDays(3)]);
+        $full = Scholarship::factory()->create(['title' => 'Full Grant', 'slots' => 1, 'deadline' => now()->addMonth()]);
+        ScholarshipApplication::factory()->approved()->for($full)->create();
+        $open = Scholarship::factory()->create(['title' => 'Open Grant', 'slots' => 5, 'deadline' => now()->addMonth()]);
+
+        foreach ([$closedEarly, $pastDeadline, $full, $open] as $scholarship) {
+            ScholarshipApplication::factory()->for($scholarship)->create();
+        }
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertViewHas('readyForPassList', function (Collection $readyForPassList): bool {
+            return $readyForPassList->pluck('title')->sort()->values()->all() === ['Closed Early Grant', 'Full Grant', 'Past Deadline Grant'];
+        });
+        $response->assertViewHas('takingApplications', function (Collection $takingApplications): bool {
+            return $takingApplications->pluck('title')->all() === ['Open Grant'];
+        });
+        $response->assertSeeInOrder(['Ready for a pass list', 'Still taking applications', 'Open Grant']);
+    }
+
+    public function test_scholarships_ready_for_a_pass_list_are_ordered_by_longest_wait(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        foreach ([
+            'Recent Grant' => [now()->subDays(1), now()->subDays(2)],
+            'Open Ended Grant' => [null, now()->subDays(20)],
+            'Middle Grant' => [now()->subDays(8), now()->subDays(9)],
+        ] as $title => [$deadline, $submittedAt]) {
+            $scholarship = Scholarship::factory()->closed()->create(['title' => $title, 'deadline' => $deadline]);
+            ScholarshipApplication::factory()->for($scholarship)->create(['submitted_at' => $submittedAt]);
+            ScholarshipApplication::factory()->for($scholarship)->create(['submitted_at' => now()]);
+        }
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertViewHas('readyForPassList', function (Collection $readyForPassList): bool {
+            return $readyForPassList->pluck('title')->all() === ['Open Ended Grant', 'Middle Grant', 'Recent Grant'];
+        });
+    }
+
+    public function test_a_full_scholarship_reads_as_full_rather_than_closing_later(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $scholarship = Scholarship::factory()->create(['title' => 'Municipal Grant', 'slots' => 1, 'deadline' => now()->addDays(21)]);
+        ScholarshipApplication::factory()->approved()->for($scholarship)->create();
+        ScholarshipApplication::factory()->for($scholarship)->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertSeeInOrder(['Municipal Grant', 'Full', '1 of 1 slots filled']);
+        $response->assertDontSee('Closes in 21 days');
+    }
+
+    public function test_a_scholarship_osas_closed_early_reads_as_closed_rather_than_closing_later(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $scholarship = Scholarship::factory()->closed()->create(['title' => 'Closed Early Grant', 'deadline' => now()->addDays(21)]);
+        ScholarshipApplication::factory()->for($scholarship)->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertSeeInOrder(['Closed Early Grant', 'Closed by OSAS']);
+        $response->assertDontSee('Closes in 21 days');
+    }
+
+    public function test_a_deadline_of_today_reads_as_closed_because_applications_already_stopped(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $scholarship = Scholarship::factory()->create(['deadline' => today()]);
+        ScholarshipApplication::factory()->for($scholarship)->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertSee('Closed today');
+        $response->assertDontSee('Closes today');
+    }
+
+    public function test_summary_counts_the_pass_lists_due_and_the_scholarships_still_open(): void
+    {
+        $admin = User::factory()->admin()->create();
+        ScholarshipApplication::factory()->for(Scholarship::factory()->closed())->create();
+        ScholarshipApplication::factory()->count(2)->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertSeeInOrder(['scholarship is ready for a pass list.', 'more are still taking applications.']);
+    }
+
+    public function test_summary_says_no_pass_lists_are_due_while_every_scholarship_is_still_open(): void
+    {
+        $admin = User::factory()->admin()->create();
+        ScholarshipApplication::factory()->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertSee('No pass lists are due yet.');
+        $response->assertSee('scholarship with applicants is still taking applications.');
     }
 
     public function test_each_scholarship_shows_its_pending_count_and_filled_slots(): void
@@ -82,13 +187,10 @@ class DashboardTest extends TestCase
 
         $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
-        $response->assertOk();
-        $response->assertViewHas('needsDecision', function (Collection $needsDecision): bool {
-            return (int) $needsDecision->first()->pending_count === 2;
+        $response->assertViewHas('takingApplications', function (Collection $takingApplications): bool {
+            return (int) $takingApplications->first()->pending_count === 2;
         });
         $response->assertSee('1 of 10 slots filled');
-        $response->assertViewHas('pendingTotal', 2);
-        $response->assertSee('applications need your decision.');
     }
 
     public function test_deadlines_are_counted_in_whole_calendar_days(): void

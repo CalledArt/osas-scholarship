@@ -71,10 +71,8 @@
                                         <p class="text-sm text-gray-500">{{ $document->description }}</p>
                                     @endif
                                     @if ($document->hasSample())
-                                        <div class="mt-1 text-sm text-gray-500 [overflow-wrap:anywhere]">
-                                            <x-sample-link :document="$document" />
-                                            &middot; {{ $document->sample_original_name }}
-                                        </div>
+                                        <p class="mt-1 text-sm text-gray-500 [overflow-wrap:anywhere]">{{ $document->sample_original_name }}</p>
+                                        <x-sample-preview :document="$document" class="mt-2 w-full sm:w-64" />
                                     @else
                                         <p class="mt-1 text-sm text-gray-400">{{ __('No sample posted.') }}</p>
                                     @endif

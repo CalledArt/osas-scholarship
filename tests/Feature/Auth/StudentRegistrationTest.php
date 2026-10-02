@@ -84,7 +84,7 @@ class StudentRegistrationTest extends TestCase
         $this->assertFalse($student->must_change_password);
         $this->assertDatabaseHas('users', Arr::except($this->studentDetails(), 'date_of_birth'));
         $this->assertSame('2003-05-14', $student->date_of_birth->toDateString());
-        $this->get(route('dashboard'))->assertOk();
+        $this->get(route('dashboard'))->assertRedirect(route('tutorial'));
         $this->get(route('admin.dashboard'))->assertForbidden();
     }
 

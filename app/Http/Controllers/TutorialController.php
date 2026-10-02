@@ -2,19 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\View\View;
 
 class TutorialController extends Controller
 {
     /**
-     * Record that the user has finished or dismissed the tutorial, so it stops
-     * starting on its own. It stays replayable from the rail either way.
+     * Display the practice tour for the user's role.
+     *
+     * The tour plays on sample screens built from in-memory data and posts
+     * nothing, so it cannot create, change or decide any real record.
      */
-    public function __invoke(Request $request): Response
+    public function show(): View
     {
-        $request->user()->forceFill(['tutorial_completed_at' => now()])->save();
+        return view('tutorial.show');
+    }
 
-        return response()->noContent();
+    /**
+     * Record that the user has seen the tour, then return them to their dashboard.
+     *
+     * Only the first completion is kept: replaying the tour later doesn't move it.
+     */
+    public function complete(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($user->tutorial_completed_at === null) {
+            $user->forceFill(['tutorial_completed_at' => now()])->save();
+        }
+
+        return redirect()->route($user->isAdmin() ? 'admin.dashboard' : 'dashboard');
     }
 }

@@ -44,7 +44,19 @@ class UserFactory extends Factory
             'year_level' => fake()->numberBetween(1, 4),
             'contact_number' => fake()->numerify('09#########'),
             'address' => fake()->address(),
+            // Most tests act as someone who has used the system before; see newcomer().
+            'tutorial_completed_at' => now(),
         ];
+    }
+
+    /**
+     * Indicate that the user has not seen the practice tour yet, as on their first sign-in.
+     */
+    public function newcomer(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'tutorial_completed_at' => null,
+        ]);
     }
 
     /**

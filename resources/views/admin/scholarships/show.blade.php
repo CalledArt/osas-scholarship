@@ -91,12 +91,12 @@
                     @if ($scholarship->requiredDocuments->isNotEmpty())
                         <div>
                             <h4 class="text-sm font-semibold text-gray-900">{{ __('Required Documents') }}</h4>
-                            <ul class="mt-1 list-disc list-inside text-sm text-gray-600">
+                            <ul class="mt-1 divide-y divide-gray-100">
                                 @foreach ($scholarship->requiredDocuments as $document)
-                                    <li>
-                                        {{ $document->name }}
+                                    <li class="flex flex-col gap-3 py-3 sm:flex-row sm:items-start sm:justify-between">
+                                        <p class="min-w-0 text-sm font-medium text-gray-900">{{ $document->name }}</p>
                                         @if ($document->hasSample())
-                                            <x-sample-link :document="$document" class="ms-1" />
+                                            <x-sample-preview :document="$document" class="w-full shrink-0 sm:w-64" />
                                         @endif
                                     </li>
                                 @endforeach

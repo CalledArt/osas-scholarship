@@ -64,24 +64,24 @@
                         @else
                             <div class="mt-4 space-y-4">
                                 @foreach ($scholarship->requiredDocuments as $document)
-                                    <div>
-                                        <div class="flex items-baseline justify-between gap-3">
+                                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start">
+                                        <div class="min-w-0 flex-1">
                                             <x-input-label :for="'document-'.$document->id" :value="$document->name" />
-                                            @if ($document->hasSample())
-                                                <x-sample-link :document="$document" class="shrink-0 text-xs" />
+                                            @if ($document->description)
+                                                <p class="text-xs text-gray-500">{{ $document->description }}</p>
                                             @endif
+                                            <x-file-input
+                                                id="document-{{ $document->id }}"
+                                                name="documents[{{ $document->id }}]"
+                                                accept=".jpg,.jpeg,.png,.pdf"
+                                                class="mt-1 w-full"
+                                                required
+                                            />
+                                            <x-input-error :messages="$errors->get('documents.'.$document->id)" class="mt-2" />
                                         </div>
-                                        @if ($document->description)
-                                            <p class="text-xs text-gray-500">{{ $document->description }}</p>
+                                        @if ($document->hasSample())
+                                            <x-sample-preview :document="$document" class="w-full shrink-0 sm:w-56" />
                                         @endif
-                                        <x-file-input
-                                            id="document-{{ $document->id }}"
-                                            name="documents[{{ $document->id }}]"
-                                            accept=".jpg,.jpeg,.png,.pdf"
-                                            class="mt-1 w-full"
-                                            required
-                                        />
-                                        <x-input-error :messages="$errors->get('documents.'.$document->id)" class="mt-2" />
                                     </div>
                                 @endforeach
                             </div>

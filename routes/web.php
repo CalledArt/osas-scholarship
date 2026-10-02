@@ -14,6 +14,7 @@ use App\Http\Controllers\ScholarshipApplicationDocumentController;
 use App\Http\Controllers\ScholarshipController;
 use App\Http\Controllers\ScholarshipRequiredDocumentSampleController;
 use App\Http\Controllers\TutorialController;
+use App\Http\Middleware\StartTutorialOnFirstVisit;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -27,11 +28,11 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:student'])
+    ->middleware(['auth', 'verified', 'role:student', StartTutorialOnFirstVisit::class])
     ->name('dashboard');
 
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:admin'])
+    ->middleware(['auth', 'verified', 'role:admin', StartTutorialOnFirstVisit::class])
     ->name('admin.dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -43,7 +44,8 @@ Route::middleware('auth')->group(function () {
         return view('auth.force-password-change');
     })->name('password.force-change');
 
-    Route::post('/tutorial/complete', TutorialController::class)->name('tutorial.complete');
+    Route::get('/tutorial', [TutorialController::class, 'show'])->middleware('verified')->name('tutorial');
+    Route::post('/tutorial/complete', [TutorialController::class, 'complete'])->name('tutorial.complete');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

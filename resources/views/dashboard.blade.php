@@ -16,7 +16,7 @@
             </p>
 
             @if ($applicationCount > 0)
-                <section class="mt-10" aria-labelledby="applications-heading" data-tour="my-applications">
+                <section class="mt-10" aria-labelledby="applications-heading">
                     <h2 id="applications-heading" class="text-base font-semibold text-gray-900">{{ __('My applications') }}</h2>
 
                     <ul class="-mx-3 mt-3 divide-y divide-gray-100 border-y border-gray-200">
@@ -56,7 +56,7 @@
                 </section>
             @endif
 
-            <section class="mt-10" aria-labelledby="open-heading" data-tour="open-for-you">
+            <section class="mt-10" aria-labelledby="open-heading">
                 <h2 id="open-heading" class="text-base font-semibold text-gray-900">{{ __('Open for you') }}</h2>
 
                 @if ($openScholarships->isEmpty())
@@ -95,6 +95,4 @@
             </section>
         </div>
     </div>
-
-    <x-tutorial />
 </x-app-layout>

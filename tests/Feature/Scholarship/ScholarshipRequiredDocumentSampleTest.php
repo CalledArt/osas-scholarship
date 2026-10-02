@@ -285,10 +285,10 @@ class ScholarshipRequiredDocumentSampleTest extends TestCase
         $response->assertSee('Upload sample');
         $response->assertSee(route('admin.scholarships.required-documents.sample.update', [$document->scholarship_id, $document]));
         $response->assertDontSee('Remove sample');
-        $response->assertDontSee('View sample');
+        $response->assertDontSee(route('scholarships.required-documents.sample', [$document->scholarship_id, $document]));
     }
 
-    public function test_scholarship_page_links_only_the_documents_that_have_a_sample(): void
+    public function test_scholarship_page_previews_only_the_documents_that_have_a_sample(): void
     {
         $student = User::factory()->create();
         $scholarship = Scholarship::factory()->create();
@@ -312,17 +312,30 @@ class ScholarshipRequiredDocumentSampleTest extends TestCase
         $response = $this->actingAs($student)->get(route('scholarships.show', $scholarship));
 
         $response->assertSee('<img src="'.route('scholarships.required-documents.sample', [$scholarship, $picture]).'"', false);
-        $response->assertSee('<object data="'.route('scholarships.required-documents.sample', [$scholarship, $pdf]).'"', false);
+        $response->assertSee('<object data="'.route('scholarships.required-documents.sample', [$scholarship, $pdf]), false);
     }
 
-    public function test_application_form_links_the_sample_next_to_its_upload_field(): void
+    public function test_application_form_previews_the_sample_next_to_its_upload_field(): void
     {
         $student = User::factory()->create();
         $scholarship = Scholarship::factory()->create();
-        $document = ScholarshipRequiredDocument::factory()->for($scholarship)->withSample()->create();
+        $document = ScholarshipRequiredDocument::factory()->for($scholarship)->withSample()->create(['sample_path' => 'scholarship-samples/1/picture.jpg']);
 
         $response = $this->actingAs($student)->get(route('scholarships.apply', $scholarship));
 
-        $response->assertSee(route('scholarships.required-documents.sample', [$scholarship, $document]));
+        $response->assertSeeInOrder([
+            'name="documents['.$document->id.']"',
+            '<img src="'.route('scholarships.required-documents.sample', [$scholarship, $document]).'"',
+        ], false);
+    }
+
+    public function test_admin_scholarship_page_previews_a_posted_sample(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $document = ScholarshipRequiredDocument::factory()->withSample()->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.scholarships.show', $document->scholarship_id));
+
+        $response->assertSee('<object data="'.route('scholarships.required-documents.sample', [$document->scholarship_id, $document]), false);
     }
 }

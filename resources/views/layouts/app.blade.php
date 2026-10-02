@@ -17,7 +17,7 @@
     <body class="font-sans antialiased">
         <x-page-progress />
 
-        <div x-data="{ navOpen: false }" @keydown.escape.window="navOpen = false" class="min-h-screen bg-gray-100 lg:flex">
+        <div x-data="{ navOpen: false }" @keydown.escape.window="navOpen = false" @tutorial-nav.window="navOpen = $event.detail" class="min-h-screen bg-gray-100 lg:flex">
             @include('layouts.rail')
 
             <div class="flex min-h-screen min-w-0 flex-1 flex-col {{ $sheet ? 'bg-white' : 'bg-gray-100' }}">

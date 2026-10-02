@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-09T00:00:00Z",
+  "generatedAt": "2026-10-02T00:00:00Z",
   "title": "Design System: OSAS Scholarship Allocation System",
   "extensions": {
     "colorMeta": {
@@ -118,12 +118,6 @@
         "canonical": "#B91C1C",
         "tonalRamp": ["#7F1D1D", "#991B1B", "#B91C1C", "#DC2626", "#EF4444", "#F87171", "#FCA5A5", "#FEE2E2"]
       },
-      "rejected-mark": {
-        "role": "tertiary",
-        "displayName": "Rejected Mark",
-        "canonical": "#F87171",
-        "tonalRamp": ["#7F1D1D", "#991B1B", "#B91C1C", "#DC2626", "#EF4444", "#F87171", "#FCA5A5", "#FEE2E2"]
-      },
       "danger": {
         "role": "tertiary",
         "displayName": "Danger",
@@ -136,13 +130,12 @@
       "headline": { "displayName": "Headline", "purpose": "Auth form heading, one per unauthenticated screen." },
       "title": { "displayName": "Title", "purpose": "Page header in the white header band. Exactly one per authenticated screen." },
       "section": { "displayName": "Section", "purpose": "Card headings and the dashboard welcome line." },
-      "metric": { "displayName": "Metric", "purpose": "KPI numerals. Always between an uppercase label and a Mist caption." },
       "body": { "displayName": "Body", "purpose": "The default: supporting copy, table cells, inputs, nav items, buttons." },
       "label": { "displayName": "Label", "purpose": "Badges and section captions; uppercased with +0.05em tracking for table column headers." },
       "mono": { "displayName": "Mono", "purpose": "Character disambiguation only — one-time passwords and literal CSV header names. Never decorative." }
     },
     "shadows": [
-      { "name": "seat", "value": "0 1px 2px 0 rgba(0, 0, 0, 0.05)", "purpose": "Default for cards, stat tiles, table containers, primary buttons, and inputs. Edge definition, not elevation." },
+      { "name": "seat", "value": "0 1px 2px 0 rgba(0, 0, 0, 0.05)", "purpose": "Default for cards, table containers, primary buttons, and inputs. Edge definition, not elevation." },
       { "name": "header-band", "value": "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)", "purpose": "The white page-header strip below the nav — the only horizontal element that casts onto content." },
       { "name": "overlay", "value": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)", "purpose": "Account dropdown, paired with a 1px black/5% ring." },
       { "name": "dialog", "value": "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)", "purpose": "Modals only, over a 75%-opacity gray-500 scrim." },
@@ -223,20 +216,12 @@
       "css": ".ds-card { background: #FFFFFF; border: 1px solid #F3F4F6; border-radius: 8px; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); padding: 24px; overflow: hidden; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; transition: border-color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-card--link:hover { border-color: rgba(11,110,79,0.4); } .ds-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; } .ds-card-title { margin: 0; font-size: 18px; font-weight: 600; color: #111827; } .ds-card-desc { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: #6B7280; } .ds-card-meta { margin-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 14px; color: #6B7280; } .ds-card-link { color: #0B6E4F; font-weight: 500; text-decoration: none; } .ds-card-link:hover { color: #074A35; } .ds-badge { display: inline-flex; align-items: center; border-radius: 9999px; padding: 2px 10px; font-size: 12px; font-weight: 500; flex-shrink: 0; } .ds-badge-approved { background: #DCFCE7; color: #15803D; }"
     },
     {
-      "name": "Stat Tile",
-      "kind": "card",
-      "refersTo": "stat-tile",
-      "description": "The admin dashboard KPI unit: uppercase Mist label, oversized Ink numeral, Mist caption. Linked tiles warm their border on hover.",
-      "html": "<a class=\"ds-stat\" href=\"#\"><p class=\"ds-stat-label\">Pending Review</p><p class=\"ds-stat-value ds-stat-value--attention\">18</p><p class=\"ds-stat-caption\">applications awaiting a decision</p></a>",
-      "css": ".ds-stat { display: block; background: #FFFFFF; border: 1px solid #F3F4F6; border-radius: 8px; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); padding: 20px; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; text-decoration: none; transition: border-color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-stat:hover { border-color: rgba(11,110,79,0.4); } .ds-stat:focus-visible { outline: none; border-color: #0B6E4F; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #FFC72C; } .ds-stat-label { margin: 0; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #9CA3AF; } .ds-stat-value { margin: 8px 0 0; font-size: 30px; line-height: 36px; font-weight: 700; color: #111827; } .ds-stat-value--attention { color: #E6A800; } .ds-stat-caption { margin: 4px 0 0; font-size: 12px; color: #9CA3AF; }"
-    },
-    {
-      "name": "The Register",
+      "name": "The Decision Queue",
       "kind": "custom",
-      "refersTo": "table-header",
-      "description": "The admin dashboard's whole surface: one ruled table on the white sheet, no card wrapper, ordered so scholarships needing a decision come first. Numerics are right-aligned tabular numerals; absent values are a Mist em-dash with sr-only text. Replaced the KPI tile grid and the stacked status bar.",
-      "html": "<table class=\"ds-register\"><thead><tr><th scope=\"col\">Scholarship</th><th scope=\"col\" class=\"ds-num\">Pending</th><th scope=\"col\" class=\"ds-num\">Awarded</th><th scope=\"col\" class=\"ds-num\">Oldest wait</th><th scope=\"col\">Closes</th></tr></thead><tbody><tr><td><a class=\"ds-register-link\" href=\"#\">CHED Tulong Dunong Grant</a></td><td class=\"ds-num\"><b>12</b></td><td class=\"ds-num\">4<span class=\"ds-den\"> / 20</span></td><td class=\"ds-num\"><b>11 days</b></td><td class=\"ds-urgent\">in 2 days</td></tr><tr><td><a class=\"ds-register-link\" href=\"#\">Tertiary Education Subsidy</a></td><td class=\"ds-num\"><b>6</b></td><td class=\"ds-num\">18<span class=\"ds-den\"> / 30</span></td><td class=\"ds-num ds-quiet\">9 days</td><td class=\"ds-quiet\">in 18 days</td></tr><tr><th colspan=\"5\" scope=\"colgroup\" class=\"ds-group\">Settled</th></tr><tr><td><a class=\"ds-register-link\" href=\"#\">Academic Merit Scholarship</a></td><td class=\"ds-num\"><span class=\"ds-dash\" aria-hidden=\"true\">&mdash;</span></td><td class=\"ds-num\"><span class=\"ds-full\">8</span><span class=\"ds-den\"> / 8</span></td><td class=\"ds-num\"><span class=\"ds-dash\" aria-hidden=\"true\">&mdash;</span></td><td class=\"ds-quiet\">in 9 days</td></tr></tbody></table>",
-      "css": ".ds-register { width: 100%; border-collapse: collapse; background: #FFFFFF; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 14px; color: #111827; } .ds-register thead th { border-bottom: 1px solid #E5E7EB; padding: 8px 16px 8px 0; text-align: left; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280; } .ds-register tbody td { border-bottom: 1px solid #F3F4F6; padding: 12px 16px 12px 0; } .ds-register tbody tr:hover td { background: #F9FAFB; } .ds-num { text-align: right; font-variant-numeric: tabular-nums; } .ds-den { color: #6B7280; } .ds-quiet { color: #6B7280; } .ds-dash { color: #9CA3AF; } .ds-full { font-weight: 600; color: #0B6E4F; } .ds-urgent { font-weight: 600; color: #B91C1C; } .ds-group { border-bottom: 1px solid #E5E7EB; padding: 40px 0 8px; text-align: left; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280; } .ds-register-link { font-weight: 600; color: #111827; text-decoration: none; } .ds-register-link:hover { color: #0B6E4F; } .ds-register-link:focus-visible { outline: none; box-shadow: 0 0 0 2px #0B6E4F; border-radius: 2px; }"
+      "refersTo": "card",
+      "description": "The admin dashboard's working surface: scholarships with applicants waiting, split into 'Ready for a pass list' (closed, past deadline, or full; longest wait first) and 'Still taking applications' (soonest deadline first). Ruled list on the white sheet, no card wrapper. Availability leads each meta line and comes from the same check that stops applications. No red.",
+      "html": "<section class=\"ds-queue\"><h2>Ready for a pass list</h2><p class=\"ds-hint\">Closed to new applicants. Longest wait first.</p><ul><li><a href=\"#\"><span class=\"ds-main\"><span class=\"ds-title\">SM Foundation College Scholarship</span><span class=\"ds-meta\">Closed by OSAS &middot; 1 of 3 slots filled</span></span><span class=\"ds-count\"><b>4</b>pending</span><span class=\"ds-go\">Review &rarr;</span></a></li><li><a href=\"#\"><span class=\"ds-main\"><span class=\"ds-title\">Municipal Educational Assistance</span><span class=\"ds-meta\">Full &middot; 5 of 5 slots filled</span></span><span class=\"ds-count\"><b>2</b>pending</span><span class=\"ds-go\">Review &rarr;</span></a></li></ul></section>",
+      "css": ".ds-queue { font-family: Figtree, ui-sans-serif, system-ui, sans-serif; background: #FFFFFF; } .ds-queue h2 { margin: 0; font-size: 16px; font-weight: 600; color: #111827; } .ds-hint { margin: 4px 0 0; font-size: 14px; color: #6B7280; } .ds-queue ul { list-style: none; margin: 12px -12px 0; padding: 0; border-top: 1px solid #E5E7EB; border-bottom: 1px solid #E5E7EB; } .ds-queue li + li { border-top: 1px solid #F3F4F6; } .ds-queue a { display: flex; align-items: center; gap: 16px; padding: 16px 12px; text-decoration: none; transition: background-color 150ms ease-in-out; } .ds-queue a:hover { background: #F9FAFB; } .ds-queue a:hover .ds-title { color: #0B6E4F; } .ds-queue a:focus-visible { outline: none; box-shadow: inset 0 0 0 2px #0B6E4F; } .ds-main { flex: 1; min-width: 0; } .ds-title { display: block; font-size: 14px; font-weight: 600; color: #111827; overflow-wrap: anywhere; } .ds-meta { display: block; margin-top: 4px; font-size: 14px; color: #6B7280; } .ds-count { flex-shrink: 0; text-align: right; font-size: 14px; color: #6B7280; } .ds-count b { display: block; font-size: 18px; line-height: 24px; font-weight: 600; color: #111827; font-variant-numeric: tabular-nums; } .ds-go { flex-shrink: 0; font-size: 14px; font-weight: 600; color: #0B6E4F; }"
     },
     {
       "name": "CvSU Seal",
@@ -301,7 +286,7 @@
       },
       {
         "name": "The Small-Caps Perimeter Rule",
-        "body": "Uppercase with letter-spacing is reserved for the perimeter of data: table column headers and stat-tile captions. It never touches a sentence, a button, a card heading, or a badge. Every button in the system reads in sentence case at Body size.",
+        "body": "Uppercase with letter-spacing is reserved for the perimeter of data: table column headers. It never touches a sentence, a button, a card heading, or a badge. Every button in the system reads in sentence case at Body size.",
         "section": "typography"
       },
       {
@@ -311,7 +296,7 @@
       },
       {
         "name": "The Numeral-Over-Word Rule",
-        "body": "Where a count matters, the number is the largest thing in its tile (Metric weight 700) and every word around it drops to Mist. Never let a KPI's label out-weigh its value.",
+        "body": "Where a count matters, the number carries the weight and the words around it drop to Slate. Never let a label out-weigh its value.",
         "section": "typography"
       },
       {
@@ -342,18 +327,18 @@
       "Do render every disabled control at 70% opacity with a not-allowed cursor.",
       "Do reserve gold for the unresolved and the focused — pending decisions and keyboard focus. If you are reaching for gold and neither applies, reach for a neutral.",
       "Do border cards with the same value as the page ground (#F3F4F6). Records sit in the desk, they don't hover over it.",
-      "Do build hierarchy from Figtree's weights (400/500/600/700) and the seven type roles. Never add a second font family.",
-      "Do pick containers by task: max-w-7xl for administrative comparison surfaces, max-w-5xl for student reading lists, max-w-sm for auth forms.",
+      "Do build hierarchy from Figtree's weights (400/500/600/700) and the six type roles. Never add a second font family.",
+      "Do pick containers by task: max-w-7xl for administrative comparison surfaces, max-w-5xl for lists read top to bottom (the student's scholarship list, the admin decision queue), max-w-sm for auth forms.",
       "Do set every compared number in tabular numerals and right-align it in its column.",
       "Do say it in a sentence when a sentence will do. A line of prose naming what is waiting beats a row of tiles restating the same counts.",
       "Do pair every colour-or-glyph-only signal (an em-dash for \"none\", a coloured deadline) with sr-only text carrying the same meaning.",
       "Do write a real empty state for every list and table — a centered sentence at 14px in Mist or Slate, inside the card, saying what would appear here and what to do about it (\"Nothing needs review right now.\", \"No scholarships have been posted yet.\").",
-      "Do give every progress or status graphic an accessible text equivalent, as the status breakdown bar does with role=\"img\" and a spelled-out aria-label.",
+      "Do give every progress or status graphic an accessible text equivalent, such as role=\"img\" with a spelled-out aria-label.",
       "Do keep state transitions at 150ms ease-in-out, overlay entrances at 200–300ms, and overlay exits faster than their entrances (75–200ms)."
     ],
     "donts": [
       "Don't reintroduce focus:ring-indigo-500. Both Laravel Breeze instances — the secondary button and the profile form's resend-verification button — have been removed; indigo belongs to no part of this palette. Pick a ring hue with the Two-Ring Rule.",
-      "Don't uppercase a button label. uppercase tracking-widest was Breeze residue on the secondary and danger buttons and has been removed; uppercase belongs only to table column headers and stat-tile captions.",
+      "Don't uppercase a button label. uppercase tracking-widest was Breeze residue on the secondary and danger buttons and has been removed; uppercase belongs only to table column headers.",
       "Don't shrink a supporting button's type to signal that it is secondary. All three variants share 14px/600; the hierarchy lives in fill and border.",
       "Don't disable a control below 70% opacity. The Breeze default of 25% left the label unreadable.",
       "Don't add shadows to convey importance. Surfaces are flat at rest and stay flat on hover — deepen a border or add a heading instead. Only dropdowns and modals may exceed the Seat shadow.",
@@ -368,7 +353,7 @@
       "Don't represent a distribution as a stacked bar, donut, progress ring, or sparkline. This system states quantities as aligned figures; a reader should never have to estimate a length to learn a number.",
       "Don't put navigation in a horizontal bar. The rail is the only wayfinding surface.",
       "Don't set gold or Mist as text. See the Gold Is Not Ink and Readable Neutral rules.",
-      "Don't wrap a table in a card. A register is the document, not something sitting on top of one.",
+      "Don't wrap a table or the decision queue in a card. A list of records is the document, not something sitting on top of one.",
       "Don't style a file input inline. Every upload surface renders the one file-input component, whose button matches the secondary button; a second treatment is drift.",
       "Don't use diffForHumans() for a deadline. It phrases futures as \"1 day from now\" and truncates fractional days, so a date two days out reads as one. Count whole calendar days between day boundaries."
     ]

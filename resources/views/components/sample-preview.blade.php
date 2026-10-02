@@ -6,12 +6,38 @@
     $downloadUrl = route('scholarships.required-documents.sample.download', [$document->scholarship_id, $document]);
 @endphp
 
-{{-- The preview is teleported to <body>: this link sits inside lists and form labels, where a modal cannot be nested. --}}
-<span x-data {{ $attributes }}>
-    <button type="button" x-on:click="$dispatch('open-modal', '{{ $modalName }}')" class="font-medium text-cvsu-green hover:text-cvsu-green-dark focus:outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-cvsu-green">
-        {{ __('View sample') }}<span class="sr-only"> {{ __('of :document', ['document' => $document->name]) }}</span>
-    </button>
+<figure x-data {{ $attributes->merge(['class' => 'overflow-hidden rounded-lg border border-gray-200 bg-white']) }}>
+    <div class="relative h-48 bg-gray-50">
+        @if ($document->sampleIsImage())
+            <img src="{{ $previewUrl }}" alt="{{ __('Sample of :document', ['document' => $document->name]) }}" loading="lazy" class="h-full w-full object-contain">
+        @else
+            <object data="{{ $previewUrl }}#toolbar=0&amp;navpanes=0&amp;view=FitH" type="application/pdf" tabindex="-1" class="block h-full w-full">
+                <div class="flex h-full flex-col items-center justify-center gap-2 px-4 text-center">
+                    <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    </svg>
+                    <p class="text-xs text-gray-600">{{ __('PDF sample — tap to view') }}</p>
+                </div>
+            </object>
+        @endif
 
+        {{-- Laid over the preview so a click anywhere on it, even on the PDF viewer, opens the full-size copy. Keyboard users get the Enlarge button below. --}}
+        <button type="button" x-on:click="$dispatch('open-modal', '{{ $modalName }}')" tabindex="-1" aria-hidden="true" class="absolute inset-0 h-full w-full cursor-zoom-in"></button>
+    </div>
+
+    <figcaption class="flex items-center justify-between gap-3 border-t border-gray-100 px-3 py-2 text-xs">
+        <span class="font-medium text-gray-500">{{ __('Sample') }}</span>
+        <span class="flex items-center gap-3">
+            <button type="button" x-on:click="$dispatch('open-modal', '{{ $modalName }}')" class="font-medium text-cvsu-green hover:text-cvsu-green-dark focus:outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-cvsu-green">
+                {{ __('Enlarge') }}<span class="sr-only"> {{ __('sample of :document', ['document' => $document->name]) }}</span>
+            </button>
+            <a href="{{ $downloadUrl }}" class="font-medium text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-cvsu-green">
+                {{ __('Download') }}<span class="sr-only"> {{ __('sample of :document', ['document' => $document->name]) }}</span>
+            </a>
+        </span>
+    </figcaption>
+
+    {{-- The enlarged view is teleported to <body>: this preview sits inside lists and forms, where a modal cannot be nested. --}}
     <template x-teleport="body">
         <x-modal :name="$modalName" max-width="4xl" focusable>
             <div class="flex items-start justify-between gap-4 border-b border-gray-100 px-6 py-4">
@@ -27,7 +53,7 @@
                 </button>
             </div>
 
-            {{-- Rendered only while open, so a page listing several samples does not download them all up front. --}}
+            {{-- Rendered only while open, so the page does not load every sample a second time at full size. --}}
             <div class="bg-gray-50">
                 <template x-if="show">
                     @if ($document->sampleIsImage())
@@ -55,4 +81,4 @@
             </div>
         </x-modal>
     </template>
-</span>
+</figure>
