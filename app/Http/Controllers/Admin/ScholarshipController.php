@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\ApplicationStatus;
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreScholarshipRequest;
 use App\Http\Requests\Admin\UpdateScholarshipRequest;
+use App\Mail\ScholarshipPosted;
 use App\Models\Scholarship;
+use App\Models\User;
+use App\Support\BccMailer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class ScholarshipController extends Controller
@@ -45,9 +50,12 @@ class ScholarshipController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage, then email every student about it.
+     *
+     * The scholarship stays posted even if the email fails; the admin is told
+     * how many students it actually reached.
      */
-    public function store(StoreScholarshipRequest $request): RedirectResponse
+    public function store(StoreScholarshipRequest $request, BccMailer $mailer): RedirectResponse
     {
         $scholarship = $request->user()->postedScholarships()->create(
             $request->safe()->only(['title', 'description', 'slots', 'deadline'])
@@ -63,8 +71,20 @@ class ScholarshipController extends Controller
             }
         }
 
-        return redirect()->route('admin.scholarships.show', $scholarship)
-            ->with('status', 'Scholarship posted.');
+        $studentEmails = User::where('role', UserRole::Student)->pluck('email')->all();
+        $studentCount = count($studentEmails);
+        $emailed = $mailer->send($studentEmails, new ScholarshipPosted($scholarship));
+
+        $redirect = redirect()->route('admin.scholarships.show', $scholarship);
+
+        if ($emailed < $studentCount) {
+            return $redirect->with('status', 'Scholarship posted.')
+                ->with('error', "The announcement email reached only {$emailed} of {$studentCount} students. Check the mail settings and the application log.");
+        }
+
+        return $redirect->with('status', $studentCount > 0
+            ? "Scholarship posted and emailed to {$studentCount} ".Str::plural('student', $studentCount).'.'
+            : 'Scholarship posted.');
     }
 
     /**

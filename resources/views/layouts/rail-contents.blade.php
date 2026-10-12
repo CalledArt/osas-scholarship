@@ -22,6 +22,9 @@
             <x-rail-link :href="route('admin.roster.index')" :active="request()->routeIs('admin.roster.*')" data-tour="nav-roster">
                 {{ __('Search Student') }}
             </x-rail-link>
+            <x-rail-link :href="route('admin.students.index')" :active="request()->routeIs('admin.students.*')" data-tour="nav-students">
+                {{ __('Edit Student Data') }}
+            </x-rail-link>
         @else
             <x-rail-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" data-tour="nav-dashboard">
                 {{ __('Dashboard') }}

@@ -41,13 +41,22 @@
 
         <div>
             <x-input-label for="student_number" :value="__('Student number')" />
-            <x-text-input id="student_number" name="student_number" type="text" class="mt-1 block w-full" :value="old('student_number')" required maxlength="255" placeholder="21-00123" />
+            <x-text-input id="student_number" name="student_number" type="text" class="mt-1 block w-full" :value="old('student_number')" required maxlength="255" placeholder="202212345" />
             <x-input-error :messages="$errors->get('student_number')" class="mt-2" />
         </div>
 
         <div>
             <x-input-label for="course" :value="__('Course / program')" />
-            <x-text-input id="course" name="course" type="text" class="mt-1 block w-full" :value="old('course')" required maxlength="255" placeholder="BS Information Technology" />
+            <select id="course" name="course" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-cvsu-green focus:ring-cvsu-green" required>
+                <option value="">{{ __('Select your course') }}</option>
+                @foreach (\App\Support\CvsuPrograms::BY_COLLEGE as $college => $programs)
+                    <optgroup label="{{ $college }}">
+                        @foreach ($programs as $program)
+                            <option value="{{ $program }}" @selected(old('course') === $program)>{{ $program }}</option>
+                        @endforeach
+                    </optgroup>
+                @endforeach
+            </select>
             <x-input-error :messages="$errors->get('course')" class="mt-2" />
         </div>
 
@@ -60,6 +69,18 @@
                 @endforeach
             </select>
             <x-input-error :messages="$errors->get('year_level')" class="mt-2" />
+        </div>
+
+        <div>
+            <x-input-label for="program_years" :value="__('Program length')" />
+            <select id="program_years" name="program_years" aria-describedby="program_years-hint" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-cvsu-green focus:ring-cvsu-green" required>
+                <option value="">{{ __('Select your program’s length') }}</option>
+                @foreach (range(2, 6) as $years)
+                    <option value="{{ $years }}" @selected((string) old('program_years') === (string) $years)>{{ __(':years years', ['years' => $years]) }}</option>
+                @endforeach
+            </select>
+            <p id="program_years-hint" class="mt-1 text-sm text-gray-500">{{ __('How many years your course takes to finish, such as 4 for most bachelor’s programs.') }}</p>
+            <x-input-error :messages="$errors->get('program_years')" class="mt-2" />
         </div>
 
         <div>

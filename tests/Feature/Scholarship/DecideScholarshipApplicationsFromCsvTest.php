@@ -196,6 +196,18 @@ class DecideScholarshipApplicationsFromCsvTest extends TestCase
         $this->assertSame(ScholarshipStatus::Closed, $scholarship->fresh()->status);
     }
 
+    public function test_leaves_an_ended_scholarship_ended_once_slots_are_filled(): void
+    {
+        $scholarship = Scholarship::factory()->ended()->create(['slots' => 1]);
+        ScholarshipApplication::factory()->for($scholarship)
+            ->for(User::factory()->create(['name' => 'Juan Dela Cruz']))
+            ->create();
+
+        (new DecideScholarshipApplicationsFromCsv)->handle($scholarship, $this->csvFile("name\nJuan Dela Cruz\n"));
+
+        $this->assertSame(ScholarshipStatus::Ended, $scholarship->fresh()->status);
+    }
+
     private function csvFile(string $contents): UploadedFile
     {
         $path = tempnam(sys_get_temp_dir(), 'csv');

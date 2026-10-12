@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ScholarshipApplicationController as AdminScholars
 use App\Http\Controllers\Admin\ScholarshipController as AdminScholarshipController;
 use App\Http\Controllers\Admin\ScholarshipRequiredDocumentController;
 use App\Http\Controllers\Admin\ScholarshipRequiredDocumentSampleController as AdminScholarshipRequiredDocumentSampleController;
+use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Admin\StudentRosterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -76,10 +77,14 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
         ->name('scholarships.applications.import-decisions');
 
     Route::get('roster', [StudentRosterController::class, 'index'])->name('roster.index');
+
+    Route::resource('students', AdminStudentController::class)->only(['index', 'edit', 'update']);
 });
 
 Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
     Route::get('scholarships', [ScholarshipController::class, 'index'])->name('scholarships.index');
+    // Registered ahead of scholarships/{scholarship}, which would otherwise capture this path.
+    Route::view('scholarships/republic-act-10931', 'scholarships.republic-act-10931')->name('scholarships.republic-act-10931');
     Route::get('scholarships/{scholarship}', [ScholarshipController::class, 'show'])->name('scholarships.show');
     Route::get('scholarships/{scholarship}/apply', [ScholarshipApplicationController::class, 'create'])->name('scholarships.apply');
     Route::post('scholarships/{scholarship}/apply', [ScholarshipApplicationController::class, 'store'])->name('scholarships.apply.store');

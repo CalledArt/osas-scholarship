@@ -57,13 +57,14 @@
                 </div>
 
                 <div class="mt-2 overflow-x-auto">
-                    <table class="w-full min-w-[44rem] text-sm">
+                    <table class="w-full min-w-[52rem] text-sm">
                         <thead>
                             <tr class="border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500">
                                 <th scope="col" class="py-2 pr-4 text-left font-medium">{{ __('Name') }}</th>
                                 <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Email') }}</th>
                                 <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Student no.') }}</th>
-                                <th scope="col" class="py-2 pl-4 text-left font-medium">{{ __('Course / year') }}</th>
+                                <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Course') }}</th>
+                                <th scope="col" class="py-2 pl-4 text-left font-medium">{{ __('Year level') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -72,13 +73,12 @@
                                     <td class="py-3 pr-4 font-medium text-gray-900">{{ $student->name }}</td>
                                     <td class="px-4 py-3 text-gray-600">{{ $student->email }}</td>
                                     <td class="px-4 py-3 tabular-nums text-gray-500">{{ $student->student_number ?? '—' }}</td>
-                                    <td class="py-3 pl-4 text-gray-500">
-                                        {{ collect([$student->course, $student->year_level ? __('Year :level', ['level' => $student->year_level]) : null])->filter()->implode(' · ') ?: '—' }}
-                                    </td>
+                                    <td class="px-4 py-3 text-gray-500">{{ $student->course ?? '—' }}</td>
+                                    <td class="py-3 pl-4 text-gray-500">{{ $student->year_level ? __('Year :level', ['level' => $student->year_level]) : '—' }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="py-8 text-center text-gray-500">
+                                    <td colspan="5" class="py-8 text-center text-gray-500">
                                         {{ $hasFilters ? __('No students match your search or filters.') : __('No students have registered yet.') }}
                                     </td>
                                 </tr>

@@ -18,8 +18,16 @@
 
                     <dl class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
                         <div>
-                            <dt class="text-xs font-medium uppercase tracking-wide text-gray-400">{{ __('Name') }}</dt>
-                            <dd class="text-sm text-gray-900">{{ $applicant->name }}</dd>
+                            <dt class="text-xs font-medium uppercase tracking-wide text-gray-400">{{ __('First Name') }}</dt>
+                            <dd class="text-sm text-gray-900">{{ $applicant->first_name ?? __('Not set') }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium uppercase tracking-wide text-gray-400">{{ __('Middle Name') }}</dt>
+                            <dd class="text-sm text-gray-900">{{ $applicant->middle_name ?: '—' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium uppercase tracking-wide text-gray-400">{{ __('Last Name') }}</dt>
+                            <dd class="text-sm text-gray-900">{{ $applicant->last_name ?? __('Not set') }}</dd>
                         </div>
                         <div>
                             <dt class="text-xs font-medium uppercase tracking-wide text-gray-400">{{ __('Age') }}</dt>

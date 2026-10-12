@@ -26,6 +26,9 @@ class ScholarshipApplicationPolicy
 
     /**
      * Determine whether the user can apply to the given scholarship.
+     *
+     * A student may apply only once to each scholarship, and only while they
+     * are under the scholarship limit.
      */
     public function create(User $user, Scholarship $scholarship): bool
     {
@@ -37,7 +40,10 @@ class ScholarshipApplicationPolicy
             return false;
         }
 
-        return ! $scholarship->applications()->where('user_id', $user->id)->exists();
+        $applications = $user->scholarshipApplicationsWithScholarship()->get();
+
+        return ! $applications->contains('scholarship_id', $scholarship->id)
+            && $user->remainingScholarshipPlaces($applications) > 0;
     }
 
     /**

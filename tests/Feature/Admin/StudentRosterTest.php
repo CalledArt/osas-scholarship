@@ -41,7 +41,7 @@ class StudentRosterTest extends TestCase
             ->assertSee('juan@cvsu.edu.ph')
             ->assertSee('Juan Cruz')
             ->assertSee('21-00123')
-            ->assertSee('BS Information Technology · Year 3')
+            ->assertSeeInOrder(['BS Information Technology</td>', 'Year 3</td>'], false)
             ->assertDontSee('osas.staff@cvsu.edu.ph')
             ->assertDontSee('Upload roster');
     }

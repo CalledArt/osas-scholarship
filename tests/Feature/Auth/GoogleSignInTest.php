@@ -114,6 +114,7 @@ class GoogleSignInTest extends TestCase
             'student_number' => '21-00123',
             'course' => 'BS Information Technology',
             'year_level' => 3,
+            'program_years' => 4,
             'date_of_birth' => '2003-05-14',
             'contact_number' => '09171234567',
             'address' => 'Indang, Cavite',

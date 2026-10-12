@@ -3,11 +3,15 @@
 namespace Tests\Feature\Scholarship;
 
 use App\Enums\ApplicationStatus;
+use App\Mail\ScholarshipApplicationApproved;
+use App\Mail\ScholarshipApplicationRejected;
 use App\Models\Scholarship;
 use App\Models\ScholarshipApplication;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Tests\TestCase;
 
 class AdminImportsApplicationDecisionsTest extends TestCase
@@ -35,6 +39,67 @@ class AdminImportsApplicationDecisionsTest extends TestCase
         $this->assertSame(ApplicationStatus::Rejected, $failed->fresh()->status);
 
         $this->followRedirects($response)->assertSee('1 approved, 1 rejected.');
+    }
+
+    public function test_applicants_are_emailed_whether_they_passed_or_failed(): void
+    {
+        Mail::fake();
+        $admin = User::factory()->admin()->create();
+        $scholarship = Scholarship::factory()->for($admin, 'postedBy')->create(['slots' => 5]);
+        $passed = User::factory()->create(['name' => 'Juan Dela Cruz']);
+        $failed = User::factory()->create(['name' => 'Maria Santos']);
+        ScholarshipApplication::factory()->for($scholarship)->for($passed)->create();
+        ScholarshipApplication::factory()->for($scholarship)->for($failed)->create();
+
+        $response = $this->actingAs($admin)->post(
+            route('admin.scholarships.applications.import-decisions', $scholarship),
+            ['file' => $this->csvFile("name\nJuan Dela Cruz\n")]
+        );
+
+        $response->assertSessionHas('status', 'Emailed the result to 2 applicants.');
+        Mail::assertSent(ScholarshipApplicationApproved::class, fn (ScholarshipApplicationApproved $mail) => $mail->hasBcc($passed->email)
+            && ! $mail->hasBcc($failed->email));
+        Mail::assertSent(ScholarshipApplicationRejected::class, fn (ScholarshipApplicationRejected $mail) => $mail->hasBcc($failed->email)
+            && ! $mail->hasBcc($passed->email));
+    }
+
+    public function test_applicants_the_pass_list_leaves_pending_are_not_emailed(): void
+    {
+        Mail::fake();
+        $admin = User::factory()->admin()->create();
+        $scholarship = Scholarship::factory()->for($admin, 'postedBy')->create(['slots' => 5]);
+        foreach (User::factory()->count(2)->create(['name' => 'Ana Cruz']) as $namesake) {
+            ScholarshipApplication::factory()->for($scholarship)->for($namesake)->create();
+        }
+
+        $this->actingAs($admin)->post(
+            route('admin.scholarships.applications.import-decisions', $scholarship),
+            ['file' => $this->csvFile("name\nAna Cruz\n")]
+        );
+
+        Mail::assertNothingSent();
+    }
+
+    public function test_decisions_are_kept_when_the_result_email_fails(): void
+    {
+        Mail::shouldReceive('to')->andThrow(new TransportException('Connection refused.'));
+        $admin = User::factory()->admin()->create();
+        $scholarship = Scholarship::factory()->for($admin, 'postedBy')->create(['slots' => 5]);
+        $passed = ScholarshipApplication::factory()->for($scholarship)
+            ->for(User::factory()->create(['name' => 'Juan Dela Cruz']))
+            ->create();
+        $failed = ScholarshipApplication::factory()->for($scholarship)
+            ->for(User::factory()->create(['name' => 'Maria Santos']))
+            ->create();
+
+        $response = $this->actingAs($admin)->post(
+            route('admin.scholarships.applications.import-decisions', $scholarship),
+            ['file' => $this->csvFile("name\nJuan Dela Cruz\n")]
+        );
+
+        $response->assertSessionHas('error', 'The result email reached only 0 of 2 applicants. Check the mail settings and the application log.');
+        $this->assertSame(ApplicationStatus::Approved, $passed->fresh()->status);
+        $this->assertSame(ApplicationStatus::Rejected, $failed->fresh()->status);
     }
 
     public function test_upload_pass_list_section_is_visible_even_with_no_pending_applicants(): void

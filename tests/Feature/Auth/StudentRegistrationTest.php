@@ -32,6 +32,7 @@ class StudentRegistrationTest extends TestCase
             'student_number' => '21-00123',
             'course' => 'BS Information Technology',
             'year_level' => 3,
+            'program_years' => 5,
             'date_of_birth' => '2003-05-14',
             'contact_number' => '09171234567',
             'address' => 'Indang, Cavite',
@@ -55,7 +56,9 @@ class StudentRegistrationTest extends TestCase
             ->assertSee('juan@cvsu.edu.ph')
             ->assertSee('name="student_number"', false)
             ->assertSee('name="course"', false)
+            ->assertSeeInOrder(['<optgroup label="College of Engineering and Information Technology (CEIT)">', '<option value="BS Information Technology"'], false)
             ->assertSee('name="year_level"', false)
+            ->assertSee('name="program_years"', false)
             ->assertDontSee('name="email"', false)
             ->assertDontSee('name="password"', false);
     }
@@ -113,7 +116,7 @@ class StudentRegistrationTest extends TestCase
     {
         $this->withSession($this->googleRegistration())->from('/register')->post('/register', [])
             ->assertRedirect('/register')
-            ->assertSessionHasErrors(['first_name', 'last_name', 'student_number', 'course', 'year_level', 'date_of_birth', 'contact_number', 'address']);
+            ->assertSessionHasErrors(['first_name', 'last_name', 'student_number', 'course', 'year_level', 'program_years', 'date_of_birth', 'contact_number', 'address']);
 
         $this->assertGuest();
         $this->assertDatabaseCount('users', 0);
@@ -122,6 +125,9 @@ class StudentRegistrationTest extends TestCase
     #[TestWith(['year_level', 0])]
     #[TestWith(['year_level', 7])]
     #[TestWith(['year_level', 'first'])]
+    #[TestWith(['program_years', 1])]
+    #[TestWith(['program_years', 7])]
+    #[TestWith(['course', 'BS Astrology'])]
     #[TestWith(['date_of_birth', 'not-a-date'])]
     #[TestWith(['date_of_birth', '2999-01-01'])]
     public function test_invalid_student_details_are_rejected(string $field, mixed $value): void

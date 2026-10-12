@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use App\Models\User;
+use App\Support\CvsuPrograms;
 use App\Support\PersonName;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -31,11 +32,24 @@ class StudentRegistrationRequest extends FormRequest
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'student_number' => ['required', 'string', 'max:255', Rule::unique(User::class)],
-            'course' => ['required', 'string', 'max:255'],
+            'course' => ['required', 'string', Rule::in(CvsuPrograms::all())],
             'year_level' => ['required', 'integer', 'between:1,6'],
+            'program_years' => ['required', 'integer', 'between:2,6'],
             'date_of_birth' => ['required', 'date_format:Y-m-d', 'before:today'],
             'contact_number' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
+        ];
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'program_years' => 'program length',
         ];
     }
 

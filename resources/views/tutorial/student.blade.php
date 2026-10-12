@@ -19,7 +19,9 @@
     ];
     $notSet = __('Not set');
     $details = [
-        ['key' => 'name', 'label' => __('Name'), 'value' => $student->name],
+        ['key' => 'first_name', 'label' => __('First Name'), 'value' => $student->first_name ?? $notSet],
+        ['key' => 'middle_name', 'label' => __('Middle Name'), 'value' => $student->middle_name ?: '—'],
+        ['key' => 'last_name', 'label' => __('Last Name'), 'value' => $student->last_name ?? $notSet],
         ['key' => 'age', 'label' => __('Age'), 'value' => $student->age ?? $notSet],
         ['key' => 'email', 'label' => __('Email'), 'value' => $student->email],
         ['key' => 'student_number', 'label' => __('Student Number'), 'value' => $student->student_number ?? $notSet],
@@ -30,6 +32,8 @@
     ];
     $filledDetails = collect($details)->mapWithKeys(fn (array $detail): array => [$detail['key'] => (string) $detail['value']])->all();
     $application = ['title' => $title, 'submitted' => __('Submitted :date', ['date' => now()->format('M j, Y')]), 'status' => 'pending'];
+    $activeRow = ['title' => $title, 'applied' => __('Applied :date', ['date' => now()->format('M j, Y')])];
+    $limit = \App\Models\User::SCHOLARSHIP_LIMIT;
 
     $base = [
         'badges' => $badges,
@@ -37,6 +41,8 @@
         'clock' => null,
         'summary' => $welcome.' '.e(__("You haven't applied to any scholarships yet.")),
         'applications' => [],
+        'active' => [],
+        'places' => $limit,
         'open' => $openRows,
         'details' => array_fill_keys(array_keys($filledDetails), ''),
         'files' => ['picture' => '', 'registration' => ''],
@@ -46,6 +52,7 @@
     $applied = [
         'summary' => $welcome.' '.$count(1).' '.e(__('application is waiting for a decision.')),
         'applications' => [$application],
+        'places' => $limit - 1,
         'open' => [$openRows[1]],
     ];
 
@@ -53,6 +60,8 @@
         'clock' => __('Two weeks later'),
         'summary' => $welcome.' '.e(__('Every application you sent has been decided.')),
         'applications' => [array_merge($application, ['status' => 'approved'])],
+        'active' => [$activeRow],
+        'places' => $limit - 1,
         'open' => [$openRows[1]],
     ];
 
@@ -69,9 +78,9 @@
         [
             'screen' => 'dashboard',
             'targets' => ['tour-open'],
-            'location' => ['target' => 'nav-dashboard', 'trail' => [__('Dashboard'), __('Open for you')]],
+            'location' => ['target' => 'nav-dashboard', 'trail' => [__('Dashboard'), __('Available to apply')]],
             'title' => __('Find a scholarship'),
-            'body' => __('Open for you on your Dashboard lists the scholarships you can still apply to, with their deadline and slots left. Scholarships in the menu lists every scholarship OSAS has posted.'),
+            'body' => __('Available to apply on your Dashboard lists the scholarships you can still apply to, with their deadline and slots left. You can hold up to :limit scholarships at a time, counting applications waiting for a decision. Scholarships in the menu shows the full lists.', ['limit' => $limit]),
             'state' => [],
             'actions' => [
                 ['wait', 300],
@@ -114,7 +123,7 @@
             'targets' => ['tour-applications'],
             'location' => ['target' => 'nav-applications', 'trail' => [__('My Applications')]],
             'title' => __('Follow your application'),
-            'body' => __('Your application stays Pending while OSAS reviews it, then changes to Approved or Rejected. Press Skip ahead to see the decision arrive.'),
+            'body' => __('Your application stays Pending while OSAS reviews it, then changes to Approved or Rejected. An approved scholarship shows under Active scholarships on your Dashboard until OSAS ends it. Press Skip ahead to see the decision arrive.'),
             'state' => $applied,
             'actions' => [
                 ['pause', __('Skip ahead two weeks')],
@@ -159,6 +168,50 @@
             </div>
             <p class="mt-2 text-base text-gray-600" x-html="state.summary"></p>
 
+            <section class="mt-10">
+                <h2 class="text-base font-semibold text-gray-900">{{ __('Active scholarships') }}</h2>
+
+                <ul class="-mx-3 mt-3 divide-y divide-gray-100 border-y border-gray-200">
+                    <x-free-tertiary-education :linked="false" />
+
+                    <template x-for="row in state.active" :key="row.title">
+                        <li class="flex items-center gap-4 px-3 py-4">
+                            <div class="min-w-0 flex-1">
+                                <p class="text-sm font-semibold text-gray-900 [overflow-wrap:anywhere]" x-text="row.title"></p>
+                                <p class="mt-1 text-sm text-gray-500" x-text="row.applied"></p>
+                            </div>
+                            <x-badge class="shrink-0" color="green">{{ __('Active') }}</x-badge>
+                            <svg class="h-5 w-5 shrink-0 text-gray-500" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m8 5 5 5-5 5" />
+                            </svg>
+                        </li>
+                    </template>
+                </ul>
+            </section>
+
+            <section class="mt-10" data-tour="tour-open">
+                <h2 class="text-base font-semibold text-gray-900">{{ __('Available to apply') }}</h2>
+                <p class="mt-1 text-sm text-gray-500">
+                    {{ __('You can hold up to :limit scholarships at a time, counting applications waiting for a decision.', ['limit' => $limit]) }}
+                    <span class="font-semibold tabular-nums text-gray-900" x-text="@js(__('You can apply to :count more.')).replace(':count', state.places)"></span>
+                </p>
+
+                <ul class="-mx-3 mt-3 divide-y divide-gray-100 border-y border-gray-200">
+                    <template x-for="row in state.open" :key="row.key">
+                        <li class="flex items-center gap-4 px-3 py-4 transition duration-150 ease-in-out"
+                            :class="pressed === 'open-' + row.key && 'bg-gray-50'">
+                            <div class="min-w-0 flex-1">
+                                <p class="text-sm font-semibold [overflow-wrap:anywhere]"
+                                   :class="pressed === 'open-' + row.key ? 'text-cvsu-green' : 'text-gray-900'"
+                                   x-text="row.title"></p>
+                                <p class="mt-1 text-sm tabular-nums text-gray-500" x-text="row.meta"></p>
+                            </div>
+                            <span class="hidden shrink-0 text-sm font-semibold text-cvsu-green sm:inline">{{ __('Apply') }} &rarr;</span>
+                        </li>
+                    </template>
+                </ul>
+            </section>
+
             <section :class="{ 'hidden': state.applications.length === 0 }" class="mt-10">
                 <h2 class="text-base font-semibold text-gray-900">{{ __('My applications') }}</h2>
 
@@ -175,25 +228,6 @@
                             <svg class="h-5 w-5 shrink-0 text-gray-500" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m8 5 5 5-5 5" />
                             </svg>
-                        </li>
-                    </template>
-                </ul>
-            </section>
-
-            <section class="mt-10" data-tour="tour-open">
-                <h2 class="text-base font-semibold text-gray-900">{{ __('Open for you') }}</h2>
-
-                <ul class="-mx-3 mt-3 divide-y divide-gray-100 border-y border-gray-200">
-                    <template x-for="row in state.open" :key="row.key">
-                        <li class="flex items-center gap-4 px-3 py-4 transition duration-150 ease-in-out"
-                            :class="pressed === 'open-' + row.key && 'bg-gray-50'">
-                            <div class="min-w-0 flex-1">
-                                <p class="text-sm font-semibold [overflow-wrap:anywhere]"
-                                   :class="pressed === 'open-' + row.key ? 'text-cvsu-green' : 'text-gray-900'"
-                                   x-text="row.title"></p>
-                                <p class="mt-1 text-sm tabular-nums text-gray-500" x-text="row.meta"></p>
-                            </div>
-                            <span class="hidden shrink-0 text-sm font-semibold text-cvsu-green sm:inline">{{ __('Apply') }} &rarr;</span>
                         </li>
                     </template>
                 </ul>

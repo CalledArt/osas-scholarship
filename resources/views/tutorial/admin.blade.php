@@ -151,6 +151,15 @@
         ],
         [
             'screen' => 'dashboard',
+            'targets' => ['nav-students'],
+            'location' => ['target' => 'nav-students', 'trail' => [__('Edit Student Data')]],
+            'title' => __('Edit Student Data'),
+            'body' => __('Correct a student\'s name, student number, course, year level or contact details. Their sign-in email cannot be changed.'),
+            'state' => $caughtUp,
+            'actions' => [],
+        ],
+        [
+            'screen' => 'dashboard',
             'targets' => ['nav-tutorial'],
             'location' => ['target' => 'nav-tutorial', 'trail' => [__('Tutorial')]],
             'title' => __('Replay this tour'),

@@ -4,6 +4,7 @@ paths:
   - vercel.json
   - Caddyfile
   - .dockerignore
+  - '.env*'
 ---
 
 # Vercel deployment
@@ -25,3 +26,6 @@ Vercel starts instances concurrently, so an entrypoint migration races itself. R
 
 ## Vercel uses the transaction pooler (6543), never DB_PERSISTENT
 Session mode (:5432) caps clients at pool_size 15. With DB_PERSISTENT every PHP thread of every Vercel instance (frozen ones included) pins a slot forever; once 15 are held, requests hang or 500 with `EMAXCONNSESSION max clients reached in session mode` — seen in production 2026-09-24 as "login does nothing, works on the second click". Production DB_URL points at :6543 with DB_EMULATE_PREPARES=true and DB_PERSISTENT unset. The workstation-only ~950ms connect cost that motivated DB_PERSISTENT (controllers.md) does not apply in hnd1, next to the database. Migrations still go through :5432 from a workstation.
+
+## Restart `composer run dev` fully after editing .env
+`php artisan dev` loads .env once at startup, and its putenv makes those values real environment variables that the child `artisan serve` inherits. Laravel's dotenv never overwrites a variable already in the environment. So after an .env edit, the "Environment modified. Restarting server" message still leaves the web server on the OLD values. Seen 2026-10-06: emails kept going to the log after MAIL_MAILER was switched to smtp. Stop the whole dev command with Ctrl+C and start it again; `php artisan tinker` and other fresh processes are unaffected.

@@ -42,6 +42,7 @@ class UserFactory extends Factory
             'student_number' => fake()->unique()->numerify('##-#####'),
             'course' => fake()->randomElement(['BS Computer Science', 'BS Information Technology', 'BS Accountancy', 'BS Civil Engineering']),
             'year_level' => fake()->numberBetween(1, 4),
+            'program_years' => 4,
             'contact_number' => fake()->numerify('09#########'),
             'address' => fake()->address(),
             // Most tests act as someone who has used the system before; see newcomer().
@@ -95,6 +96,7 @@ class UserFactory extends Factory
             'student_number' => null,
             'course' => null,
             'year_level' => null,
+            'program_years' => null,
         ]);
     }
 }

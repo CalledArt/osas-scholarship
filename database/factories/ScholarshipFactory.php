@@ -38,4 +38,14 @@ class ScholarshipFactory extends Factory
             'status' => ScholarshipStatus::Closed,
         ]);
     }
+
+    /**
+     * Indicate that the scholarship's grant period has ended.
+     */
+    public function ended(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => ScholarshipStatus::Ended,
+        ]);
+    }
 }

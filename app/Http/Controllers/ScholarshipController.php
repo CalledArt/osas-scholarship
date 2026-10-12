@@ -5,35 +5,44 @@ namespace App\Http\Controllers;
 use App\Enums\ApplicationStatus;
 use App\Models\Scholarship;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class ScholarshipController extends Controller
 {
     /**
-     * Display the scholarships available to students.
+     * Display the scholarships the student holds, then the ones they can still apply to.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
         Gate::authorize('viewAny', Scholarship::class);
 
-        $scholarships = Scholarship::withCount([
-            'applications',
-            'applications as approved_applications_count' => fn (Builder $query) => $query->where('status', ApplicationStatus::Approved),
-        ])
-            ->orderByRaw("status = 'open' desc")
-            ->latest()
-            ->paginate(10);
+        $student = $request->user();
+
+        $applications = $student->scholarshipApplicationsWithScholarship()
+            ->latest('scholarship_applications.submitted_at')
+            ->get();
+
+        $remainingPlaces = $student->remainingScholarshipPlaces($applications);
+
+        // A student at the limit can't apply to anything, so skip the round trip.
+        $availableScholarships = $remainingPlaces > 0
+            ? Scholarship::availableTo($student)->get()->filter->isOpenForApplications()->values()
+            : new Collection;
 
         return view('scholarships.index', [
-            'scholarships' => $scholarships,
+            'activeApplications' => $applications->filter->isActive()->values(),
+            'availableScholarships' => $availableScholarships,
+            'remainingPlaces' => $remainingPlaces,
         ]);
     }
 
     /**
      * Display the given scholarship's details.
      */
-    public function show(Scholarship $scholarship): View
+    public function show(Request $request, Scholarship $scholarship): View
     {
         Gate::authorize('view', $scholarship);
 
@@ -42,13 +51,12 @@ class ScholarshipController extends Controller
             'applications as approved_applications_count' => fn (Builder $query) => $query->where('status', ApplicationStatus::Approved),
         ]);
 
-        $application = $scholarship->applications()
-            ->where('user_id', auth()->id())
-            ->first();
+        $applications = $request->user()->scholarshipApplicationsWithScholarship()->get();
 
         return view('scholarships.show', [
             'scholarship' => $scholarship,
-            'application' => $application,
+            'application' => $applications->firstWhere('scholarship_id', $scholarship->id),
+            'remainingPlaces' => $request->user()->remainingScholarshipPlaces($applications),
         ]);
     }
 }

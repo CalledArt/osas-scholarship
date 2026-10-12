@@ -17,8 +17,7 @@ class ScholarshipApplicationTest extends TestCase
 
     public function test_application_form_is_prefilled_from_the_authenticated_users_own_profile(): void
     {
-        $student = User::factory()->create([
-            'name' => 'Juan Dela Cruz',
+        $student = User::factory()->named('Juan', 'Santos', 'Dela Cruz')->create([
             'date_of_birth' => now()->subYears(20)->format('Y-m-d'),
             'student_number' => '21-00123',
         ]);
@@ -27,9 +26,19 @@ class ScholarshipApplicationTest extends TestCase
         $response = $this->actingAs($student)->get(route('scholarships.apply', $scholarship));
 
         $response->assertOk();
-        $response->assertSee('Juan Dela Cruz');
+        $response->assertSeeInOrder(['First Name', 'Juan', 'Middle Name', 'Santos', 'Last Name', 'Dela Cruz']);
         $response->assertSee('20');
         $response->assertSee('21-00123');
+    }
+
+    public function test_application_form_marks_a_missing_middle_name_with_a_dash(): void
+    {
+        $student = User::factory()->named('Juan', null, 'Dela Cruz')->create();
+        $scholarship = Scholarship::factory()->create();
+
+        $this->actingAs($student)
+            ->get(route('scholarships.apply', $scholarship))
+            ->assertSeeInOrder(['Middle Name', '—', 'Last Name', 'Dela Cruz']);
     }
 
     public function test_student_can_submit_an_application_with_required_documents(): void
@@ -114,6 +123,25 @@ class ScholarshipApplicationTest extends TestCase
         $response = $this->actingAs($student)->get(route('scholarships.apply', $scholarship));
 
         $response->assertForbidden();
+    }
+
+    public function test_student_at_the_scholarship_limit_is_forbidden_from_submitting_another_application(): void
+    {
+        Storage::fake('supabase');
+        $student = User::factory()->create();
+        ScholarshipApplication::factory()->count(2)->for($student)->create();
+        $scholarship = Scholarship::factory()->create();
+        $requiredDocument = $scholarship->requiredDocuments()->create(['name' => '2x2 Picture']);
+
+        $response = $this->actingAs($student)->post(route('scholarships.apply.store', $scholarship), [
+            'documents' => [
+                $requiredDocument->id => UploadedFile::fake()->create('picture.pdf', 100, 'application/pdf'),
+            ],
+        ]);
+
+        $response->assertForbidden();
+        $this->assertDatabaseMissing('scholarship_applications', ['scholarship_id' => $scholarship->id]);
+        Storage::disk('supabase')->assertEmpty();
     }
 
     public function test_student_cannot_apply_after_the_deadline_has_passed(): void

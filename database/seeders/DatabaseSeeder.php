@@ -41,6 +41,7 @@ class DatabaseSeeder extends Seeder
                 'student_number' => '21-00123',
                 'course' => 'BS Information Technology',
                 'year_level' => 3,
+                'program_years' => 4,
                 'contact_number' => '09171234567',
                 'address' => 'Indang, Cavite',
             ]

@@ -2,13 +2,16 @@
 
 namespace Tests\Feature\Scholarship;
 
+use App\Mail\ScholarshipPosted;
 use App\Models\Scholarship;
 use App\Models\ScholarshipApplication;
 use App\Models\ScholarshipApplicationDocument;
 use App\Models\ScholarshipRequiredDocument;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Tests\TestCase;
 
 class AdminScholarshipManagementTest extends TestCase
@@ -53,6 +56,45 @@ class AdminScholarshipManagementTest extends TestCase
         $this->assertTrue($scholarship->requiredDocuments->pluck('name')->contains('2x2 Picture'));
     }
 
+    public function test_posting_a_scholarship_emails_every_student_but_not_staff(): void
+    {
+        Mail::fake();
+        $admin = User::factory()->admin()->create();
+        $students = User::factory()->count(2)->create();
+
+        $response = $this->actingAs($admin)->post(route('admin.scholarships.store'), [
+            'title' => 'STEM Excellence Grant',
+            'description' => 'For outstanding STEM students.',
+            'slots' => 5,
+        ]);
+
+        $scholarship = Scholarship::sole();
+        $response->assertRedirect(route('admin.scholarships.show', $scholarship));
+        $response->assertSessionHas('status', 'Scholarship posted and emailed to 2 students.');
+        Mail::assertSent(ScholarshipPosted::class, fn (ScholarshipPosted $mail) => $mail->scholarship->is($scholarship)
+            && $mail->hasBcc($students[0]->email)
+            && $mail->hasBcc($students[1]->email)
+            && ! $mail->hasBcc($admin->email));
+    }
+
+    public function test_a_scholarship_stays_posted_when_the_announcement_email_fails(): void
+    {
+        Mail::shouldReceive('to')->andThrow(new TransportException('Connection refused.'));
+        $admin = User::factory()->admin()->create();
+        User::factory()->create();
+
+        $response = $this->actingAs($admin)->post(route('admin.scholarships.store'), [
+            'title' => 'STEM Excellence Grant',
+            'description' => 'For outstanding STEM students.',
+            'slots' => 5,
+        ]);
+
+        $scholarship = Scholarship::sole();
+        $response->assertRedirect(route('admin.scholarships.show', $scholarship));
+        $response->assertSessionHas('status', 'Scholarship posted.');
+        $response->assertSessionHas('error', 'The announcement email reached only 0 of 1 students. Check the mail settings and the application log.');
+    }
+
     public function test_student_cannot_create_scholarship(): void
     {
         $student = User::factory()->create();
@@ -91,6 +133,22 @@ class AdminScholarshipManagementTest extends TestCase
         $response->assertRedirect(route('admin.scholarships.show', $scholarship));
         $this->assertSame('New Title', $scholarship->fresh()->title);
         $this->assertSame('closed', $scholarship->fresh()->status->value);
+    }
+
+    public function test_admin_can_mark_a_scholarship_as_ended(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $scholarship = Scholarship::factory()->for($admin, 'postedBy')->closed()->create();
+
+        $response = $this->actingAs($admin)->put(route('admin.scholarships.update', $scholarship), [
+            'title' => $scholarship->title,
+            'description' => $scholarship->description,
+            'slots' => $scholarship->slots,
+            'status' => 'ended',
+        ]);
+
+        $response->assertRedirect(route('admin.scholarships.show', $scholarship));
+        $this->assertSame('ended', $scholarship->fresh()->status->value);
     }
 
     public function test_admin_can_delete_scholarship(): void

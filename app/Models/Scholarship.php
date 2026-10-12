@@ -7,6 +7,8 @@ use App\Enums\ScholarshipAvailability;
 use App\Enums\ScholarshipStatus;
 use Database\Factories\ScholarshipFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -91,6 +93,26 @@ class Scholarship extends Model
         }
 
         return (int) now()->startOfDay()->diffInDays($this->deadline->startOfDay());
+    }
+
+    /**
+     * Narrow to the scholarships the student has not applied to that are still
+     * open, soonest deadline first.
+     *
+     * Filled slots are not checked here, so callers filter the results through
+     * isOpenForApplications(), which stays the final word on eligibility.
+     */
+    #[Scope]
+    protected function availableTo(Builder $query, User $student): void
+    {
+        $query->where('status', ScholarshipStatus::Open)
+            ->where(fn (Builder $query) => $query->whereNull('deadline')->orWhere('deadline', '>', now()))
+            ->whereDoesntHave('applications', fn (Builder $query) => $query->whereBelongsTo($student))
+            ->withCount([
+                'applications as approved_applications_count' => fn (Builder $query) => $query->where('status', ApplicationStatus::Approved),
+            ])
+            ->orderByRaw('deadline asc nulls last')
+            ->orderBy('title');
     }
 
     public function isOpenForApplications(): bool

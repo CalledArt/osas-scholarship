@@ -120,7 +120,7 @@ class DecideScholarshipApplicationsFromCsv
             $rejected[] = ['name' => $application->user->name, 'email' => $application->user->email];
         }
 
-        if ($remainingSlots < 1) {
+        if ($remainingSlots < 1 && $scholarship->status === ScholarshipStatus::Open) {
             $scholarship->update(['status' => ScholarshipStatus::Closed]);
         }
 

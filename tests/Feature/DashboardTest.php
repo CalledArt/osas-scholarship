@@ -67,7 +67,54 @@ class DashboardTest extends TestCase
         $response->assertViewHas('pendingCount', 1);
     }
 
-    public function test_open_for_you_lists_only_scholarships_the_student_can_still_apply_to(): void
+    public function test_active_scholarships_are_the_students_approvals_on_scholarships_that_have_not_ended(): void
+    {
+        $student = User::factory()->create();
+        ScholarshipApplication::factory()->approved()->for($student)
+            ->for(Scholarship::factory()->closed()->create(['title' => 'Ongoing Grant']))
+            ->create();
+        ScholarshipApplication::factory()->approved()->for($student)
+            ->for(Scholarship::factory()->ended()->create(['title' => 'Ended Grant']))
+            ->create();
+        ScholarshipApplication::factory()->for($student)
+            ->for(Scholarship::factory()->create(['title' => 'Pending Grant']))
+            ->create();
+        ScholarshipApplication::factory()->approved()
+            ->for(Scholarship::factory()->create(['title' => 'Someone Else Grant']))
+            ->create();
+
+        $response = $this->actingAs($student)->get(route('dashboard'));
+
+        $response->assertViewHas('activeApplications', function ($activeApplications): bool {
+            return $activeApplications->pluck('scholarship_title')->all() === ['Ongoing Grant'];
+        });
+        $response->assertSeeInOrder(['Active scholarships', 'Ongoing Grant', 'Available to apply']);
+    }
+
+    public function test_every_student_holds_republic_act_10931_without_it_counting_toward_the_limit(): void
+    {
+        $this->travelTo('2026-10-12');
+        $student = User::factory()->create(['student_number' => '202212345', 'program_years' => 4]);
+
+        $response = $this->actingAs($student)->get(route('dashboard'));
+
+        $response->assertSeeInOrder(['Active scholarships', 'Republic Act No. 10931', 'Year 5 of 5', 'Available to apply']);
+        $response->assertSee(route('scholarships.republic-act-10931'));
+        $response->assertSee('You can apply to 2 more.');
+    }
+
+    public function test_republic_act_10931_leaves_active_scholarships_once_the_student_passes_the_years_it_covers(): void
+    {
+        $this->travelTo('2026-10-12');
+        $student = User::factory()->create(['student_number' => '202112345', 'program_years' => 4]);
+
+        $response = $this->actingAs($student)->get(route('dashboard'));
+
+        $response->assertDontSee('Republic Act No. 10931');
+        $response->assertSee("You don't hold a scholarship right now.");
+    }
+
+    public function test_available_to_apply_lists_only_scholarships_the_student_can_still_apply_to(): void
     {
         $student = User::factory()->create();
 
@@ -84,10 +131,23 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($student)->get(route('dashboard'));
 
         $response->assertOk();
-        $response->assertViewHas('openScholarships', function ($openScholarships): bool {
-            return $openScholarships->pluck('title')->all() === ['Eligible Grant'];
+        $response->assertViewHas('availableScholarships', function ($availableScholarships): bool {
+            return $availableScholarships->pluck('title')->all() === ['Eligible Grant'];
         });
         $response->assertSee('5 slots left');
+        $response->assertSee('You can apply to 1 more.');
+    }
+
+    public function test_student_at_the_scholarship_limit_is_offered_nothing_to_apply_to(): void
+    {
+        $student = User::factory()->create();
+        ScholarshipApplication::factory()->count(2)->for($student)->create();
+        Scholarship::factory()->create(['title' => 'Eligible Grant']);
+
+        $response = $this->actingAs($student)->get(route('dashboard'));
+
+        $response->assertSee("You've reached the limit.");
+        $response->assertDontSee('Eligible Grant');
     }
 
     public function test_unauthenticated_request_redirects_to_login(): void

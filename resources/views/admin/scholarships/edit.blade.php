@@ -46,6 +46,9 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <p class="mt-1 text-sm text-gray-500">
+                                {{ __('Closed stops new applications. Set Ended once the grant period is over: approved students stop holding it, freeing one of their :limit scholarship places.', ['limit' => \App\Models\User::SCHOLARSHIP_LIMIT]) }}
+                            </p>
                             <x-input-error :messages="$errors->get('status')" class="mt-2" />
                         </div>
                     </div>

@@ -54,10 +54,14 @@
                             }" class="mt-2">
                                 {{ __('Status') }}: {{ $application->status->label() }}
                             </x-badge>
-                        @elseif ($scholarship->isOpenForApplications())
+                        @elseif ($scholarship->isOpenForApplications() && $remainingPlaces > 0)
                             <a href="{{ route('scholarships.apply', $scholarship) }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-cvsu-green px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-cvsu-green-dark focus:outline-none focus:ring-2 focus:ring-cvsu-gold focus:ring-offset-2">
                                 {{ __('Apply Now') }}
                             </a>
+                        @elseif ($scholarship->isOpenForApplications())
+                            <p class="text-sm text-gray-500">
+                                {{ __('You already hold :limit scholarships, counting applications waiting for a decision. You can apply again once an application is rejected or one of your scholarships ends.', ['limit' => \App\Models\User::SCHOLARSHIP_LIMIT]) }}
+                            </p>
                         @else
                             <p class="text-sm text-gray-500">{{ __('This scholarship is no longer accepting applications.') }}</p>
                         @endif
