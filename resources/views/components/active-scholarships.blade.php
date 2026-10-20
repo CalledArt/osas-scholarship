@@ -1,10 +1,12 @@
-@props(['applications', 'student'])
+@props(['applications', 'student', 'grid' => false])
 
 {{--
     The scholarships a student holds: Republic Act 10931 while they are within
     the years it covers, then approved applications whose scholarship has not
     ended. Rows read `scholarship_title`, which
-    User::scholarshipApplicationsWithScholarship() joins in.
+    User::scholarshipApplicationsWithScholarship() joins in. `grid` lays them
+    out as record cards (the Scholarships page) instead of ruled rows (the
+    Dashboard).
 --}}
 @php($hasFreeTertiaryEducation = $student->hasFreeTertiaryEducation())
 
@@ -15,6 +17,27 @@
         <p class="mt-3 border-y border-gray-200 py-6 text-sm text-gray-500">
             {{ __("You don't hold a scholarship right now. Once OSAS approves one of your applications, it appears here until the scholarship ends.") }}
         </p>
+    @elseif ($grid)
+        <ul class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            @if ($hasFreeTertiaryEducation)
+                <x-free-tertiary-education :card="true" :year-of-study="$student->yearOfStudy()" :covered-years="$student->freeTertiaryEducationYears()" />
+            @endif
+
+            @foreach ($applications as $application)
+                <li>
+                    <a href="{{ route('scholarship-applications.show', $application) }}"
+                       class="group flex h-full flex-col rounded-lg border border-gray-200 bg-white p-5 transition-colors duration-150 ease-in-out hover:border-cvsu-green/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2">
+                        <div class="flex items-start justify-between gap-3">
+                            <p data-vt-title class="text-base font-semibold leading-snug text-gray-900 [overflow-wrap:anywhere] group-hover:text-cvsu-green">{{ $application->scholarship_title }}</p>
+                            <x-badge class="shrink-0" color="green">{{ __('Active') }}</x-badge>
+                        </div>
+                        <p class="mt-auto pt-6 text-sm text-gray-500">
+                            {{ __('Applied :date', ['date' => ($application->submitted_at ?? $application->created_at)->format('M j, Y')]) }}
+                        </p>
+                    </a>
+                </li>
+            @endforeach
+        </ul>
     @else
         <ul class="-mx-3 mt-3 divide-y divide-gray-100 border-y border-gray-200">
             @if ($hasFreeTertiaryEducation)
@@ -26,7 +49,7 @@
                     <a href="{{ route('scholarship-applications.show', $application) }}"
                        class="group flex items-center gap-4 px-3 py-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cvsu-green">
                         <div class="min-w-0 flex-1">
-                            <p class="text-sm font-semibold text-gray-900 [overflow-wrap:anywhere] group-hover:text-cvsu-green">{{ $application->scholarship_title }}</p>
+                            <p data-vt-title class="text-sm font-semibold text-gray-900 [overflow-wrap:anywhere] group-hover:text-cvsu-green">{{ $application->scholarship_title }}</p>
                             <p class="mt-1 text-sm text-gray-500">
                                 {{ __('Applied :date', ['date' => ($application->submitted_at ?? $application->created_at)->format('M j, Y')]) }}
                             </p>

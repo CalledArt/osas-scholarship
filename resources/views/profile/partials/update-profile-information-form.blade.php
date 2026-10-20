@@ -1,6 +1,6 @@
 <section>
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-base font-semibold text-gray-900">
             {{ __('Profile Information') }}
         </h2>
 
@@ -27,21 +27,40 @@
             <x-input-label for="middle_name" :value="__('Middle Name')" />
             <x-text-input id="middle_name" name="middle_name" type="text" class="mt-1 block w-full" :value="old('middle_name', $user->middle_name)" autocomplete="additional-name" />
             <x-input-error class="mt-2" :messages="$errors->get('middle_name')" />
-            <p class="mt-1 text-xs text-gray-400">{{ __('Optional. Leave blank if you do not use one.') }}</p>
+            <p class="mt-1 text-xs text-gray-500">{{ __('Optional. Leave blank if you do not use one.') }}</p>
         </div>
 
         <div>
             <x-input-label for="last_name" :value="__('Last Name')" />
             <x-text-input id="last_name" name="last_name" type="text" class="mt-1 block w-full" :value="old('last_name', $user->last_name)" required autocomplete="family-name" />
             <x-input-error class="mt-2" :messages="$errors->get('last_name')" />
-            <p class="mt-1 text-xs text-gray-400">{{ __('Include the full surname, for example "Dela Cruz".') }}</p>
+            <p class="mt-1 text-xs text-gray-500">{{ __('Include the full surname, for example "Dela Cruz".') }}</p>
         </div>
 
         @if ($user->isStudent())
             <div>
+                <x-input-label for="date_of_birth" :value="__('Date of Birth')" />
+                <x-text-input id="date_of_birth" name="date_of_birth" type="date" class="mt-1 block w-full" :value="old('date_of_birth', $user->date_of_birth?->format('Y-m-d'))" :max="now()->subDay()->toDateString()" required autocomplete="bday" />
+                <x-input-error class="mt-2" :messages="$errors->get('date_of_birth')" />
+            </div>
+
+            <div>
+                <x-input-label for="contact_number" :value="__('Contact Number')" />
+                <x-text-input id="contact_number" name="contact_number" type="tel" class="mt-1 block w-full" :value="old('contact_number', $user->contact_number)" required autocomplete="tel" maxlength="255" />
+                <x-input-error class="mt-2" :messages="$errors->get('contact_number')" />
+            </div>
+
+            <div>
+                <x-input-label for="address" :value="__('Address')" />
+                <x-text-input id="address" name="address" type="text" class="mt-1 block w-full" :value="old('address', $user->address)" required autocomplete="street-address" maxlength="255" />
+                <x-input-error class="mt-2" :messages="$errors->get('address')" />
+                <p class="mt-1 text-xs text-gray-500">{{ __('Only you can see and change your date of birth, contact number and address. OSAS staff cannot.') }}</p>
+            </div>
+
+            <div>
                 <x-input-label for="student_number" :value="__('Student Number')" />
                 <x-text-input id="student_number" type="text" class="mt-1 block w-full bg-gray-50 text-gray-500" :value="$user->student_number ?? __('Not set')" disabled />
-                <p class="mt-1 text-xs text-gray-400">{{ __('Managed by OSAS. Contact the office if this is incorrect.') }}</p>
+                <p class="mt-1 text-xs text-gray-500">{{ __('Managed by OSAS. Contact the office if this is incorrect.') }}</p>
             </div>
         @endif
 
@@ -50,7 +69,7 @@
             @if ($user->isStudent())
                 {{-- A student's email belongs to their verified Google identity. --}}
                 <x-text-input id="email" type="email" class="mt-1 block w-full bg-gray-50 text-gray-500" :value="$user->email" disabled />
-                <p class="mt-1 text-xs text-gray-400">{{ __('You sign in with this Google account. Contact OSAS if it needs to change.') }}</p>
+                <p class="mt-1 text-xs text-gray-500">{{ __('You sign in with this Google account. Contact OSAS if it needs to change.') }}</p>
             @else
                 <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
             @endif

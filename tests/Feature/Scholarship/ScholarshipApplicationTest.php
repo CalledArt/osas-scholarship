@@ -5,9 +5,11 @@ namespace Tests\Feature\Scholarship;
 use App\Enums\ApplicationStatus;
 use App\Models\Scholarship;
 use App\Models\ScholarshipApplication;
+use App\Models\ScholarshipRequiredDocument;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -41,6 +43,49 @@ class ScholarshipApplicationTest extends TestCase
             ->assertSeeInOrder(['Middle Name', '—', 'Last Name', 'Dela Cruz']);
     }
 
+    public function test_application_form_still_uploads_each_document_as_a_file_without_javascript(): void
+    {
+        $student = User::factory()->create();
+        $scholarship = Scholarship::factory()->create();
+        $documents = ScholarshipRequiredDocument::factory()->count(2)->for($scholarship)->create();
+
+        $response = $this->actingAs($student)->get(route('scholarships.apply', $scholarship));
+
+        $response->assertSee('enctype="multipart/form-data"', false);
+        foreach ($documents as $document) {
+            $response->assertSee('name="documents['.$document->id.']"', false);
+        }
+    }
+
+    public function test_application_form_asks_the_student_to_certify_their_documents(): void
+    {
+        $student = User::factory()->create();
+        $scholarship = Scholarship::factory()->create();
+
+        $response = $this->actingAs($student)->get(route('scholarships.apply', $scholarship));
+
+        $response->assertSee('name="certification"', false);
+        $response->assertSee('shall render this application null and void.');
+    }
+
+    public function test_submission_without_certifying_the_documents_is_refused(): void
+    {
+        Storage::fake('supabase');
+        $student = User::factory()->create();
+        $scholarship = Scholarship::factory()->create();
+        $requiredDocument = $scholarship->requiredDocuments()->create(['name' => '2x2 Picture']);
+
+        $response = $this->actingAs($student)->post(route('scholarships.apply.store', $scholarship), [
+            'documents' => [
+                $requiredDocument->id => UploadedFile::fake()->create('picture.pdf', 100, 'application/pdf'),
+            ],
+        ]);
+
+        $response->assertSessionHasErrors(['certification' => 'Certify that your documents are true and authentic before submitting.']);
+        $this->assertDatabaseCount('scholarship_applications', 0);
+        Storage::disk('supabase')->assertEmpty();
+    }
+
     public function test_student_can_submit_an_application_with_required_documents(): void
     {
         Storage::fake('supabase');
@@ -52,6 +97,7 @@ class ScholarshipApplicationTest extends TestCase
             'documents' => [
                 $requiredDocument->id => UploadedFile::fake()->image('picture.jpg'),
             ],
+            'certification' => '1',
         ]);
 
         $application = ScholarshipApplication::sole();
@@ -74,6 +120,7 @@ class ScholarshipApplicationTest extends TestCase
             'user_id' => $impersonationTarget->id,
             'name' => 'Victim Student',
             'status' => 'approved',
+            'certification' => '1',
             'documents' => [
                 $requiredDocument->id => UploadedFile::fake()->image('picture.jpg'),
             ],
@@ -163,6 +210,28 @@ class ScholarshipApplicationTest extends TestCase
         $response = $this->actingAs($student)->get(route('scholarships.apply', $scholarship));
 
         $response->assertForbidden();
+    }
+
+    public function test_submission_is_forbidden_when_the_last_slot_is_taken_after_the_request_was_authorized(): void
+    {
+        Storage::fake('supabase');
+        $student = User::factory()->create();
+        $scholarship = Scholarship::factory()->create(['slots' => 1]);
+        $requiredDocument = $scholarship->requiredDocuments()->create(['name' => '2x2 Picture']);
+        ScholarshipApplication::factory()->for($scholarship)->create();
+        // Authorization passes as it would have a moment before the other student applied.
+        Gate::before(fn (): bool => true);
+
+        $response = $this->actingAs($student)->post(route('scholarships.apply.store', $scholarship), [
+            'documents' => [
+                $requiredDocument->id => UploadedFile::fake()->create('picture.pdf', 100, 'application/pdf'),
+            ],
+            'certification' => '1',
+        ]);
+
+        $response->assertForbidden();
+        $this->assertDatabaseCount('scholarship_applications', 1);
+        Storage::disk('supabase')->assertEmpty();
     }
 
     public function test_admin_cannot_apply_to_a_scholarship(): void

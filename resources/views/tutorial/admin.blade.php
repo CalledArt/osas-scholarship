@@ -1,6 +1,7 @@
 @php
     $title = 'DOST-SEI Merit Scholarship';
     $deadline = now()->addDays(9);
+    $description = 'For second-year science and engineering students with a GWA of 1.75 or better.';
     $badges = [
         'pending' => 'bg-cvsu-gold/20 text-cvsu-green-dark',
         'approved' => 'bg-green-100 text-green-700',
@@ -68,7 +69,7 @@
             'state' => [],
             'actions' => [
                 ['type', 'post.title', $title],
-                ['type', 'post.description', 'For second-year science and engineering students with a GWA of 1.75 or better.'],
+                ['type', 'post.description', $description],
                 ['type', 'post.slots', '2'],
                 ['set', 'post.deadline', $deadline->toDateString()],
                 ['wait', 300],
@@ -154,7 +155,7 @@
             'targets' => ['nav-students'],
             'location' => ['target' => 'nav-students', 'trail' => [__('Edit Student Data')]],
             'title' => __('Edit Student Data'),
-            'body' => __('Correct a student\'s name, student number, course, year level or contact details. Their sign-in email cannot be changed.'),
+            'body' => __('Correct a student\'s name, student number, course, year level or program length. Their sign-in email and personal details cannot be changed.'),
             'state' => $caughtUp,
             'actions' => [],
         ],
@@ -227,14 +228,14 @@
     </div>
 
     {{-- Mirrors the Post Scholarship form. --}}
-    <div :class="{ 'hidden': screen !== 'post' }" x-cloak class="min-h-screen bg-gray-100">
-        <div class="border-b border-gray-200 bg-white px-6 py-5 lg:px-10">
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">{{ __('Post Scholarship') }}</h2>
-        </div>
+    <div :class="{ 'hidden': screen !== 'post' }" x-cloak class="px-6 py-10 lg:px-10">
+        <div class="mx-auto max-w-3xl">
+            <span class="text-sm font-medium text-gray-600 underline underline-offset-4">{{ __('Back to scholarships') }}</span>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
-                <div class="space-y-6 overflow-hidden rounded-lg border border-gray-100 bg-white p-6 shadow-sm" data-tour="tour-post">
+            <h1 class="mt-6 text-xl font-semibold leading-tight text-gray-900">{{ __('Post Scholarship') }}</h1>
+
+            <div class="mt-8 space-y-10" data-tour="tour-post">
+                <div class="space-y-5">
                     <div>
                         <x-input-label for="tour-title" :value="__('Title')" />
                         <x-text-input id="tour-title" type="text" class="mt-1 block w-full" x-model="state.post.title" readonly tabindex="-1"
@@ -243,139 +244,153 @@
 
                     <div>
                         <x-input-label for="tour-description" :value="__('Description')" />
-                        <textarea id="tour-description" rows="3" readonly tabindex="-1" x-model="state.post.description"
+                        <textarea id="tour-description" rows="4" readonly tabindex="-1" x-model="state.post.description"
                                   :class="focus === 'post.description' && 'border-cvsu-green ring-1 ring-cvsu-green'"
                                   class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm"></textarea>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid gap-5 sm:grid-cols-2 sm:gap-4">
                         <div>
                             <x-input-label for="tour-slots" :value="__('Available Slots')" />
-                            <x-text-input id="tour-slots" type="number" class="mt-1 block w-full" x-model="state.post.slots" readonly tabindex="-1"
+                            <x-text-input id="tour-slots" type="number" class="mt-1 block w-full tabular-nums" x-model="state.post.slots" readonly tabindex="-1"
                                           ::class="focus === 'post.slots' && 'border-cvsu-green ring-1 ring-cvsu-green'" />
                         </div>
 
                         <div>
                             <x-input-label for="tour-deadline" :value="__('Application Deadline')" />
-                            <x-text-input id="tour-deadline" type="date" class="mt-1 block w-full" x-model="state.post.deadline" readonly tabindex="-1" />
+                            <x-text-input id="tour-deadline" type="date" class="mt-1 block w-full tabular-nums" x-model="state.post.deadline" readonly tabindex="-1" />
                         </div>
                     </div>
+                </div>
 
-                    <div class="border-t border-gray-100 pt-6">
-                        <div class="flex items-center justify-between gap-4">
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-900">{{ __('Required Documents') }}</h3>
-                                <p class="text-sm text-gray-500">{{ __('Documents applicants must upload, e.g. 2x2 Picture.') }}</p>
-                            </div>
-                            <span class="shrink-0 rounded-sm text-sm font-medium text-cvsu-green"
-                                  :class="pressed === 'add-document' && 'text-cvsu-green-dark ring-2 ring-cvsu-green ring-offset-2'">
-                                {{ __('+ Add document') }}
-                            </span>
+                <div class="border-t border-gray-200 pt-8">
+                    <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+                        <div>
+                            <h2 class="text-base font-semibold text-gray-900">{{ __('Required Documents') }}</h2>
+                            <p class="mt-1 text-sm text-gray-500">{{ __('Documents applicants must upload, e.g. 2x2 Picture.') }}</p>
                         </div>
-
-                        <div class="mt-4">
-                            <div :class="{ 'hidden': ! state.post.hasDocument }" class="rounded-lg border border-gray-200 p-4">
-                                <x-text-input type="text" class="block w-full text-sm" x-model="state.post.document" readonly tabindex="-1"
-                                              :placeholder="__('Document name (e.g. 2x2 Picture)')"
-                                              ::class="focus === 'post.document' && 'border-cvsu-green ring-1 ring-cvsu-green'" />
-                            </div>
-                            <p :class="{ 'hidden': state.post.hasDocument }" class="text-sm text-gray-500">{{ __('No documents required yet.') }}</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
-                        <span class="text-sm font-medium text-gray-500">{{ __('Cancel') }}</span>
-                        <span class="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-150 ease-in-out"
-                              :class="pressed === 'post' ? 'bg-cvsu-green-dark ring-2 ring-cvsu-gold ring-offset-2' : 'bg-cvsu-green'">
-                            {{ __('Post Scholarship') }}
+                        <span class="inline-flex shrink-0 items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition duration-150 ease-in-out"
+                              :class="pressed === 'add-document' && 'bg-gray-50 ring-2 ring-cvsu-green ring-offset-2'">
+                            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                                <path stroke-linecap="round" d="M10 4.5v11M4.5 10h11" />
+                            </svg>
+                            {{ __('Add document') }}
                         </span>
                     </div>
+
+                    <div class="mt-4">
+                        <div :class="{ 'hidden': ! state.post.hasDocument }" class="rounded-lg border border-gray-200 p-4">
+                            <x-text-input type="text" class="block w-full" x-model="state.post.document" readonly tabindex="-1"
+                                          :placeholder="__('Document name (e.g. 2x2 Picture)')"
+                                          ::class="focus === 'post.document' && 'border-cvsu-green ring-1 ring-cvsu-green'" />
+                        </div>
+                        <p :class="{ 'hidden': state.post.hasDocument }" class="border-y border-gray-200 py-6 text-sm text-gray-500">{{ __('No documents required yet.') }}</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-4">
+                    <span class="text-sm font-medium text-gray-600">{{ __('Cancel') }}</span>
+                    <span class="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-150 ease-in-out"
+                          :class="pressed === 'post' ? 'bg-cvsu-green-dark ring-2 ring-cvsu-gold ring-offset-2' : 'bg-cvsu-green'">
+                        {{ __('Post Scholarship') }}
+                    </span>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Mirrors a scholarship's page: its pass list upload and applicants. --}}
-    <div :class="{ 'hidden': screen !== 'scholarship' }" x-cloak class="min-h-screen bg-gray-100">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 bg-white px-6 py-5 lg:px-10">
-            <div class="flex flex-wrap items-center gap-3">
-                <h2 class="text-xl font-semibold leading-tight text-gray-800">{{ $title }}</h2>
-                <x-badge ::class="{ 'hidden': ! state.clock }" x-text="state.clock" />
-            </div>
-            <span class="text-sm font-medium text-cvsu-green">{{ __('Edit') }}</span>
-        </div>
+    {{-- Mirrors a scholarship's review page: the pass list and its applicants, with what OSAS posted beside them. --}}
+    <div :class="{ 'hidden': screen !== 'scholarship' }" x-cloak class="px-6 py-10 lg:px-10">
+        <div class="mx-auto max-w-5xl">
+            <span class="text-sm font-medium text-gray-600 underline underline-offset-4">{{ __('Back to scholarships') }}</span>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-5xl space-y-6 sm:px-6 lg:px-8">
-                <div class="overflow-hidden rounded-lg border border-gray-100 bg-white p-6 shadow-sm">
-                    <div class="flex flex-wrap items-center gap-3">
-                        <x-badge color="green">{{ __('Open') }}</x-badge>
-                        <span class="text-sm text-gray-500"><span class="tabular-nums" x-text="state.remaining"></span> / 2 {{ __('slots remaining') }}</span>
-                        <span class="text-sm text-gray-500">&middot; {{ __('Deadline') }}: {{ $deadline->format('M j, Y') }}</span>
-                    </div>
+            <div class="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+                <div class="flex min-w-0 flex-wrap items-center gap-3">
+                    <h1 class="text-xl font-semibold leading-tight text-gray-900">{{ $title }}</h1>
+                    <x-badge ::class="{ 'hidden': ! state.clock }" x-text="state.clock" />
                 </div>
+                <span class="inline-flex shrink-0 items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm">{{ __('Edit') }}</span>
+            </div>
 
-                <div class="space-y-6" data-tour="tour-decide">
-                    <div :class="{ 'hidden': ! state.results }" class="overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm">
-                        <div class="border-b border-gray-100 px-6 py-4">
-                            <h3 class="text-sm font-semibold text-gray-900">{{ __('Pass List Results') }}</h3>
-                        </div>
-                        <p class="p-6 text-sm text-gray-700" x-text="state.results"></p>
-                    </div>
+            <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
+                <x-badge color="green">{{ __('Open') }}</x-badge>
+                <span class="tabular-nums"><span x-text="state.remaining"></span> / 2 {{ __('slots remaining') }}</span>
+                <span class="tabular-nums"><span aria-hidden="true">&middot;</span> {{ __('Deadline') }}: {{ $deadline->format('M j, Y') }}</span>
+            </div>
 
-                    <div class="overflow-hidden rounded-lg border border-gray-100 bg-white p-6 shadow-sm">
-                        <h3 class="text-sm font-semibold text-gray-900">{{ __('Upload Pass List') }}</h3>
+            <div class="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-x-12">
+                <div class="min-w-0">
+                    <div data-tour="tour-decide">
+                        <section :class="{ 'hidden': ! state.results }" class="mb-10 rounded-lg border border-gray-200 bg-gray-50 p-5 text-sm">
+                            <h2 class="text-base font-semibold text-gray-900">{{ __('Pass List Results') }}</h2>
+                            <p class="mt-1 tabular-nums text-gray-700" x-text="state.results"></p>
+                        </section>
 
-                        <template x-if="state.applicants.some((applicant) => applicant.status === 'pending')">
-                            <div>
-                                <p class="mt-1 text-sm text-gray-500"
-                                   x-text="@js($passListHint).replace(':count', state.applicants.filter((applicant) => applicant.status === 'pending').length)"></p>
+                        <section>
+                            <h2 class="text-base font-semibold text-gray-900">{{ __('Upload Pass List') }}</h2>
 
-                                <div class="mt-4 flex flex-wrap items-center gap-3">
-                                    <span class="flex min-w-0 flex-1 items-center gap-4 text-sm text-gray-600">
-                                        <span class="shrink-0 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700"
-                                              :class="pressed === 'choose-file' && 'bg-gray-50 ring-2 ring-cvsu-green ring-offset-2'">{{ __('Choose file') }}</span>
-                                        <span class="truncate" x-text="state.passList || @js(__('No file chosen'))"></span>
-                                    </span>
-                                    <span class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition duration-150 ease-in-out"
-                                          :class="pressed === 'apply' && 'bg-gray-50 ring-2 ring-cvsu-green ring-offset-2'">{{ __('Apply Decisions') }}</span>
+                            <template x-if="state.applicants.some((applicant) => applicant.status === 'pending')">
+                                <div>
+                                    <p class="mt-1 max-w-prose text-sm text-gray-500"
+                                       x-text="@js($passListHint).replace(':count', state.applicants.filter((applicant) => applicant.status === 'pending').length)"></p>
+
+                                    <div class="mt-4 flex flex-col gap-3 rounded-lg border border-gray-200 p-4 sm:flex-row sm:items-center">
+                                        <span class="flex min-w-0 flex-1 items-center gap-4 text-sm text-gray-600">
+                                            <span class="shrink-0 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700"
+                                                  :class="pressed === 'choose-file' && 'bg-gray-50 ring-2 ring-cvsu-green ring-offset-2'">{{ __('Choose file') }}</span>
+                                            <span class="truncate" x-text="state.passList || @js(__('No file chosen'))"></span>
+                                        </span>
+                                        <span class="inline-flex shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition duration-150 ease-in-out"
+                                              :class="pressed === 'apply' && 'bg-gray-50 ring-2 ring-cvsu-green ring-offset-2'">{{ __('Apply Decisions') }}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </template>
-                        <p :class="{ 'hidden': state.applicants.some((applicant) => applicant.status === 'pending') }" class="mt-1 text-sm text-gray-500">
-                            {{ __('There are no pending applicants to decide on right now.') }}
-                        </p>
+                            </template>
+                            <p :class="{ 'hidden': state.applicants.some((applicant) => applicant.status === 'pending') }" class="mt-1 text-sm text-gray-500">
+                                {{ __('There are no pending applicants to decide on right now.') }}
+                            </p>
+                        </section>
                     </div>
 
-                    <div class="overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm" data-tour="tour-applicants">
-                        <div class="border-b border-gray-100 px-6 py-4">
-                            <h3 class="text-sm font-semibold text-gray-900">{{ __('Applicants') }} (<span class="tabular-nums" x-text="state.applicants.length"></span>)</h3>
-                        </div>
+                    <section class="mt-12" data-tour="tour-applicants">
+                        <h2 class="text-base font-semibold text-gray-900">
+                            {{ __('Applicants') }} <span class="font-normal tabular-nums text-gray-500">(<span x-text="state.applicants.length"></span>)</span>
+                        </h2>
 
-                        <ul class="divide-y divide-gray-100">
+                        <p :class="{ 'hidden': state.applicants.length > 0 }" class="mt-3 border-y border-gray-200 py-6 text-sm text-gray-500">{{ __('No applications yet.') }}</p>
+
+                        <ul :class="{ 'hidden': state.applicants.length === 0 }" class="mt-3 divide-y divide-gray-100 border-y border-gray-200">
                             <template x-for="applicant in state.applicants" :key="applicant.number">
-                                <li class="space-y-3 p-6">
-                                    <div class="flex items-center justify-between gap-4">
+                                <li class="py-4">
+                                    <div class="flex items-start justify-between gap-4">
                                         <div class="min-w-0">
                                             <p class="text-sm font-semibold text-gray-900">
                                                 <span x-text="applicant.name"></span>
-                                                <span class="ms-1 font-normal text-gray-500" x-text="'(' + applicant.number + ')'"></span>
+                                                <span class="ms-1 font-normal tabular-nums text-gray-500" x-text="'(' + applicant.number + ')'"></span>
                                             </p>
-                                            <p class="text-sm text-gray-500" x-text="applicant.course"></p>
+                                            <p class="mt-1 text-sm text-gray-500" x-text="applicant.course"></p>
                                         </div>
                                         <span class="inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors duration-150 ease-in-out"
                                               :class="state.badges[applicant.status]"
                                               x-text="state.labels[applicant.status]"></span>
                                     </div>
-                                    <div class="flex flex-wrap gap-2">
+                                    <div class="mt-3 flex flex-wrap gap-2">
                                         <span class="inline-flex items-center gap-1 rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-600">2x2 Picture</span>
                                     </div>
                                 </li>
                             </template>
-                            <li :class="{ 'hidden': state.applicants.length > 0 }" class="p-6 text-center text-sm text-gray-500">{{ __('No applications yet.') }}</li>
                         </ul>
-                    </div>
+                    </section>
                 </div>
+
+                <aside class="mt-12 lg:mt-0">
+                    <h2 class="text-base font-semibold text-gray-900">{{ __('About this scholarship') }}</h2>
+                    <p class="mt-3 max-w-prose text-sm leading-relaxed text-gray-700">{{ $description }}</p>
+
+                    <h3 class="mt-8 text-sm font-semibold text-gray-900">{{ __('Required Documents') }}</h3>
+                    <ul class="mt-2 divide-y divide-gray-100 border-y border-gray-200">
+                        <li class="py-3 text-sm font-medium text-gray-900">2x2 Picture</li>
+                    </ul>
+                </aside>
             </div>
         </div>
     </div>

@@ -4,7 +4,7 @@
             <h1 class="text-xl font-semibold leading-tight text-gray-900">{{ __('Edit Student Data') }}</h1>
 
             <p class="mt-2 max-w-2xl text-lg leading-relaxed text-gray-600">
-                {{ __('Find a registered student by name, email or student number, then correct their name, student number, course, year level or contact details.') }}
+                {{ __('Find a registered student by name, email or student number, then correct their name, student number, course, year level or program length.') }}
             </p>
 
             <form method="GET" action="{{ route('admin.students.index') }}" class="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4" role="search">
@@ -23,7 +23,7 @@
 
             <section class="mt-8">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h2 class="text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('Registered students') }}</h2>
+                    <h2 class="text-base font-semibold text-gray-900">{{ __('Registered students') }}</h2>
                     <p class="text-sm text-gray-600">
                         <span class="font-semibold tabular-nums text-gray-900">{{ number_format($students->total()) }}</span>
                         {{ trans_choice('student found|students found', $students->total()) }}

@@ -26,7 +26,7 @@ class DashboardController extends Controller
         $scholarships = Scholarship::query()
             ->withCount([
                 'applications as pending_count' => fn (Builder $query) => $query->where('status', ApplicationStatus::Pending),
-                'applications as approved_applications_count' => fn (Builder $query) => $query->where('status', ApplicationStatus::Approved),
+                'applications as held_slots_count' => fn (Builder $query) => $query->holdingSlot(),
             ])
             ->addSelect([
                 'oldest_pending_at' => ScholarshipApplication::query()

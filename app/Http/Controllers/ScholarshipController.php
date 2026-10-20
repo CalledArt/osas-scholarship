@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ApplicationStatus;
 use App\Models\Scholarship;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -28,8 +27,9 @@ class ScholarshipController extends Controller
         $remainingPlaces = $student->remainingScholarshipPlaces($applications);
 
         // A student at the limit can't apply to anything, so skip the round trip.
+        // The document count rides along as a subquery for the cards.
         $availableScholarships = $remainingPlaces > 0
-            ? Scholarship::availableTo($student)->get()->filter->isOpenForApplications()->values()
+            ? Scholarship::availableTo($student)->withCount('requiredDocuments')->get()->filter->isOpenForApplications()->values()
             : new Collection;
 
         return view('scholarships.index', [
@@ -48,7 +48,7 @@ class ScholarshipController extends Controller
 
         $scholarship->load('requiredDocuments');
         $scholarship->loadCount([
-            'applications as approved_applications_count' => fn (Builder $query) => $query->where('status', ApplicationStatus::Approved),
+            'applications as held_slots_count' => fn (Builder $query) => $query->holdingSlot(),
         ]);
 
         $applications = $request->user()->scholarshipApplicationsWithScholarship()->get();
@@ -56,6 +56,7 @@ class ScholarshipController extends Controller
         return view('scholarships.show', [
             'scholarship' => $scholarship,
             'application' => $applications->firstWhere('scholarship_id', $scholarship->id),
+            'admitsCourse' => $scholarship->admitsCourse($request->user()->course),
             'remainingPlaces' => $request->user()->remainingScholarshipPlaces($applications),
         ]);
     }

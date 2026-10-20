@@ -49,7 +49,7 @@
 
             <section class="mt-8">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h2 class="text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('Registered students') }}</h2>
+                    <h2 class="text-base font-semibold text-gray-900">{{ __('Registered students') }}</h2>
                     <p class="text-sm text-gray-600">
                         <span class="font-semibold tabular-nums text-gray-900">{{ number_format($students->total()) }}</span>
                         {{ trans_choice('student found|students found', $students->total()) }}

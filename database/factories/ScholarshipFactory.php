@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\ScholarshipStatus;
+use App\Enums\ScholarshipType;
 use App\Models\Scholarship;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -23,7 +24,9 @@ class ScholarshipFactory extends Factory
             'created_by' => User::factory()->admin(),
             'title' => fake()->sentence(4),
             'description' => fake()->paragraph(),
-            'slots' => fake()->numberBetween(1, 20),
+            'type' => ScholarshipType::Government,
+            'stem_courses_only' => false,
+            'slots' => fake()->numberBetween(10, 20),
             'deadline' => fake()->dateTimeBetween('+1 week', '+3 months'),
             'status' => ScholarshipStatus::Open,
         ];
@@ -36,6 +39,16 @@ class ScholarshipFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => ScholarshipStatus::Closed,
+        ]);
+    }
+
+    /**
+     * Indicate that only students in STEM courses may apply.
+     */
+    public function stemCoursesOnly(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'stem_courses_only' => true,
         ]);
     }
 

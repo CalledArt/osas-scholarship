@@ -13,3 +13,6 @@ The admin Student Roster page lists users with the Student role, read-only, with
 
 ## Student edits live in Edit Student Data, not the roster
 OSAS corrects student details on the separate "Edit Student Data" section (Admin\StudentController index/edit/update + UpdateStudentRequest). The Search Student roster stays read-only — do not add edit links or forms to it. Only student accounts are editable there (staff get 403). Email, google_id and role are never accepted: the email is the student's verified Google identity. Course and year level are separate fields and separate table columns everywhere; do not merge them back into one "Course / year" cell.
+
+## Students' personal details are hidden from OSAS
+A student's date of birth, contact number and address belong to the student: they set them at registration and edit them on their own Profile (ProfileUpdateRequest, students only; the fields may be omitted but never cleared). OSAS must neither see nor edit them. Edit Student Data does not show them and UpdateStudentRequest has no rules for them, so posted values are ignored; the scholarship applicant list shows no age, since age is derived from the date of birth. OSAS still edits name, student number, course, year level and program length. Do not add these fields, or anything derived from them, to admin pages, exports or emails to staff.

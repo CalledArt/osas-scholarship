@@ -190,7 +190,7 @@ class DashboardTest extends TestCase
         $response->assertViewHas('takingApplications', function (Collection $takingApplications): bool {
             return (int) $takingApplications->first()->pending_count === 2;
         });
-        $response->assertSee('1 of 10 slots filled');
+        $response->assertSee('3 of 10 slots filled');
     }
 
     public function test_deadlines_are_counted_in_whole_calendar_days(): void

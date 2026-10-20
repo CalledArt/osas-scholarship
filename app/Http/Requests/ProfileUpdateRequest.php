@@ -16,6 +16,10 @@ class ProfileUpdateRequest extends FormRequest
      * it belongs to their verified Google identity. Letting a student rewrite
      * it could let them claim a classmate's email and block registration.
      *
+     * A student also keeps their own personal details (date of birth, contact
+     * number and address) here, since OSAS can neither see nor edit them.
+     * Each may be left out of a request, but never cleared.
+     *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
@@ -27,7 +31,12 @@ class ProfileUpdateRequest extends FormRequest
         ];
 
         if ($this->user()->isStudent()) {
-            return $rules;
+            return [
+                ...$rules,
+                'date_of_birth' => ['sometimes', 'required', 'date_format:Y-m-d', 'before:today'],
+                'contact_number' => ['sometimes', 'required', 'string', 'max:255'],
+                'address' => ['sometimes', 'required', 'string', 'max:255'],
+            ];
         }
 
         return [

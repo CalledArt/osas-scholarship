@@ -17,8 +17,8 @@ class ScholarshipApplicationApprovedTest extends TestCase
 
         $mailable = new ScholarshipApplicationApproved($scholarship);
 
-        $mailable->assertHasSubject('Your application for STEM Excellence Grant was approved');
-        $mailable->assertSeeInHtml('You passed.');
+        $mailable->assertHasSubject('Scholarship Application Approved: STEM Excellence Grant');
+        $mailable->assertSeeInOrderInText(['Notice of Approval', 'your application for the', 'STEM Excellence Grant', 'has been approved']);
         $mailable->assertSeeInHtml(route('scholarship-applications.index'));
         $mailable->assertSeeInText(route('scholarship-applications.index'));
     }

@@ -63,11 +63,11 @@
                                         <a href="{{ route('admin.scholarships.show', $scholarship) }}"
                                            class="group flex items-center gap-4 px-3 py-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cvsu-green">
                                             <div class="min-w-0 flex-1">
-                                                <p class="text-sm font-semibold text-gray-900 [overflow-wrap:anywhere] group-hover:text-cvsu-green">{{ $scholarship->title }}</p>
+                                                <p data-vt-title class="text-sm font-semibold text-gray-900 [overflow-wrap:anywhere] group-hover:text-cvsu-green">{{ $scholarship->title }}</p>
                                                 <p class="mt-1 text-sm text-gray-500">
                                                     <x-availability :scholarship="$scholarship" />
                                                     <span aria-hidden="true">&middot;</span>
-                                                    <span class="tabular-nums">{{ __(':filled of :slots slots filled', ['filled' => $scholarship->approved_applications_count, 'slots' => $scholarship->slots]) }}</span>
+                                                    <span class="tabular-nums">{{ __(':filled of :slots slots filled', ['filled' => $scholarship->filledSlots(), 'slots' => $scholarship->slots]) }}</span>
                                                 </p>
                                             </div>
 

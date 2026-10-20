@@ -165,4 +165,54 @@ class ProfileTest extends TestCase
 
         $this->assertNotNull($user->fresh());
     }
+
+    public function test_the_profile_page_shows_a_student_their_personal_details(): void
+    {
+        $student = User::factory()->create([
+            'date_of_birth' => '2003-05-14',
+            'contact_number' => '09171234567',
+            'address' => 'Indang, Cavite',
+        ]);
+
+        $response = $this->actingAs($student)->get('/profile');
+
+        $response->assertSee('value="2003-05-14"', false);
+        $response->assertSee('value="09171234567"', false);
+        $response->assertSee('value="Indang, Cavite"', false);
+    }
+
+    public function test_a_student_can_update_their_own_personal_details(): void
+    {
+        $student = User::factory()->named('Juan', null, 'Cruz')->create();
+
+        $response = $this->actingAs($student)->patch('/profile', [
+            'first_name' => 'Juan',
+            'last_name' => 'Cruz',
+            'date_of_birth' => '2003-05-14',
+            'contact_number' => '09998887777',
+            'address' => 'Trece Martires, Cavite',
+        ]);
+
+        $response->assertSessionHasNoErrors()->assertRedirect('/profile');
+        $student->refresh();
+        $this->assertSame('2003-05-14', $student->date_of_birth->toDateString());
+        $this->assertSame('09998887777', $student->contact_number);
+        $this->assertSame('Trece Martires, Cavite', $student->address);
+    }
+
+    public function test_a_student_cannot_clear_their_personal_details(): void
+    {
+        $student = User::factory()->named('Juan', null, 'Cruz')->create(['contact_number' => '09171234567']);
+
+        $response = $this->actingAs($student)->from('/profile')->patch('/profile', [
+            'first_name' => 'Juan',
+            'last_name' => 'Cruz',
+            'date_of_birth' => '',
+            'contact_number' => '',
+            'address' => '',
+        ]);
+
+        $response->assertSessionHasErrors(['date_of_birth', 'contact_number' => 'The contact number field is required.', 'address']);
+        $this->assertSame('09171234567', $student->refresh()->contact_number);
+    }
 }

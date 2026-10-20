@@ -3,7 +3,7 @@
         <div class="mx-auto max-w-5xl">
             <h1 class="text-xl font-semibold leading-tight text-gray-900">{{ __('Dashboard') }}</h1>
 
-            <p class="mt-2 text-base text-gray-600">
+            <p class="mt-3 max-w-3xl text-pretty text-lg leading-relaxed text-gray-600">
                 {{ __('Welcome, :name!', ['name' => Auth::user()->full_name]) }}
                 @if ($pendingCount > 0)
                     <span class="font-semibold tabular-nums text-gray-900">{{ $pendingCount }}</span>
@@ -15,7 +15,7 @@
                 @endif
             </p>
 
-            <x-active-scholarships :applications="$activeApplications" :student="Auth::user()" class="mt-10" />
+            <x-active-scholarships :applications="$activeApplications" :student="Auth::user()" class="mt-12" />
 
             <x-available-scholarships :scholarships="$availableScholarships" :remaining-places="$remainingPlaces" class="mt-10">
                 @if ($availableScholarshipCount > $availableScholarships->count())
@@ -36,9 +36,9 @@
                                 <a href="{{ route('scholarship-applications.show', $application) }}"
                                    class="group flex items-center gap-4 px-3 py-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cvsu-green">
                                     <div class="min-w-0 flex-1">
-                                        <p class="text-sm font-semibold text-gray-900 [overflow-wrap:anywhere] group-hover:text-cvsu-green">{{ $application->scholarship_title }}</p>
+                                        <p data-vt-title class="text-sm font-semibold text-gray-900 [overflow-wrap:anywhere] group-hover:text-cvsu-green">{{ $application->scholarship_title }}</p>
                                         <p class="mt-1 text-sm text-gray-500">
-                                            {{ __('Submitted :date', ['date' => ($application->submitted_at ?? $application->created_at)->format('M j, Y')]) }}
+                                            {{ __('Applied :date', ['date' => ($application->submitted_at ?? $application->created_at)->format('M j, Y')]) }}
                                         </p>
                                     </div>
 

@@ -25,7 +25,7 @@ class ScholarshipApplicationRejected extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: __('Your application for :title was not approved', ['title' => $this->scholarship->title]),
+            subject: __('Scholarship Application Result: :title', ['title' => $this->scholarship->title]),
         );
     }
 

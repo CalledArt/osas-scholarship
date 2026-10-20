@@ -82,6 +82,40 @@ class CvsuPrograms
     ];
 
     /**
+     * The programs above that DOST-SEI lists as S&T priority fields, which
+     * are the only ones a STEM-courses-only scholarship accepts.
+     *
+     * Taken from the "S&T Undergraduate Scholarship Priority Fields" in the
+     * DOST-SEI 2026 Undergraduate Scholarship brochure, keeping only exact
+     * name matches. Near matches are left out: Agricultural Entrepreneurship
+     * (DOST lists Agribusiness Management and Entrepreneurship), Exercise and
+     * Sports Sciences (DOST lists Sports Science), and the Education degrees,
+     * which DOST accepts only in science, mathematics or ICT majors that the
+     * list above does not record.
+     *
+     * @var list<string>
+     */
+    public const STEM = [
+        'BS Agriculture',
+        'BS Environmental Science',
+        'BS Food Technology',
+        'BS Applied Mathematics',
+        'BS Biology',
+        'BS Psychology',
+        'BS Agricultural and Biosystems Engineering',
+        'BS Architecture',
+        'BS Civil Engineering',
+        'BS Computer Engineering',
+        'BS Computer Science',
+        'BS Electrical Engineering',
+        'BS Electronics Engineering',
+        'BS Industrial Engineering',
+        'BS Information Technology',
+        'BS Medical Technology',
+        'Doctor of Veterinary Medicine',
+    ];
+
+    /**
      * Every program, across all colleges.
      *
      * @return list<string>
@@ -89,5 +123,14 @@ class CvsuPrograms
     public static function all(): array
     {
         return array_merge(...array_values(self::BY_COLLEGE));
+    }
+
+    /**
+     * Whether the course is one of the STEM programs. A course saved before
+     * the program list existed matches only once OSAS recodes it.
+     */
+    public static function isStem(?string $course): bool
+    {
+        return in_array($course, self::STEM, true);
     }
 }

@@ -1,11 +1,15 @@
 {{--
     Navigation progress. Server-rendered pages have nothing partial to skeleton,
     so the current page stays on screen and only a hairline reports the wait.
-    Decorative: the browser already announces the navigation itself.
+    Decorative: the browser already announces the navigation itself. The bar
+    grows by scaleX rather than width, so each step is composited instead of
+    laying the page out again. With reduced motion it appears at full width
+    and fades, without the creep.
 --}}
 <div class="pointer-events-none fixed inset-x-0 top-0 z-[70] h-0.5" aria-hidden="true">
     <div id="page-progress-bar"
-         class="h-full w-0 bg-cvsu-green opacity-0 transition-[width,opacity] duration-200 ease-out"></div>
+         class="h-full w-full origin-left bg-cvsu-green opacity-0 transition-[transform,opacity] duration-200 ease-out motion-reduce:transition-opacity"
+         style="transform: scaleX(0)"></div>
 </div>
 
 <script>
@@ -21,6 +25,11 @@
         var safetyTimer = null;
         var running = false;
         var width = 0;
+        var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+        var draw = function () {
+            bar.style.transform = 'scaleX(' + (width / 100).toFixed(4) + ')';
+        };
 
         var start = function () {
             if (running) {
@@ -31,14 +40,18 @@
 
             // Navigations that resolve quickly should flash nothing at all.
             revealTimer = setTimeout(function () {
-                width = 30;
+                width = reduceMotion.matches ? 100 : 30;
                 bar.style.opacity = '1';
-                bar.style.width = width + '%';
+                draw();
+
+                if (reduceMotion.matches) {
+                    return;
+                }
 
                 creepTimer = setInterval(function () {
                     // Ease toward 90% and never reach it; the page swap ends the bar.
                     width += (90 - width) * 0.12;
-                    bar.style.width = width.toFixed(2) + '%';
+                    draw();
                 }, 240);
             }, 150);
 
@@ -52,7 +65,7 @@
             running = false;
             width = 0;
             bar.style.opacity = '0';
-            bar.style.width = '0%';
+            draw();
         }
 
         document.addEventListener('click', function (event) {

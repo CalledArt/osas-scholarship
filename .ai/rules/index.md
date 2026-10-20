@@ -12,6 +12,9 @@ Before planning or editing, find the row whose globs match the file's path and r
 | Dockerfile.vercel, vercel.json, Caddyfile, .dockerignore, .env* | .ai/rules/deployment.md |
 | app/Mail/** | .ai/rules/mail.md |
 | database/migrations/** | .ai/rules/migrations.md |
+| app/Models/** | .ai/rules/models.md |
 | app/Providers/** | .ai/rules/providers.md |
 | app/Http/Requests/** | .ai/rules/requests.md |
+| app/Support/** | .ai/rules/support.md |
 | resources/views/tutorial/** | .ai/rules/tutorial.md |
+| resources/views/** | .ai/rules/views.md |

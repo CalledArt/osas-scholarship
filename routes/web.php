@@ -12,6 +12,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScholarshipApplicationController;
 use App\Http\Controllers\ScholarshipApplicationDocumentController;
+use App\Http\Controllers\ScholarshipApplicationUploadController;
 use App\Http\Controllers\ScholarshipController;
 use App\Http\Controllers\ScholarshipRequiredDocumentSampleController;
 use App\Http\Controllers\TutorialController;
@@ -88,6 +89,9 @@ Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
     Route::get('scholarships/{scholarship}', [ScholarshipController::class, 'show'])->name('scholarships.show');
     Route::get('scholarships/{scholarship}/apply', [ScholarshipApplicationController::class, 'create'])->name('scholarships.apply');
     Route::post('scholarships/{scholarship}/apply', [ScholarshipApplicationController::class, 'store'])->name('scholarships.apply.store');
+    Route::post('scholarships/{scholarship}/apply/uploads', [ScholarshipApplicationUploadController::class, 'store'])
+        ->middleware('throttle:30,1')
+        ->name('scholarships.apply.uploads.store');
 
     Route::get('scholarship-applications', [ScholarshipApplicationController::class, 'index'])->name('scholarship-applications.index');
     Route::get('scholarship-applications/{application}', [ScholarshipApplicationController::class, 'show'])->name('scholarship-applications.show');

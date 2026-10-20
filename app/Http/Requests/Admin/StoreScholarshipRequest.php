@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\ScholarshipType;
 use App\Models\Scholarship;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class StoreScholarshipRequest extends FormRequest
 {
@@ -17,6 +19,17 @@ class StoreScholarshipRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     *
+     * An unticked checkbox sends nothing, so the course limit is read as a
+     * boolean up front; otherwise unticking it could never switch it off.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge(['stem_courses_only' => $this->boolean('stem_courses_only')]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
@@ -26,6 +39,8 @@ class StoreScholarshipRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'type' => ['required', new Enum(ScholarshipType::class)],
+            'stem_courses_only' => ['boolean'],
             'slots' => ['required', 'integer', 'min:1'],
             'deadline' => ['nullable', 'date', 'after:today'],
             'required_documents' => ['nullable', 'array'],

@@ -78,7 +78,9 @@ class DecideScholarshipApplicationsFromCsv
         $rejected = [];
         $ambiguous = [];
         $skippedCapacity = [];
-        $remainingSlots = $scholarship->remainingSlots();
+        // Pending applicants hold slots too, but this list is what decides them,
+        // so only approvals already made count against the room left.
+        $remainingSlots = $scholarship->slots - $scholarship->approvedApplicationsCount();
 
         $pendingApplications = $scholarship->applications()
             ->where('status', ApplicationStatus::Pending)

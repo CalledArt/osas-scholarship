@@ -29,3 +29,6 @@ Session mode (:5432) caps clients at pool_size 15. With DB_PERSISTENT every PHP 
 
 ## Restart `composer run dev` fully after editing .env
 `php artisan dev` loads .env once at startup, and its putenv makes those values real environment variables that the child `artisan serve` inherits. Laravel's dotenv never overwrites a variable already in the environment. So after an .env edit, the "Environment modified. Restarting server" message still leaves the web server on the OLD values. Seen 2026-10-06: emails kept going to the log after MAIL_MAILER was switched to smtp. Stop the whole dev command with Ctrl+C and start it again; `php artisan tinker` and other fresh processes are unaffected.
+
+## Vercel rejects request bodies over 4.5 MB
+Measured 2026-10-17: a 6 MB POST is refused with 413 FUNCTION_PAYLOAD_TOO_LARGE before Laravel runs; 3 MB gets through. So never post files through the app where their total can pass ~4.5 MB. Applicant documents go browser → Supabase Storage by presigned PUT (App\Support\StagedUpload). Admin sample uploads (validated to 5 MB) and Post Scholarship with several samples still post through the app and will fail above the limit until they move to the same flow.

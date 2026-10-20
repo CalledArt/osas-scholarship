@@ -49,26 +49,41 @@ class ScholarshipApplicationController extends Controller
      * The applicant's identity (name, age, course, etc.) is never accepted
      * from the request; it is always read from the authenticated user so it
      * cannot be spoofed. Only document uploads come from the request body.
+     *
+     * The scholarship row is locked before the slots are counted again, so
+     * students submitting at the same moment take turns and only one of
+     * them gets the last slot.
      */
     public function store(StoreScholarshipApplicationRequest $request, Scholarship $scholarship): RedirectResponse
     {
         $application = DB::transaction(function () use ($request, $scholarship) {
+            abort_if(Scholarship::query()->lockForUpdate()->findOrFail($scholarship->id)->remainingSlots() === 0, 403);
+
             $application = $scholarship->applications()->create([
                 'user_id' => $request->user()->id,
                 'status' => ApplicationStatus::Pending,
                 'submitted_at' => now(),
             ]);
+            $directory = "scholarship-applications/{$application->id}";
 
             foreach ($scholarship->requiredDocuments as $requiredDocument) {
-                $file = $request->file("documents.{$requiredDocument->id}");
-
-                $path = $file->store("scholarship-applications/{$application->id}", 'supabase');
+                // A file sent straight to storage is moved out of staging; one
+                // that came with the form (no JavaScript) is stored as before.
+                if ($accepted = $request->acceptedUpload($requiredDocument->id)) {
+                    [$upload, $extension] = $accepted;
+                    $path = $upload->moveInto($directory, $extension);
+                    $originalName = $upload->originalName;
+                } else {
+                    $file = $request->file("documents.{$requiredDocument->id}");
+                    $path = $file->store($directory, 'supabase');
+                    $originalName = $file->getClientOriginalName();
+                }
 
                 $application->documents()->create([
                     'scholarship_required_document_id' => $requiredDocument->id,
                     'disk' => 'supabase',
                     'path' => $path,
-                    'original_name' => $file->getClientOriginalName(),
+                    'original_name' => $originalName,
                 ]);
             }
 
@@ -86,7 +101,14 @@ class ScholarshipApplicationController extends Controller
     {
         Gate::authorize('view', $application);
 
-        $application->load(['scholarship.requiredDocuments', 'documents.requiredDocument']);
+        // The held-slot count rides along as a subquery, so the page can say
+        // whether applications are still open without another round trip.
+        $application->load([
+            'scholarship' => fn ($query) => $query->withCount([
+                'applications as held_slots_count' => fn ($query) => $query->holdingSlot(),
+            ]),
+            'documents.requiredDocument',
+        ]);
 
         return view('scholarship-applications.show', [
             'application' => $application,

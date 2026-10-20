@@ -24,9 +24,11 @@ class UpdateStudentRequest extends FormRequest
      * Get the validation rules that apply to the request.
      *
      * The email is left out, so any email sent is ignored: it belongs to the
-     * student's verified Google identity. A course saved before the program
-     * list existed stays accepted, so correcting other details doesn't force
-     * OSAS to recode it.
+     * student's verified Google identity. So are the personal details (date
+     * of birth, contact number and address), which belong to the student and
+     * are kept on their own profile. A course saved before the program list
+     * existed stays accepted, so correcting other details doesn't force OSAS
+     * to recode it.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -40,9 +42,6 @@ class UpdateStudentRequest extends FormRequest
             'course' => ['required', 'string', Rule::in(array_filter([...CvsuPrograms::all(), $this->route('student')->course]))],
             'year_level' => ['required', 'integer', 'between:1,6'],
             'program_years' => ['required', 'integer', 'between:2,6'],
-            'date_of_birth' => ['required', 'date_format:Y-m-d', 'before:today'],
-            'contact_number' => ['required', 'string', 'max:255'],
-            'address' => ['required', 'string', 'max:255'],
         ];
     }
 

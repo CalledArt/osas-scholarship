@@ -1,5 +1,5 @@
 {{-- Persistent rail from 1024px up. --}}
-<aside class="hidden w-60 shrink-0 border-r border-gray-200 bg-gray-100 lg:flex lg:flex-col">
+<aside class="hidden w-60 shrink-0 border-r border-gray-200 bg-gray-100 [view-transition-name:rail] lg:flex lg:flex-col">
     @include('layouts.rail-contents')
 </aside>
 
@@ -15,14 +15,15 @@
          @click="navOpen = false"
          class="fixed inset-0 bg-gray-900/40"></div>
 
+    {{-- With reduced motion the rail fades in where it rests instead of sliding across. --}}
     <div x-show="navOpen"
          x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="-translate-x-full"
-         x-transition:enter-end="translate-x-0"
+         x-transition:enter-start="-translate-x-full motion-reduce:opacity-0"
+         x-transition:enter-end="translate-x-0 motion-reduce:opacity-100"
          x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="translate-x-0"
-         x-transition:leave-end="-translate-x-full"
-         class="fixed inset-y-0 left-0 flex w-64 flex-col border-r border-gray-200 bg-gray-100">
+         x-transition:leave-start="translate-x-0 motion-reduce:opacity-100"
+         x-transition:leave-end="-translate-x-full motion-reduce:opacity-0"
+         class="fixed inset-y-0 left-0 flex w-64 flex-col border-r border-gray-200 bg-gray-100 motion-reduce:!transform-none">
         @include('layouts.rail-contents')
     </div>
 </div>

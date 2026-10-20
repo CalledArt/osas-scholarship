@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Scholarship;
 
+use App\Enums\ScholarshipType;
 use App\Mail\ScholarshipPosted;
 use App\Models\Scholarship;
 use App\Models\ScholarshipApplication;
@@ -40,6 +41,7 @@ class AdminScholarshipManagementTest extends TestCase
 
         $response = $this->actingAs($admin)->post(route('admin.scholarships.store'), [
             'title' => 'STEM Excellence Grant',
+            'type' => 'government',
             'description' => 'For outstanding STEM students.',
             'slots' => 5,
             'deadline' => now()->addMonth()->format('Y-m-d'),
@@ -64,6 +66,7 @@ class AdminScholarshipManagementTest extends TestCase
 
         $response = $this->actingAs($admin)->post(route('admin.scholarships.store'), [
             'title' => 'STEM Excellence Grant',
+            'type' => 'government',
             'description' => 'For outstanding STEM students.',
             'slots' => 5,
         ]);
@@ -85,6 +88,7 @@ class AdminScholarshipManagementTest extends TestCase
 
         $response = $this->actingAs($admin)->post(route('admin.scholarships.store'), [
             'title' => 'STEM Excellence Grant',
+            'type' => 'government',
             'description' => 'For outstanding STEM students.',
             'slots' => 5,
         ]);
@@ -101,6 +105,7 @@ class AdminScholarshipManagementTest extends TestCase
 
         $response = $this->actingAs($student)->post(route('admin.scholarships.store'), [
             'title' => 'STEM Excellence Grant',
+            'type' => 'government',
             'description' => 'For outstanding STEM students.',
             'slots' => 5,
         ]);
@@ -109,13 +114,13 @@ class AdminScholarshipManagementTest extends TestCase
         $this->assertDatabaseCount('scholarships', 0);
     }
 
-    public function test_creating_scholarship_requires_title_description_and_slots(): void
+    public function test_creating_scholarship_requires_title_description_type_and_slots(): void
     {
         $admin = User::factory()->admin()->create();
 
         $response = $this->actingAs($admin)->post(route('admin.scholarships.store'), []);
 
-        $response->assertSessionHasErrors(['title', 'description', 'slots']);
+        $response->assertSessionHasErrors(['title', 'description', 'type', 'slots']);
     }
 
     public function test_admin_can_update_scholarship(): void
@@ -125,6 +130,7 @@ class AdminScholarshipManagementTest extends TestCase
 
         $response = $this->actingAs($admin)->put(route('admin.scholarships.update', $scholarship), [
             'title' => 'New Title',
+            'type' => 'government',
             'description' => $scholarship->description,
             'slots' => $scholarship->slots,
             'status' => 'closed',
@@ -142,6 +148,7 @@ class AdminScholarshipManagementTest extends TestCase
 
         $response = $this->actingAs($admin)->put(route('admin.scholarships.update', $scholarship), [
             'title' => $scholarship->title,
+            'type' => 'government',
             'description' => $scholarship->description,
             'slots' => $scholarship->slots,
             'status' => 'ended',
@@ -237,5 +244,100 @@ class AdminScholarshipManagementTest extends TestCase
             ->assertRedirect(route('admin.scholarships.show', $scholarship));
 
         $this->assertModelMissing($document);
+    }
+
+    public function test_post_form_offers_the_three_presets(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.scholarships.create'));
+
+        $response->assertSeeInOrder(['Start from a preset', 'Tulong Dunong Program (TDP)', 'Tertiary Education Subsidy (TES)', 'DOST Scholarship']);
+    }
+
+    public function test_admin_can_post_an_academic_scholarship_limited_to_stem_courses(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)->post(route('admin.scholarships.store'), [
+            'title' => 'Dean\'s Science Grant',
+            'type' => 'academic',
+            'stem_courses_only' => '1',
+            'description' => 'For science majors.',
+            'slots' => 5,
+        ]);
+
+        $scholarship = Scholarship::sole();
+        $this->assertSame(ScholarshipType::Academic, $scholarship->type);
+        $this->assertTrue($scholarship->stem_courses_only);
+    }
+
+    public function test_posting_a_scholarship_rejects_an_unknown_type(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->actingAs($admin)->post(route('admin.scholarships.store'), [
+            'title' => 'Mystery Grant',
+            'type' => 'private',
+            'description' => 'Unknown sponsor.',
+            'slots' => 5,
+        ]);
+
+        $response->assertSessionHasErrors(['type' => 'The selected type is invalid.']);
+        $this->assertDatabaseCount('scholarships', 0);
+    }
+
+    public function test_posting_a_stem_only_scholarship_emails_only_students_in_stem_courses(): void
+    {
+        Mail::fake();
+        $admin = User::factory()->admin()->create();
+        $stemStudent = User::factory()->create(['course' => 'BS Computer Science']);
+        $otherStudent = User::factory()->create(['course' => 'BS Accountancy']);
+
+        $response = $this->actingAs($admin)->post(route('admin.scholarships.store'), [
+            'title' => 'DOST Scholarship',
+            'type' => 'government',
+            'stem_courses_only' => '1',
+            'description' => 'For S&T priority courses.',
+            'slots' => 5,
+        ]);
+
+        $response->assertSessionHas('status', 'Scholarship posted and emailed to 1 student.');
+        Mail::assertSent(ScholarshipPosted::class, fn (ScholarshipPosted $mail) => $mail->hasBcc($stemStudent->email)
+            && ! $mail->hasBcc($otherStudent->email));
+    }
+
+    public function test_unticking_stem_courses_only_opens_the_scholarship_to_every_course(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $scholarship = Scholarship::factory()->stemCoursesOnly()->create();
+
+        $this->actingAs($admin)->put(route('admin.scholarships.update', $scholarship), [
+            'title' => $scholarship->title,
+            'type' => 'government',
+            'description' => $scholarship->description,
+            'slots' => $scholarship->slots,
+            'status' => 'open',
+        ]);
+
+        $this->assertFalse($scholarship->fresh()->stem_courses_only);
+    }
+
+    public function test_the_applicant_list_does_not_show_personal_details(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $student = User::factory()->create([
+            'date_of_birth' => now()->subYears(20)->format('Y-m-d'),
+            'contact_number' => '09171234567',
+            'address' => '123 Mabini Street, Indang, Cavite',
+        ]);
+        $application = ScholarshipApplication::factory()->for($student)->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.scholarships.show', $application->scholarship));
+
+        $response->assertSee($student->email);
+        $response->assertDontSee('years old');
+        $response->assertDontSee('09171234567');
+        $response->assertDontSee('123 Mabini Street, Indang, Cavite');
     }
 }

@@ -54,6 +54,7 @@ class ScholarshipRequiredDocumentSampleTest extends TestCase
 
         $response = $this->actingAs($admin)->post(route('admin.scholarships.store'), [
             'title' => 'STEM Excellence Grant',
+            'type' => 'government',
             'description' => 'For outstanding STEM students.',
             'slots' => 5,
             'required_documents' => [
@@ -78,6 +79,7 @@ class ScholarshipRequiredDocumentSampleTest extends TestCase
 
         $response = $this->actingAs($admin)->post(route('admin.scholarships.store'), [
             'title' => 'STEM Excellence Grant',
+            'type' => 'government',
             'description' => 'For outstanding STEM students.',
             'slots' => 5,
             'required_documents' => [

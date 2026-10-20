@@ -23,9 +23,6 @@ class StudentManagementTest extends TestCase
             'course' => 'BS Information Technology',
             'year_level' => 3,
             'program_years' => 5,
-            'date_of_birth' => '2003-05-14',
-            'contact_number' => '09171234567',
-            'address' => 'Indang, Cavite',
         ];
     }
 
@@ -69,7 +66,6 @@ class StudentManagementTest extends TestCase
             'email' => 'juan@cvsu.edu.ph',
             'course' => 'BS Information Technology',
             'year_level' => 4,
-            'date_of_birth' => '2003-05-14',
         ]);
 
         $this->actingAs(User::factory()->admin()->create())
@@ -78,7 +74,6 @@ class StudentManagementTest extends TestCase
             ->assertSee('value="Dela Cruz"', false)
             ->assertSee('value="BS Information Technology" selected', false)
             ->assertSee('value="4" selected', false)
-            ->assertSee('value="2003-05-14"', false)
             ->assertSee('value="juan@cvsu.edu.ph"', false)
             ->assertDontSee('name="email"', false);
     }
@@ -112,6 +107,42 @@ class StudentManagementTest extends TestCase
         $this->assertSame('BS Information Technology', $student->course);
         $this->assertSame(3, $student->year_level);
         $this->assertSame(5, $student->program_years);
+    }
+
+    public function test_the_edit_form_does_not_show_personal_details(): void
+    {
+        $student = User::factory()->create([
+            'date_of_birth' => '2003-05-14',
+            'contact_number' => '09171234567',
+            'address' => '123 Mabini Street, Indang, Cavite',
+        ]);
+
+        $response = $this->actingAs(User::factory()->admin()->create())->get(route('admin.students.edit', $student));
+
+        $response->assertDontSee('2003-05-14');
+        $response->assertDontSee('May 14, 2003');
+        $response->assertDontSee('09171234567');
+        $response->assertDontSee('123 Mabini Street, Indang, Cavite');
+    }
+
+    public function test_personal_details_cannot_be_changed_here(): void
+    {
+        $student = User::factory()->create([
+            'date_of_birth' => '2003-05-14',
+            'contact_number' => '09171234567',
+            'address' => 'Indang, Cavite',
+        ]);
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->put(route('admin.students.update', $student), [
+                ...$this->studentDetails(),
+                'date_of_birth' => '2001-01-01',
+                'contact_number' => '09998887777',
+                'address' => 'Somewhere Else',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $student->refresh();
         $this->assertSame('2003-05-14', $student->date_of_birth->toDateString());
         $this->assertSame('09171234567', $student->contact_number);
         $this->assertSame('Indang, Cavite', $student->address);
@@ -155,7 +186,7 @@ class StudentManagementTest extends TestCase
             ->put(route('admin.students.update', $student), [])
             ->assertSessionHasErrors([
                 'first_name' => 'The first name field is required.',
-                'last_name', 'student_number', 'course', 'year_level', 'program_years' => 'The program length field is required.', 'date_of_birth', 'contact_number', 'address',
+                'last_name', 'student_number', 'course', 'year_level', 'program_years' => 'The program length field is required.',
             ]);
 
         $this->assertSame($student->name, $student->fresh()->name);
@@ -167,8 +198,6 @@ class StudentManagementTest extends TestCase
     #[TestWith(['program_years', 1])]
     #[TestWith(['program_years', 7])]
     #[TestWith(['course', 'BS Astrology'])]
-    #[TestWith(['date_of_birth', 'not-a-date'])]
-    #[TestWith(['date_of_birth', '2999-01-01'])]
     public function test_invalid_details_are_rejected(string $field, mixed $value): void
     {
         $student = User::factory()->create(['year_level' => 2]);

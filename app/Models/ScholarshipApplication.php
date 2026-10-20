@@ -6,6 +6,8 @@ use App\Enums\ApplicationStatus;
 use App\Enums\ScholarshipStatus;
 use Database\Factories\ScholarshipApplicationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -43,6 +45,19 @@ class ScholarshipApplication extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(ScholarshipApplicationDocument::class);
+    }
+
+    /**
+     * Narrow to the applications holding one of their scholarship's slots.
+     *
+     * Pending applications hold a slot along with approved ones, so a
+     * scholarship stops taking applications once enough students have
+     * applied to fill it. A rejection gives the slot back.
+     */
+    #[Scope]
+    protected function holdingSlot(Builder $query): void
+    {
+        $query->whereIn('status', [ApplicationStatus::Pending, ApplicationStatus::Approved]);
     }
 
     /**

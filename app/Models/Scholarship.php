@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Enums\ApplicationStatus;
 use App\Enums\ScholarshipAvailability;
 use App\Enums\ScholarshipStatus;
+use App\Enums\ScholarshipType;
+use App\Support\CvsuPrograms;
 use Database\Factories\ScholarshipFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -16,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
-#[Fillable(['title', 'description', 'slots', 'deadline', 'status'])]
+#[Fillable(['title', 'description', 'type', 'stem_courses_only', 'slots', 'deadline', 'status'])]
 class Scholarship extends Model
 {
     /** @use HasFactory<ScholarshipFactory> */
@@ -32,6 +34,8 @@ class Scholarship extends Model
         return [
             'deadline' => 'date',
             'status' => ScholarshipStatus::class,
+            'type' => ScholarshipType::class,
+            'stem_courses_only' => 'boolean',
         ];
     }
 
@@ -53,26 +57,44 @@ class Scholarship extends Model
     /**
      * The number of approved applications against this scholarship.
      *
-     * Uses the `approved_applications_count` eager-loaded via
-     * `withCount()` when available, to avoid an extra query per
-     * scholarship when rendering a list. Not memoized beyond that,
-     * since callers such as the approval flow rely on a fresh count
+     * Always counted fresh, since the approval flow relies on it
      * immediately after an application's status changes.
      */
     public function approvedApplicationsCount(): int
     {
-        if (array_key_exists('approved_applications_count', $this->attributes)) {
-            return (int) $this->attributes['approved_applications_count'];
-        }
-
         return $this->applications()
             ->where('status', ApplicationStatus::Approved)
             ->count();
     }
 
+    /**
+     * The number of applications holding one of this scholarship's slots.
+     *
+     * Uses the `held_slots_count` eager-loaded via `withCount()` when
+     * available, to avoid an extra query per scholarship when rendering
+     * a list.
+     */
+    public function heldSlotsCount(): int
+    {
+        if (array_key_exists('held_slots_count', $this->attributes)) {
+            return (int) $this->attributes['held_slots_count'];
+        }
+
+        return $this->applications()->holdingSlot()->count();
+    }
+
+    /**
+     * Slots taken by applicants, capped at the slot count for a scholarship
+     * that had more applicants than slots before OSAS lowered them.
+     */
+    public function filledSlots(): int
+    {
+        return min($this->slots, $this->heldSlotsCount());
+    }
+
     public function remainingSlots(): int
     {
-        return max(0, $this->slots - $this->approvedApplicationsCount());
+        return $this->slots - $this->filledSlots();
     }
 
     public function hasPassedDeadline(): bool
@@ -96,8 +118,17 @@ class Scholarship extends Model
     }
 
     /**
+     * Whether a student in the given course may apply: any course, unless OSAS
+     * limited the scholarship to STEM courses.
+     */
+    public function admitsCourse(?string $course): bool
+    {
+        return ! $this->stem_courses_only || CvsuPrograms::isStem($course);
+    }
+
+    /**
      * Narrow to the scholarships the student has not applied to that are still
-     * open, soonest deadline first.
+     * open to them, soonest deadline first.
      *
      * Filled slots are not checked here, so callers filter the results through
      * isOpenForApplications(), which stays the final word on eligibility.
@@ -107,9 +138,10 @@ class Scholarship extends Model
     {
         $query->where('status', ScholarshipStatus::Open)
             ->where(fn (Builder $query) => $query->whereNull('deadline')->orWhere('deadline', '>', now()))
+            ->unless(CvsuPrograms::isStem($student->course), fn (Builder $query) => $query->where('stem_courses_only', false))
             ->whereDoesntHave('applications', fn (Builder $query) => $query->whereBelongsTo($student))
             ->withCount([
-                'applications as approved_applications_count' => fn (Builder $query) => $query->where('status', ApplicationStatus::Approved),
+                'applications as held_slots_count' => fn (Builder $query) => $query->holdingSlot(),
             ])
             ->orderByRaw('deadline asc nulls last')
             ->orderBy('title');
@@ -124,7 +156,7 @@ class Scholarship extends Model
      * Whether students can apply and, if not, the first reason they can't.
      *
      * The slot count is checked last because it is the only check that may
-     * cost a query when `approved_applications_count` was not loaded.
+     * cost a query when `held_slots_count` was not loaded.
      */
     public function availability(): ScholarshipAvailability
     {

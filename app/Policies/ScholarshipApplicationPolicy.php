@@ -27,8 +27,9 @@ class ScholarshipApplicationPolicy
     /**
      * Determine whether the user can apply to the given scholarship.
      *
-     * A student may apply only once to each scholarship, and only while they
-     * are under the scholarship limit.
+     * A student may apply only once to each scholarship, only while they are
+     * under the scholarship limit, and only if the scholarship admits their
+     * course.
      */
     public function create(User $user, Scholarship $scholarship): bool
     {
@@ -36,7 +37,7 @@ class ScholarshipApplicationPolicy
             return false;
         }
 
-        if (! $scholarship->isOpenForApplications()) {
+        if (! $scholarship->isOpenForApplications() || ! $scholarship->admitsCourse($user->course)) {
             return false;
         }
 

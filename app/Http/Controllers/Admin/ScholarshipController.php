@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\ApplicationStatus;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreScholarshipRequest;
@@ -11,6 +10,8 @@ use App\Mail\ScholarshipPosted;
 use App\Models\Scholarship;
 use App\Models\User;
 use App\Support\BccMailer;
+use App\Support\CvsuPrograms;
+use App\Support\ScholarshipPresets;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
@@ -29,7 +30,7 @@ class ScholarshipController extends Controller
 
         $scholarships = Scholarship::withCount([
             'applications',
-            'applications as approved_applications_count' => fn (Builder $query) => $query->where('status', ApplicationStatus::Approved),
+            'applications as held_slots_count' => fn (Builder $query) => $query->holdingSlot(),
         ])
             ->latest()
             ->paginate(10);
@@ -46,19 +47,22 @@ class ScholarshipController extends Controller
     {
         Gate::authorize('create', Scholarship::class);
 
-        return view('admin.scholarships.create');
+        return view('admin.scholarships.create', [
+            'presets' => ScholarshipPresets::ALL,
+        ]);
     }
 
     /**
-     * Store a newly created resource in storage, then email every student about it.
+     * Store a newly created resource in storage, then email every student who can apply.
      *
-     * The scholarship stays posted even if the email fails; the admin is told
-     * how many students it actually reached.
+     * A scholarship limited to STEM courses is announced only to students in
+     * those courses. It stays posted even if the email fails; the admin is
+     * told how many students it actually reached.
      */
     public function store(StoreScholarshipRequest $request, BccMailer $mailer): RedirectResponse
     {
         $scholarship = $request->user()->postedScholarships()->create(
-            $request->safe()->only(['title', 'description', 'slots', 'deadline'])
+            $request->safe()->only(['title', 'description', 'type', 'stem_courses_only', 'slots', 'deadline'])
         );
 
         foreach ($request->validated('required_documents', []) as $index => $document) {
@@ -71,7 +75,10 @@ class ScholarshipController extends Controller
             }
         }
 
-        $studentEmails = User::where('role', UserRole::Student)->pluck('email')->all();
+        $studentEmails = User::where('role', UserRole::Student)
+            ->when($scholarship->stem_courses_only, fn (Builder $query) => $query->whereIn('course', CvsuPrograms::STEM))
+            ->pluck('email')
+            ->all();
         $studentCount = count($studentEmails);
         $emailed = $mailer->send($studentEmails, new ScholarshipPosted($scholarship));
 
@@ -95,7 +102,7 @@ class ScholarshipController extends Controller
         Gate::authorize('view', $scholarship);
 
         $scholarship->loadCount([
-            'applications as approved_applications_count' => fn (Builder $query) => $query->where('status', ApplicationStatus::Approved),
+            'applications as held_slots_count' => fn (Builder $query) => $query->holdingSlot(),
         ]);
 
         $scholarship->load([

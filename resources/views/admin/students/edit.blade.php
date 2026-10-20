@@ -20,7 +20,7 @@
                 @method('PUT')
 
                 <section class="space-y-5">
-                    <h2 class="text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('Name') }}</h2>
+                    <h2 class="text-base font-semibold text-gray-900">{{ __('Name') }}</h2>
 
                     <div class="grid gap-4 sm:grid-cols-3">
                         <div>
@@ -44,7 +44,7 @@
                 </section>
 
                 <section class="space-y-5 border-t border-gray-200 pt-8">
-                    <h2 class="text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('Enrollment') }}</h2>
+                    <h2 class="text-base font-semibold text-gray-900">{{ __('Enrollment') }}</h2>
 
                     <div>
                         <x-input-label for="email" :value="__('CvSU email')" />
@@ -111,30 +111,7 @@
                     </div>
                 </section>
 
-                <section class="space-y-5 border-t border-gray-200 pt-8">
-                    <h2 class="text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('Personal details') }}</h2>
-
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <div>
-                            <x-input-label for="date_of_birth" :value="__('Date of birth')" />
-                            <x-text-input id="date_of_birth" name="date_of_birth" type="date" class="mt-1 block w-full" :value="old('date_of_birth', $student->date_of_birth?->format('Y-m-d'))" :max="now()->subDay()->toDateString()" required />
-                            <x-input-error :messages="$errors->get('date_of_birth')" class="mt-2" />
-                        </div>
-
-                        <div>
-                            <x-input-label for="contact_number" :value="__('Contact number')" />
-                            <x-text-input id="contact_number" name="contact_number" type="tel" class="mt-1 block w-full" :value="old('contact_number', $student->contact_number)" required maxlength="255" />
-                            <x-input-error :messages="$errors->get('contact_number')" class="mt-2" />
-                        </div>
-                    </div>
-
-                    <div>
-                        <x-input-label for="address" :value="__('Address')" />
-                        <x-text-input id="address" name="address" type="text" class="mt-1 block w-full" :value="old('address', $student->address)" required maxlength="255" />
-                        <x-input-error :messages="$errors->get('address')" class="mt-2" />
-                    </div>
-                </section>
-
+                {{-- Personal details (date of birth, contact number, address) are the student's own: OSAS neither sees nor edits them here. --}}
                 <div class="flex items-center justify-end gap-3 border-t border-gray-200 pt-6">
                     <a href="{{ route('admin.students.index') }}" class="text-sm font-medium text-gray-500 hover:text-gray-700">{{ __('Cancel') }}</a>
                     <x-primary-button>{{ __('Save Changes') }}</x-primary-button>
