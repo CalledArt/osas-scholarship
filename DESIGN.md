@@ -1,154 +1,181 @@
 ---
 name: OSAS Scholarship Allocation System
-description: An institutional record system for Cavite State University scholarships — flat, bordered, and unambiguous, where green is authority and gold is unfinished business.
+description: A survey plan for scholarship capacity in Cavite State University's own green and gold — a scholarship is a parcel, its slots are countable, and a student's application is staked on one of them.
 colors:
-  seal-green: "#0B6E4F"
-  deep-seal: "#074A35"
-  signal-green: "#0F9D63"
-  citation-gold: "#FFC72C"
-  struck-gold: "#E6A800"
-  record-white: "#FFFFFF"
-  bond-paper: "#F3F4F6"
-  ledger-gray: "#F9FAFB"
-  rule-line: "#E5E7EB"
-  field-stroke: "#D1D5DB"
-  ink: "#111827"
-  ink-soft: "#1F2937"
-  graphite: "#374151"
-  slate: "#6B7280"
-  mist: "#9CA3AF"
-  approved-wash: "#DCFCE7"
-  approved-ink: "#15803D"
-  rejected-wash: "#FEE2E2"
-  rejected-ink: "#B91C1C"
-  danger: "#DC2626"
+  linen: "#FBFAF7"
+  linen-sunk: "#F4F2ED"
+  seal: "#0B6E4F"
+  seal-deep: "#064532"
+  seal-tint: "#BFE5D6"
+  seal-line: "#1C9A6F"
+  ink: "#10213A"
+  graphite: "#3D4654"
+  slate: "#5A6472"
+  rule: "#D8D4CB"
+  rule-strong: "#8C8678"
+  gold: "#FFC72C"
+  gold-deep: "#B87F00"
+  gold-wash: "#FDF3DA"
+  grant: "#15803D"
+  grant-deep: "#116430"
+  grant-wash: "#DCFCE7"
+  oxide: "#A8341F"
+  oxide-deep: "#862715"
+  oxide-wash: "#F7E4E0"
 typography:
   display:
-    fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "2.25rem"
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "3.25rem"
     fontWeight: 700
-    lineHeight: 1.25
-    letterSpacing: "normal"
-  headline:
-    fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.5rem"
+    lineHeight: 1.03
+    letterSpacing: "-0.025em"
+  figure:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "2rem"
     fontWeight: 700
-    lineHeight: 2rem
-    letterSpacing: "normal"
-  title:
-    fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.25rem"
-    fontWeight: 600
-    lineHeight: 1.25
-    letterSpacing: "normal"
-  section:
-    fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
+    lineHeight: 1
+    letterSpacing: "-0.02em"
+  lead:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.125rem"
     fontWeight: 600
-    lineHeight: 1.75rem
+    lineHeight: "1.625rem"
     letterSpacing: "normal"
   body:
-    fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.875rem"
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.9375rem"
     fontWeight: 400
-    lineHeight: 1.25rem
+    lineHeight: "1.375rem"
     letterSpacing: "normal"
-  label:
-    fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
+  annot:
+    fontFamily: "Archivo Narrow, Archivo, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.75rem"
     fontWeight: 500
-    lineHeight: 1rem
-    letterSpacing: "0.025em"
+    lineHeight: "1rem"
+    letterSpacing: "0.08em"
   mono:
-    fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
-    fontSize: "0.8125rem"
+    fontFamily: "Spline Sans Mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+    fontSize: "0.9375rem"
     fontWeight: 400
-    lineHeight: 1.25rem
+    lineHeight: "1.375rem"
     letterSpacing: "normal"
 rounded:
-  sm: "4px"
-  md: "6px"
-  lg: "8px"
+  sheet: "2px"
+  plan: "0px"
   full: "9999px"
 spacing:
   xs: "4px"
   sm: "8px"
   md: "16px"
   lg: "24px"
-  xl: "48px"
+  xl: "40px"
 components:
   button-primary:
-    backgroundColor: "{colors.seal-green}"
-    textColor: "{colors.record-white}"
-    rounded: "{rounded.lg}"
+    backgroundColor: "{colors.seal}"
+    textColor: "#FFFFFF"
+    rounded: "{rounded.sheet}"
     padding: "10px 16px"
     typography: "{typography.body}"
   button-primary-hover:
-    backgroundColor: "{colors.deep-seal}"
+    backgroundColor: "{colors.seal-deep}"
   button-secondary:
-    backgroundColor: "{colors.record-white}"
+    backgroundColor: "{colors.linen}"
     textColor: "{colors.graphite}"
-    rounded: "{rounded.md}"
-    padding: "8px 16px"
+    rounded: "{rounded.sheet}"
+    padding: "9px 16px"
     typography: "{typography.body}"
   button-secondary-hover:
-    backgroundColor: "{colors.ledger-gray}"
+    backgroundColor: "{colors.linen-sunk}"
   button-danger:
-    backgroundColor: "{colors.danger}"
-    textColor: "{colors.record-white}"
-    rounded: "{rounded.md}"
-    padding: "8px 16px"
+    backgroundColor: "{colors.oxide}"
+    textColor: "#FFFFFF"
+    rounded: "{rounded.sheet}"
+    padding: "9px 16px"
     typography: "{typography.body}"
   input-text:
-    backgroundColor: "{colors.record-white}"
+    backgroundColor: "#FFFFFF"
     textColor: "{colors.ink}"
-    rounded: "{rounded.lg}"
-    padding: "8px 12px"
+    rounded: "{rounded.sheet}"
+    padding: "9px 12px"
     typography: "{typography.body}"
-  card:
-    backgroundColor: "{colors.record-white}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.lg}"
-    padding: "24px"
-  badge-pending:
-    backgroundColor: "rgba(255, 199, 44, 0.2)"
-    textColor: "{colors.deep-seal}"
-    rounded: "{rounded.full}"
-    padding: "2px 10px"
-    typography: "{typography.label}"
-  badge-approved:
-    backgroundColor: "{colors.approved-wash}"
-    textColor: "{colors.approved-ink}"
-    rounded: "{rounded.full}"
-    padding: "2px 10px"
-    typography: "{typography.label}"
-  badge-rejected:
-    backgroundColor: "{colors.rejected-wash}"
-    textColor: "{colors.rejected-ink}"
-    rounded: "{rounded.full}"
-    padding: "2px 10px"
-    typography: "{typography.label}"
-  badge-neutral:
-    backgroundColor: "{colors.bond-paper}"
+  sheet:
+    backgroundColor: "#FFFFFF"
     textColor: "{colors.graphite}"
-    rounded: "{rounded.full}"
-    padding: "2px 10px"
-    typography: "{typography.label}"
-  table-header:
-    backgroundColor: "{colors.ledger-gray}"
-    textColor: "{colors.slate}"
-    padding: "12px 24px"
-    typography: "{typography.label}"
-  rail-link-active:
-    backgroundColor: "{colors.record-white}"
+    rounded: "{rounded.plan}"
+    padding: "24px"
+  box:
+    backgroundColor: "#FFFFFF"
     textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
-    padding: "8px 12px"
+    rounded: "{rounded.plan}"
+    padding: "16px 20px"
+    typography: "{typography.body}"
+  box-pending:
+    backgroundColor: "{colors.gold-wash}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.plan}"
+    padding: "14px 20px"
+    typography: "{typography.body}"
+  box-free-tuition:
+    backgroundColor: "{colors.grant-wash}"
+    textColor: "{colors.grant-deep}"
+    rounded: "{rounded.plan}"
+    padding: "16px 20px"
+    typography: "{typography.body}"
+  box-cell-key:
+    textColor: "{colors.slate}"
+    padding: "10px 20px"
+    typography: "{typography.annot}"
+  title-block:
+    backgroundColor: "{colors.linen-sunk}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.plan}"
+    padding: "16px 24px"
+    typography: "{typography.annot}"
+  mark-pending:
+    backgroundColor: "{colors.gold-wash}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.sheet}"
+    padding: "2px 8px"
+    typography: "{typography.annot}"
+  mark-awarded:
+    backgroundColor: "{colors.grant-wash}"
+    textColor: "{colors.grant-deep}"
+    rounded: "{rounded.sheet}"
+    padding: "2px 8px"
+    typography: "{typography.annot}"
+  mark-rejected:
+    backgroundColor: "{colors.oxide-wash}"
+    textColor: "{colors.oxide-deep}"
+    rounded: "{rounded.sheet}"
+    padding: "2px 8px"
+    typography: "{typography.annot}"
+  mark-neutral:
+    backgroundColor: "{colors.linen-sunk}"
+    textColor: "{colors.graphite}"
+    rounded: "{rounded.sheet}"
+    padding: "2px 8px"
+    typography: "{typography.annot}"
+  mark-paper:
+    backgroundColor: "#FFFFFF"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.sheet}"
+    padding: "2px 8px"
+    typography: "{typography.annot}"
+  table-header:
+    backgroundColor: "{colors.linen-sunk}"
+    textColor: "{colors.slate}"
+    padding: "10px 24px"
+    typography: "{typography.annot}"
+  rail-link-active:
+    backgroundColor: "{colors.seal-deep}"
+    textColor: "#FFFFFF"
+    rounded: "{rounded.sheet}"
+    padding: "9px 12px"
     typography: "{typography.body}"
   rail-link-idle:
-    textColor: "{colors.slate}"
-    rounded: "{rounded.md}"
-    padding: "8px 12px"
+    textColor: "{colors.seal-tint}"
+    rounded: "{rounded.sheet}"
+    padding: "9px 12px"
     typography: "{typography.body}"
 ---
 
@@ -156,232 +183,245 @@ components:
 
 ## Overview
 
-**Creative North Star: "The University Registrar"**
+**Creative North Star: "Lot and Claim"**
 
-This is the interface of a well-run records office, not a product. The page ground is a quiet Bond Paper Gray desk; every unit of content is a white record card laid on it, defined by a hairline border rather than a drop shadow. Cavite State University's Seal Green carries institutional authority — it appears on the actions that commit something, the links that lead deeper into a record, and the counts that represent a settled award. Citation Gold is the office highlighter: it marks the thing you are focused on and the thing still waiting on a human decision. Nothing else is allowed to be loud.
+A scholarship is a surveyed parcel. It has a bounded capacity you can count, a closing date in its title block, and lots that are either awarded or open. A student's application is a **claim staked on one lot** — on record, in a known position, against a capacity that is drawn rather than described.
 
-The density is administrative but never cramped. Cards breathe at 24px internal padding, sections stack at a 24px rhythm, and pages open with 48px of air above the first card. Type stays small and disciplined — 14px body, 12px labels — because these screens are read in scanning mode by staff working a queue and by students checking one specific status. The one place the system raises its voice is the sign-in screen, set like the title page of a record: a full-height Deep Seal panel lit from one corner, the CvSU seal blind-embossed into it, the system's name at full display strength, and the scholarship cycle laid out as a ruled register — establishing who is behind this system before anyone types a password. That contrast is deliberate: the front door is institutional and warm; the working interior is calm and out of the way.
+That mapping is exact, not decorative. Slots are lots. The deadline is a closing date. The pass list is the recorded survey that settles every lot at once. "3 of 10 slots filled" stops being a sentence a worried student has to parse and becomes three hatched lots out of ten they can count in a glance, on a phone, in sunlight.
 
-The system rejects the dashboard-as-spectacle idiom. No gradient cards, no glassmorphism, no floating panels, no decorative iconography, no animated counters. Financial aid is high-stakes and often anxiety-inducing for the student reading it; the design's job is to make status legible at a glance and to never let visual flourish compete with a deadline, a slot count, or a decision.
+The surface is the drafting table that plan is drawn on. The shell — the navigation rail and the page's header band — is a committed field of **Seal Green**, a deep drafting ink. The working sheets laid on it are **Linen**, a warm off-white, because a plan is printed on stock and because pure white glares on a cheap Android screen outdoors. Structure is carried by **line weight and hatch density**, the way a drawing carries it: hairlines, witness marks, tick rails, and 45° hatching. Depth is not the medium here; measurement is.
 
-**Key Characteristics:**
-- Flat white record cards on a Bond Paper Gray desk, separated by 1px hairlines, not shadows
-- One typeface (Figtree) doing every job through weight and size alone
-- Green for what is settled, gold for what is unresolved — a strict two-signal color language
-- Uniformly soft corners (8px cards and primary actions, fully round status pills)
-- Small, dense, uppercase-tracked labels above large plain numerals
-- Motion confined to 150ms state transitions and overlay entrances; nothing moves on its own
+Density is administrative and unapologetic — tight uppercase annotation in Archivo Narrow against generous drawing space — but body copy runs at **15px, not 14**, because the reader is often an anxious nineteen-year-old on mobile data who needs to read a decision, not skim a queue.
+
+The system raises its voice exactly twice. **Citation Gold** appears only on a record that belongs to the person reading it. **Oxide** appears only on a refusal or a destructive control. Everything else is Seal Green, Seal Green, Grant green, or a neutral.
+
+**Key characteristics**
+- A Seal Green shell framing Linen sheets; no grey screen with one accent
+- Capacity drawn as countable lots, never estimated as a bar or a ring
+- Four interior type sizes; rank carried by weight, case, reversal and rule
+- Two voices — Archivo for reading, Archivo Narrow for annotation — plus a mono reserved to values you must transcribe
+- True corners on the plan geometry, 2px on the controls you touch
+- Citation Gold means *yours*; Grant green means *settled*; Oxide means *refused*
+- The student's Dashboard and Scholarships page are two panes of same-anatomy boxes; every other screen keeps sheets as containers, not scaffold
 
 ## Colors
 
-An institutional two-note palette — a deep muted forest green and a warm saturated academic gold — set against a strictly neutral cool-gray document stack that does all the structural work.
+Cavite State University's own two colours doing real work, on a warm paper stack that carries all the structure. There is no third hue: the drawing is ink.
 
-### Primary
-- **Seal Green** (#0B6E4F): The university's authority color and the system's only action color. It fills primary buttons ("Post Scholarship", "Sign in"), colors every inline navigational link ("View details →", "View"), and underlines the active desktop nav item. Also the input focus border.
-- **Deep Seal** (#074A35): The hover partner for every Seal Green surface, and the text color for the wordmark and for anything set on a gold wash (the pending badge, the role chip in the account menu). Never used as a fill for a resting element.
-- **Signal Green** (#0F9D63): Reserved almost entirely for the sign-in branding panel, as the light source of a radial glow falling from its top-right corner across a Deep Seal field. It is a lighting effect, not a UI color. Text on that panel sits on the Deep Seal end, where white at 70% opacity still clears 4.5:1.
+### The shell
+- **Seal Green** (#0B6E4F): the navigation rail and the narrow-screen strip. The shell is a committed colour field, not a tint — a grey screen with one accent is the category default without the category's polish. It is also the university's own green, which is why the CvSU seal sits *in* its shell rather than on top of a foreign one.
+- **Seal Deep** (#064532): the active rail item, every Seal Green hover, and the front door's ground.
+- **Seal Tint** (#BFE5D6): **secondary text on the shell.** Tinted from the green itself rather than greyed, at 4.6:1 on the rail and 8.1:1 on Seal Deep.
+- **Seal Line** (#1C9A6F): hairlines inside the shell, and the light source of the front door's glow.
 
-### Secondary
-- **Citation Gold** (#FFC72C): The attention marker. It appears as the focus ring on Seal Green buttons, as a 20%-opacity wash behind pending badges, and as the lettering in the CvSU seal. It is never a background for a large surface, and never a text color — see the Gold Is Not Ink Rule.
-- **Struck Gold** (#E6A800): A darker gold held in reserve for gold-on-dark or gold-on-wash situations. It is **not** a text color on white either (≈2.1:1).
+Seal Green is also the one action colour on paper: it fills primary buttons, colours every forward link, and draws the season bar's elapsed run. On a Linen sheet it reads 6.0:1.
 
-### Neutral
-- **Record White** (#FFFFFF): Every card, table, panel, modal, dropdown, and the nav bar. The surface that content lives on.
-- **Bond Paper Gray** (#F3F4F6): The application desk — the page background behind all authenticated screens — and, at the same value, the hairline border of every card. The system deliberately uses one value for both the ground and the card edge, which is why cards read as cut from the desk rather than floating above it.
-- **Ledger Gray** (#F9FAFB): Table header rows, table row hover, and secondary-button hover. The faintest possible tonal shift.
-- **Rule Line** (#E5E7EB): Table head/body dividers and the mobile nav section separator.
-- **Field Stroke** (#D1D5DB): Input and checkbox borders at rest, and the secondary button's edge.
-- **Ink** (#111827): Card headings, table cell primary text, the pending counts in the decision queue — the highest-contrast text.
-- **Ink Soft** (#1F2937): Page header titles in the white header bar.
-- **Graphite** (#374151): Form field labels and secondary-button text.
-- **Slate** (#6B7280): Body copy, supporting descriptions, table cell secondary values, idle nav items.
-- **Mist** (#9CA3AF): Decorative marks only — input icons and the em-dash that stands in for an absent value. At ≈2.6:1 on white it is **not** a text color; anything a reader must actually read is Slate or darker.
+### Paper and ink
+- **Linen** (#FBFAF7): every reading surface. Sheets are white; Linen is the desk they lie on. A plan is printed on stock, and pure white glares on a phone outdoors.
+- **Linen Sunk** (#F4F2ED): title blocks, table header rows, row hover.
+- **Ink** (#10213A) / **Graphite** (#3D4654) / **Slate** (#5A6472): the only three text colours on paper — headings and figures, body, supporting copy.
+- **Rule** (#D8D4CB) separates rows, which is decoration. **Rule Strong** (#8C8678) draws the strokes that carry meaning — input borders, open slot boundaries — and is dark enough to clear 3:1 on Linen, Linen Sunk and white alike.
+- **Graphite** also hatches a slot held by an undecided application: plain drawing ink, because green here means granted and nothing about a waiting application is granted.
 
-### Tertiary
-Status semantics, used only inside badges and flash messages, plus the one red deadline below. They never appear as page furniture.
+### Citation Gold — what is yours
+- **Gold** (#FFC72C) / **Gold Deep** (#B87F00) / **Gold Wash** (#FDF3DA): the record that belongs to the person reading it, or the one still waiting on a human. The staked slot, the pending mark, the reader's own row. It is also the focus ring on every Seal Green surface — the gold-on-green pairing is this system's most recognisable interaction detail.
 
-- **Approved** (#DCFCE7 wash / #15803D ink): Approved application badges and success flash messages.
-- **Rejected** (#FEE2E2 wash / #B91C1C ink): Rejected application badges. On the student dashboard, a deadline inside three days sets in Rejected Ink at 600 weight — the one place red appears outside a badge or a destructive control. The admin decision queue never uses it.
-- **Danger** (#DC2626): Destructive buttons only (account deletion). It is the one red that is ever a fill.
+### Granted, and refused
+- **Grant** (#15803D) / **Grant Deep** (#116430) / **Grant Wash** (#DCFCE7): awarded, settled, in force. A pale wash carrying dark green ink, far enough in value from the shell that the two never read alike.
+- **Oxide** (#A8341F) / **Oxide Deep** (#862715) / **Oxide Wash** (#F7E4E0): the rejection stamp, a deadline inside three days, and destructive controls. Nothing else.
 
-### Named Rules
+### Named rules
 
-**The Two-Signal Rule.** This system speaks with exactly two signals. Green means *settled* — approved, open, authoritative, committed. Gold means *unresolved or focused* — pending a human decision, or the element the keyboard is currently on. Gold is never decoration and never a general brand accent on an interior screen; if a new element is gold, it must be because someone still has to act on it. Everything that is neither settled nor pending is gray.
+**The Committed Shell Rule.** The rail and strip are a Seal Green field. If a new shell element needs separation it takes a Seal Line hairline or a step to Seal Deep — never a grey.
 
-**The Seal Rule.** Seal Green is the university's authority, so it only ever marks a committing action or a forward path. It never colors a destructive control, a cancel, a dismissal, or a merely decorative surface. Red is the only color permitted on a destructive action.
+**The Never-Grey-On-Colour Rule.** Secondary text on any coloured surface is tinted from that surface's own hue, never from the neutral ramp. Seal Tint exists precisely because the previous system set Slate on its coloured rail and landed at 4.39:1 — a real, measured failure.
 
-**The One Ground Rule.** Bond Paper Gray (#F3F4F6) is simultaneously the page ground and the card border. Do not introduce a third neutral between them to "separate" a card — the identical value is what makes the interface read as flat records on a desk. On sheet surfaces the relationship inverts: the rail takes the Bond Paper ground and the content becomes Record White.
+**The Gold Rule.** Gold marks ownership and waiting, and nothing else. It is never a general accent and never a large fill. **On paper it is never text** (1.5:1 on Linen); there it appears only as a focus ring on green, as a wash behind a pending mark carrying Ink, and in the seal. On the Seal Deep front door it *is* legible as text at 7.1:1, and is used there for the university's name — the one place gold sets type.
 
-**The Gold Is Not Ink Rule.** Neither gold is ever a text color. Citation Gold reaches about 1.6:1 on white and Struck Gold about 2.1:1 — both fail the 4.5:1 floor at any size the interface actually uses. Gold appears as a focus ring against a green fill, as a 20%-opacity badge wash carrying Deep Seal text, and in the seal. When a number must read as urgent, give it weight and sort position, not gold.
+**The One Hue Rule.** Green and gold are the only hues. Grant and Oxide are semantic states, not palette colours, and they appear only inside a mark, a wash, or a destructive control. If something new wants a colour and it is neither the university's nor a state, it is a neutral.
 
-**The Readable Neutral Rule.** Only Ink, Ink Soft, Graphite, and Slate carry text. Mist (≈2.6:1) is for marks a reader never has to decode, and every such mark pairs with an `sr-only` word so assistive technology gets the meaning the color cannot carry.
+**The Countable Capacity Rule.** Quantities with a unit a reader cares about — slots, documents, days — are drawn as discrete countable marks or set as aligned figures. Never a progress bar, ring, donut, or sparkline. A reader must never estimate a length to learn a number they could have counted.
+
+**The Product's Words Rule.** The world lends type, palette, density and the parcel. It never lends vocabulary. On screen a scholarship has **slots**, a student sends an **application**, and OSAS settles them with a **pass list** — the office's own words, which PRODUCT.md and the controller rules both use. "Parcel", "lot" and "claim" name the drawing in code, in CSS classes and in this document; they never appear in an interface string. A metaphor that starts renaming the product's nouns has stopped being a design and become a costume.
+
+**The Readable Ink Rule.** On paper, only Ink, Graphite and Slate carry text. On the shell, only white and Seal Tint. Every colour-only or glyph-only signal pairs with an sr-only word carrying the same meaning.
 
 ## Typography
 
-**Display Font:** Figtree (loaded from Bunny Fonts, with `ui-sans-serif, system-ui, sans-serif` fallback)
-**Body Font:** Figtree — the same family
-**Mono Font:** the platform monospace stack (`ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`) at 13px, used only where a reader must tell one character from another — one-time passwords, and literal CSV header names. Never as a costume for "technical".
+**Reading and controls:** Archivo (self-hosted, OFL 1.1, weights 400/500/600/700)
+**Plan annotation:** Archivo Narrow (self-hosted, OFL 1.1, weights 500/600)
+**Transcription:** Spline Sans Mono (self-hosted, OFL 1.1, weight 400)
 
-**Character:** Figtree is a geometric humanist sans with open apertures and a tall x-height — clear at 12px, friendly rather than corporate at 36px. Using one family for everything is a deliberate institutional choice: hierarchy is built entirely from weight (400/500/600/700) and size, never from a contrasting face. The result reads like a well-set official form rather than a marketing page. Authenticated screens load weights 400/500/600; the sign-in screen additionally loads 700 for its headline.
+Archivo is a grotesque built for small sizes and dense setting, with real tabular figures and a narrow companion that is a true separate design rather than a squeezed instance. That pairing is the whole type system: one face you read, one face that labels the drawing.
 
-### Hierarchy
-- **Display** (700, 3rem → 3.75rem → 4.5rem across `lg`/`xl`/`2xl`, leading 1.05, tracking -0.02em): The sign-in branding panel headline ("Scholarship Allocation System"), stacked one word per line on desktop and set at 1.875rem in the mobile band. It does not appear anywhere inside the authenticated app.
-- **Headline** (700, 1.5rem/24px, 2rem): The auth form heading ("Sign in", "Reset password"). One per screen, on unauthenticated pages only.
-- **Title** (600, 1.25rem/20px, leading-tight): The page header inside the white header bar — the persistent "what screen am I on" label. Exactly one per authenticated screen.
-- **Section** (600, 1.125rem/18px, 1.75rem): Card headings and the dashboard welcome line.
-- **Body** (400, 0.875rem/14px, 1.25rem): All supporting copy, table cells, form inputs, nav items, buttons. The default.
-- **Label** (500, 0.75rem/12px, +0.025em tracking): Badges and, uppercased with wider tracking (+0.05em), table column headers.
+### Hierarchy — four interior sizes
 
-### Named Rules
+- **Annot** (Archivo Narrow 500, 12px, +0.08em, uppercase): column headers, field labels, title-block keys, status marks. It labels the drawing and never forms a sentence.
+- **Body** (Archivo 400, 15px/22px): all running copy, table cells, inputs, buttons, rail items. The default.
+- **Lead** (Archivo 600, 18px/26px): the page `h1` and every section heading. One weight does both jobs; the page heading is distinguished by position and by the title block beneath it, not by a fifth size.
+- **Figure** (Archivo 700, 32px, tabular): **one per region.** The number the region exists to report — days waiting, lots remaining, pesos released.
 
-**The Single Family Rule.** Figtree does every job. Do not introduce a second family for headings, numerals, or emphasis — if something needs to feel different, change its weight or its size. The one exception is character disambiguation: a value the reader must transcribe exactly, such as a one-time password or a literal CSV header, sets in the mono stack. Wanting to look technical is not disambiguation.
+**Display** (Archivo 700, 52px) exists for the unauthenticated front door only and appears nowhere inside the application.
 
-**The Small-Caps Perimeter Rule.** Uppercase with letter-spacing is reserved for the perimeter of data: table column headers. It never touches a sentence, a button, a card heading, or a badge. Every button in the system reads in sentence case at Body size.
+### Named rules
 
-**The Tabular Numerals Rule.** Every number a reader compares down a column sets in `font-variant-numeric: tabular-nums` — counts, slot ratios, waits, elapsed days. Proportional digits make a column of figures ragged, and a register whose numbers do not line up is not a register. This is the cheapest detail in the system and the one most easily lost.
+**The Four Sizes Rule.** The authenticated application has exactly four type sizes, published as tokens. No component may introduce a fifth, and no component may reach for `display`. When something needs to feel more important, it changes weight, case, or reversal, or it gains a rule above it — it does not get bigger. The previous system drifted to a welcome line at 18px sitting above its own section headings at 16px; a fixed scale makes that impossible.
 
-**The Numeral-Over-Word Rule.** Where a count matters, the number carries the weight and the words around it drop to Slate. Never let a label out-weigh its value.
+**The Annotation Rule.** Uppercase with tracking belongs to Archivo Narrow at Annot size, and only ever to the labels around data: table column headers, title-block keys, status marks. It never touches a sentence, a heading, a button, or a paragraph of statute.
+
+**The One Figure Rule.** A region reports one number at Figure size. If two numbers compete, one of them is Body — rank them, or the reader ranks them wrongly. This is also what keeps the system off the hero-metric template: a Figure always sits inside a sentence or a title block that says what it counts, never in a tile of its own.
+
+**The Transcription Rule.** Spline Sans Mono is for values a reader must copy exactly: student numbers, application reference numbers, literal CSV headers. Wanting to look technical is not a reason to reach for it.
+
+**The Tabular Default.** `font-variant-numeric: tabular-nums` is set on `html`, so every figure in the product aligns without a component having to remember. The previous system made this a rule and then lost it on exactly the columns it warned about.
 
 ## Layout
 
-The application is a two-column shell: a fixed 240px (`w-60`) rail on the left and a content column that takes the rest. There is no horizontal navigation bar at any breakpoint. Content sits on the Bond Paper desk by default; surfaces that *are* the document opt into a Record White sheet instead.
+A two-column shell: a fixed **240px** Seal Green rail and a content column. There is no horizontal navigation bar at any breakpoint.
 
-**Containers.** Widths are chosen semantically inside the content column: **1024px (`max-w-5xl`)** for the admin decision queue and the student's scholarship list, where rows are read top-to-bottom; **1280px (`max-w-7xl`)** for wide administrative tables that need every column; and **384px (`max-w-sm`)** for auth forms, centered in their half of the split. Content gutters step 24px → 40px (`px-6 lg:px-10`); older card surfaces keep 16px → 24px → 32px.
+**Containers**, chosen by the reader's task:
+- **`max-w-plan` (1280px)** — wide administrative comparison surfaces, where columns must be read against each other.
+- **`max-w-sheet` (1024px)** — lists read top to bottom.
+- **`max-w-leaf` (672px)** — a single record, and all prose. This also keeps running text inside a 65–75 character measure.
+- **`max-w-stub` (352px)** — auth forms.
 
-**Vertical rhythm.** Content regions open with 48px of top and bottom padding (`py-12`). Sibling cards and sections stack at 24px (`space-y-6`); tighter lists — the student scholarship feed — stack at 16px (`space-y-4`). Card interiors are 24px (`p-6`); list rows inside a card are 24px horizontal by 12px vertical. Form fields stack at 20px (`space-y-5`), with 4px between a label and its input and 8px before an error message.
+**Vertical rhythm.** Content regions open at 40px (`py-10`). Sibling sheets stack at 24px. Sheet interiors are 24px; list rows are 24px by 12px. Form fields stack at 20px. More space sits above a heading than below it, so a heading binds to what it introduces.
 
-**Grids.** Paired detail panels run 1 column → 2 at 1024px with a 24px gutter. Only two breakpoints do real work: `sm` (640px) and `lg` (1024px).
+**Grids.** Paired detail panels run one column to two at 1024px. Only `sm` (640px) and `lg` (1024px) do real work.
 
-**Responsive behavior.** Below 1024px the rail leaves the flow and becomes a slide-over over a 40%-opacity scrim, opened by a single icon button in a minimal 56px strip that carries nothing but that button and the seal. Tables do not restructure — they scroll horizontally inside `overflow-x-auto`, keeping column relationships intact. The sign-in screen's branding panel collapses below 1024px into a compact Deep Seal band above the form, carrying the seal, wordmark, headline, and one-line lede, so phones meet the same front door. The cycle register shows only on desktop screens at least 820px tall; shorter laptops keep the headline and lede with room to breathe.
+**The student panes.** The student Dashboard and Scholarships page sit in `max-w-[100rem]` (1600px, which fills a 1920px screen beside the rail) as two panes of boxes on the Linen desk, separated by a 24px gap. From 1024px the left pane is a fixed **22rem** column headed "Where you stand" (on the Dashboard: the student's ID box, Republic Act 10931, the active scholarship, places left, then "My applications"); the right pane, headed "Available to apply" with its count in Slate, is a two-up grid of open-scholarship boxes. Boxes inside a pane stack or tile at 16px. From 640px the Where-you-stand boxes run two-up and the Available grid is already two-up; below 640px everything is one column. On a phone the Dashboard's "My applications" follows the open scholarships, so the student's standing and what they can act on come first; on wide screens it closes the left column, which takes an `auto` then `1fr` row so a long right pane never opens a gap beneath it. Both pages keep two panes only while there are open boxes to fill the right one. When nothing can be applied to (an active scholarship held, two applications waiting, on leave, or nothing open), the panes stack: the Where-you-stand boxes run three across in equal-height cells from 1280px (the ID box full width over the other two from 640px), then the empty Available box and My applications (three-up from 1280px) span the width, so one sentence never sits beside a tall column. Above the panes, the student Dashboard's h1 is the admin dashboard's welcome banner (x-welcome-banner, at the user's request): "Welcome back, {name}!" over one status clause (applications waiting for a decision, then scholarships open to them, or "You're all caught up."). The Scholarships page takes the same banner with "Scholarships" as its heading, over "N scholarships are open to you." or "Nothing is open for you to apply to right now." My Applications takes it too, headed "My Applications" over the count still waiting for a decision, "You're all caught up.", or "Your applications appear here once you apply.", and runs at the same 100rem. At the user's request (2026-10-25) its applications are cards drawn like the admin Fund Allocation cards, a third exception to the Two Panes Rule: an auto-fill grid of cards at least 20rem wide, each with the scholarship's title and the application's status mark, its type and status, Reference (in mono) and Applied cells under a rule, "N days waiting" while pending, and a "View application" cue. The admin Scholarships list follows suit (same date, the user's request, chosen over a table): the banner headed "Manage Scholarships" with Post Scholarship as its action, at 100rem, and one card per scholarship (status mark, type, Slots left and Applicants cells, closing date, View and Edit), an admin exception to sheets-not-scaffold. A scholarship's own admin page follows too: its title in the banner with status, type, slots remaining and deadline, Fund Allocation and Edit as the action, then Upload Pass List and Applicants as bordered panels beside a sticky About this scholarship panel whose long description scrolls inside it. A student's own application page takes the banner too (title, status mark and type, View the scholarship), keeps its title block, and sets the Post/Apply/Review/Decide register and Documents you sent as bordered panels side by side from 1024px. The Republic Act 10931 page takes the banner and its title block, then sets What this means for you beside the full text of the Act, which stays in view and scrolls inside its own panel; the Act's wording is untouched. Both Fund Allocation pages take the banner and 100rem too: the list headed "Fund Allocation" over the count of funds still to set, and each scholarship's page headed by its title over its status and type, with View scholarship and Download Excel sheet as the action. Search Student takes the banner ("Find registered students by name, email or student number.") and 100rem, its filters in one row from 1024px, and its roster stays a table, now in a bordered panel like the admin dashboard's postings table. From 1024px the page fits the screen and only that list scrolls, under a sticky header row. Edit Student Data is drawn the same way, its rows closing on an Edit button; its edit form takes the banner (headed by the student's name) and one card whose sections set their title on the left from 1024px, with the save bar at the card's foot. The student Profile copies the staff Profile (the user's request): a plain "Profile" heading at 88rem and one compact card of rows (Profile information, Personal details, and a read-only Enrollment row that says once, in its description, that OSAS keeps it) with one Save, fitting one laptop screen. Like the admin banner, it is a deliberate exception to the True Corner and One Hue rules.
 
-### Named Rules
 
-**The Two-Container Rule.** 1280px means "this is a working surface with columns to compare." 1024px means "this is a list read top-to-bottom." Pick the container from the reader's task, not from the amount of content.
+**Responsive.** Below 1024px the rail leaves the flow and becomes a slide-over over a Seal Green scrim, opened from a 56px Seal Green strip that carries the trigger, the seal, and the current page's name. Data tables scroll horizontally inside `overflow-x-auto`; they never collapse into stacked cards, because a parcel's lots, closing date and status only mean anything beside each other.
 
-**The No Horizontal Nav Rule.** Wayfinding lives in the rail and nowhere else. The mobile strip is a disclosure control, not a navigation bar: it may hold the rail trigger and the seal, and it must never grow links, a search field, or an account menu. If a destination matters, it belongs in the rail.
+### Named rules
 
-**The Tables Don't Fold Rule.** On narrow screens, data tables scroll sideways; they never collapse into stacked card lists. A scholarship's slots, applicants, deadline, and status only mean something next to each other.
+**The Task-Container Rule.** Pick the container from what the reader is doing, not from how much content there is. 1280px means "compare columns". 1024px means "read down a list". 672px means "read a record or a sentence".
 
-## Elevation & Depth
+**The Rail-Only Rule.** Wayfinding lives in the rail. The narrow-screen strip is a disclosure control plus a page label; it must never grow links, a search field, or an account menu.
 
-**This system is flat by doctrine.** Depth comes from tonal layering and hairline borders, not from shadows. A card is Record White on a Bond Paper Gray ground with a 1px Bond Paper Gray border; that value pairing — identical border and ground — is what makes surfaces read as inset records rather than floating panels. Shadows exist in only two roles: an almost-invisible `shadow-sm` that keeps white cards from vibrating against the gray ground, and genuine overlay shadows on elements that actually leave the page plane.
+**The Named Page Rule.** Every authenticated screen sets a page title, and the narrow strip prints the current page's name. The previous system shipped a `$header` slot no view ever filled and a single `<title>` for the whole application, which left every page announcing itself identically.
 
-Hover never lifts. Interactive cards respond by warming their border to 40%-opacity Seal Green (`hover:border-cvsu-green/40`) and list rows respond with a Ledger Gray fill — the surface stays exactly where it is.
+**The Two Panes Rule.** The student Dashboard and Scholarships page are the one approved place where a grid of same-size boxes is the page's structure. It holds only there and only under three limits: every box in a grid sets the same facts in the same cells, so two can be compared at a glance; a box never nests inside a box; and the boxes carry the student's own record and the scholarships open to them, nothing ornamental. Admin surfaces are unchanged and keep sheets as containers, not scaffold.
 
-### Shadow Vocabulary
-- **Seat** (`box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05)`): The default for every card, table container, primary button, and input. Barely perceptible; its job is edge definition, not elevation.
-- **Header band** (`box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)`): The white page-header strip below the nav, the one horizontal element that casts onto the content beneath it.
-- **Overlay** (`box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)`): The account dropdown, paired with a `ring-1 ring-black/5` edge.
-- **Dialog** (`box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)`): Modals only, over a 75%-opacity gray-500 scrim.
+## Elevation and depth
 
-### Named Rules
+**This system measures; it does not float.** Separation comes from the Seal Green/Linen field change, from hairlines, and from hatch density. Where a shadow does appear it carries a real offset and a soft blur, tinted from Ink rather than black — a zero-offset coloured halo is decoration, not depth.
 
-**The Flat Desk Rule.** Surfaces are flat at rest and stay flat on hover. A shadow heavier than Seat is permitted only on an element that genuinely floats above the page — a dropdown or a modal. If a new component wants elevation to feel important, give it a border or a heading instead.
+- **Seat** (`0 1px 2px 0 rgb(16 33 58 / 0.06)`): sheets, inputs, primary buttons. Edge definition only.
+- **Lift** (`0 10px 24px -8px rgb(16 33 58 / 0.22)`): dropdowns.
+- **Sheet** (`0 20px 40px -12px rgb(16 33 58 / 0.28)`): modals, over a Seal Green scrim at 55%.
+
+Hover never lifts. An interactive sheet warms its border to Seal Green; a list row fills Linen Sunk. The surface stays exactly where it is.
 
 ## Shapes
 
-Uniformly soft, never sharp, never fully organic. The corner radius encodes what a thing is:
+The plan geometry keeps **true corners**: parcels, lots, title blocks, sheets, tables and the season bar are square, because a survey drawing has no rounded parcels. Controls you touch — buttons, inputs, marks, icon buttons — take **2px**, just enough to read as handles. Status marks are rectangular, not pills: a mark is a stamp on a drawing, not a bubble.
 
-- **8px (`rounded-lg`)** — the system's signature radius. Cards, table containers, primary buttons, text inputs, flash-message banners, and modals. If it holds content or commits an action, it is 8px.
-- **6px (`rounded-md`)** — secondary and danger buttons, the account dropdown panel, and icon buttons. A subtly tighter corner that quietly separates supporting controls from primary ones.
-- **4px (`rounded`)** — loading-skeleton bars only.
-- **Fully round (`rounded-full`)** — status pills, the circular seal, and skeleton avatars. Roundness here means "this is a state, not a control."
+Borders are 1px, with two deliberate exceptions where thickness is information: the **2px Seal Green foot** on every fifth lot, and the **2px rule** under a title block's key row.
 
-Borders are always exactly 1px and always a neutral, with three deliberate exceptions that use thickness to mark selection: the **2px bottom border** on the active desktop nav item, the **4px left border** on the active mobile nav item, and the **4px gold ring** on the CvSU seal. The sign-in panel's blind-embossed seal — concentric rings with "Cavite State University" on the top arc and "Office of Student Affairs and Services" upright on the bottom arc, in white at 8%, cropped off the top-right corner — is the only free-form geometry in the system. It exists to press the institution into the page the way a seal is pressed into an official record, and its center stays empty so it never competes with the headline.
+### Named rules
 
-### Named Rules
+**The True Corner Rule.** If it is part of the drawing, it is square. If it is a control, it is 2px. There is no third radius, and nothing in the authenticated application is fully round except the seal.
 
-**The Nothing-Is-Square Rule.** No element in this system has a 0px corner. If a new component needs to feel more rigid, use a border, not a sharp corner.
+**The No Costume Rule.** The world lends type, palette, density, and the parcel. It does not lend the navigation model or the controls. Every control is the standard one a visitor already knows — real buttons, tabs, inputs, selects, tables with sortable headers — never a drafting instrument's bezel, a drawn ruler standing in for a slider, or ruled paper standing in for a table.
 
 ## Components
 
-Components are **quiet, bordered, and unambiguous**. They state their status plainly and never perform. Every surface is bordered rather than floated, and every interactive element has an obvious, high-contrast state — this is a system students trust with their financial aid, so restraint is the point.
+### The Parcel (signature component)
+
+A scholarship's capacity, drawn. A flex row of `.lot` squares, exactly one per slot, at 13px (`--lot-edge`) or 18px in the `.parcel--wide` variant used on a scholarship's own page.
+
+- **Open lot:** Linen fill, 1px Rule Strong boundary.
+- **Awarded lot:** Grant Wash fill with 45° Grant hatching, Grant Deep boundary.
+- **Goldd lot** (the reader's own pending claim): Gold Wash fill, Gold Deep boundary, a 1px Gold inset, and a Gold Deep corner triangle.
+- **Goldd and awarded:** the Grant hatch with the Gold inset retained.
+- Every **fifth lot** carries a 2px Seal Green foot, so a parcel of fifteen reads as fifteen without counting one at a time.
+
+Lots are laid in **groups of five that wrap as units**, so a parcel that runs out of width breaks 20 + 5, never 21 + 4, and the fifth-lot foot keeps its rhythm on every line. Groups and lots are both spaced 2px.
+
+The parcel always sits beside the same figures in Annot and Body — `8 OF 10 LOTS OPEN` — so the drawing is an accelerant for a number that is also written. It is never the only statement of a quantity, and it always carries an `sr-only` sentence giving the same facts in words. The written caption is **optional only where the containing box already writes the figure in a cell**, as an open-scholarship box does in its Slots left cell; the `sr-only` sentence stays regardless.
+
+### The Title Block
+
+The plan convention, and the home of the cycle register carried over from the previous system — the strongest thing in it. A Linen Sunk block, 16px by 24px, under a 2px rule, holding Annot keys over Body or Figure values: the award's name, its reference, the closing date, the capacity, and the stage the record has reached (Posted, Applied, Under review, Decided) with dates on the stages that have happened and none on the stages ahead.
+
+It keeps `view-transition-name: cycle`, so navigating between a scholarship and a claim holds the block still and changes only the filled row. The register is the document; only the entered line moves.
+
+It is **not** a kicker. It carries real values, it sits beneath the heading it belongs to, and it is never a label floating above a title.
+
+### The Season Bar
+
+A closing date made measurable: a 3px rule whose width is the window from posting to deadline, with `--elapsed` marking today as a 2px Ink witness line. Past the deadline the whole run is struck in Oxide and the witness line is removed. It reports a date that is also written out in full beside it.
 
 ### Buttons
-- **Shape:** Softly rounded, 8px on primary, 6px on supporting controls.
-- **Primary:** Seal Green fill (#0B6E4F), white text, 600 weight at 14px, 16px × 10px padding, Seat shadow, transparent 1px border. Content is centered with an 8px gap so an inline spinner or icon sits correctly.
-- **Hover / Focus:** Background deepens to Deep Seal (#074A35) over 150ms `ease-in-out`. Focus shows a 2px Citation Gold ring with a 2px offset — the gold-on-green pairing is the system's most recognizable interaction detail. Disabled drops to 70% opacity with a not-allowed cursor.
-- **Secondary:** White fill, Field Stroke border (#D1D5DB), Graphite text, 6px radius, 16px × 8px padding, Ledger Gray on hover. Focus rings in Seal Green.
-- **Danger:** Danger red fill (#DC2626), white text, 6px radius, 16px × 8px padding, lightening to red-500 on hover and darkening to red-700 on press. Focus rings in red-500.
-- **Shared type:** Every button — primary, secondary, danger — sets its label at Body size in 600 weight (14px), sentence case. The tiers are separated by fill, border, and corner, never by type size.
-- **Disabled:** 70% opacity with a not-allowed cursor, on every variant.
-- **Loading:** Submit buttons that navigate bind a `loading` flag, swap the label to a progress phrase ("Signing in..."), disable themselves, and reveal a 16px spinning ring. The button never changes size.
+- **Primary:** Seal Green fill, white text, Body at 600, 16px by 10px, 2px radius, Seat shadow. Hover deepens to Seal Deep over 150ms.
+- **Secondary:** Linen fill, Rule Strong border, Graphite text, same type, Linen Sunk on hover.
+- **Danger:** Oxide fill, white text. The only red fill in the system.
+- Every variant sets its label in Body at 600, sentence case. Tiers are separated by fill and border, never by type size and never by uppercase.
+- **Disabled:** 70% opacity with a not-allowed cursor. **Loading:** the label swaps to a progress phrase, the button disables and keeps its width, and a 16px ring spins.
 
-### Named Rules
+**The Two-Ring Rule.** A focus ring is 2px at 2px offset, and its hue comes from the surface it sits on: **Gold** on any Seal Green surface — the primary button, the rail items, the strip trigger — which is the signature pairing and reads at 4.0:1 against the green; **Seal Green** on any Linen or white control; and the control own hue on a semantically coloured control. The ring offset colour is the surface behind it, so a ring never sits on a mismatched halo. A global focus-visible floor in app.css guarantees nothing is ever left wearing the browser default outline — which the previous system left on its mobile wordmark.
 
-**The Two-Ring Rule.** A focus ring is always 2px at a 2px offset, and its hue is decided by the surface it sits on, not by brand preference. On a Seal Green fill, the ring is Citation Gold — the system's signature pairing, legible because the gold reads against the green edge. On any white or neutral control, the ring is Seal Green, matching the input focus treatment; gold on white is roughly 1.5:1 and does not survive as an indicator. On a semantically colored control, the ring is that control's own hue (red-500 on the danger button).
+### Marks (status)
+Rectangular stamps at 2px radius, 8px by 2px, Annot size, uppercase: **pending** (Gold Wash on Ink), **awarded** (Grant Wash on Grant Deep), **rejected** (Oxide Wash on Oxide Deep), **neutral** (Linen Sunk on Graphite). Read-only output — never a filter, never a button, never dismissible.
 
-### Chips / Badges
-- **Style:** Fully round pills, 10px × 2px padding, 12px text at 500 weight, wash background with matching darker ink. Four variants: neutral (Bond Paper on Graphite), approved (#DCFCE7 on #15803D), rejected (#FEE2E2 on #B91C1C), and pending (Citation Gold at 20% on Deep Seal).
-- **State:** Badges are read-only status output — they are never filters, never buttons, never dismissible. The pending variant is the only gold surface permitted in a list.
+### Sheets
+White, true corners, 1px Rule border, Seat shadow, 24px padding. A titled sheet uses a 24px by 16px header block with a 1px bottom rule, then a `divide-y` list of 24px by 12px rows. **Sheets are not a page scaffold:** a grid of same-size sheets each holding an icon, a heading and a line of text is not how a screen here is organised, and a sheet never nests inside a sheet. The one approved exception is the student Dashboard and Scholarships page, which are built from boxes under the Two Panes Rule (see Layout and Boxes).
 
-### Cards / Containers
-- **Corner Style:** 8px (`rounded-lg`), with `overflow-hidden` so tables and divided lists clip cleanly to the corner.
-- **Background:** Record White on the Bond Paper Gray page ground.
-- **Shadow Strategy:** Seat only — see Elevation & Depth.
-- **Border:** 1px Bond Paper Gray, identical to the page ground.
-- **Internal Padding:** 24px for content cards. Cards with a titled head use a divided structure instead: a 24px × 16px header block with a 1px bottom rule, then a `divide-y` list whose rows are 24px × 12px.
-- **Interactive variant:** A card that is itself a link warms its border to Seal Green at 40% opacity on hover, with no movement and no shadow change.
+### Boxes (student Dashboard and Scholarships)
+The sheet's material at a smaller unit: **white, true corners, 1px Rule border, Seat shadow**, 20px by 16px inside. A box that opens something is the whole link: its border warms to **Seal Green** on hover over 150ms and its title goes Seal Green with it; nothing lifts. A box title is Body at 600 in Ink, never a larger size.
 
-### Inputs / Fields
-- **Style:** White fill, 1px Field Stroke border, 8px radius, Seat shadow, 14px text. Fields carrying an affordance icon get a 20px icon in Mist inset 12px from the edge, with the input padded to 40px on that side.
-- **Focus:** The border and ring both shift to Seal Green — the one place green appears on a non-committing element, because it marks where you are.
-- **Error:** Messages render as a Slate-spaced list in red-600 at 14px, 8px below the field. The field itself is not recolored; the message carries the signal.
-- **Password fields** pair a Mist eye toggle inside the right inset that swaps the input type without losing focus position.
-- **File fields:** the native control, with its `::file-selector-button` styled as a secondary button — white fill, Field Stroke border, 6px radius, Graphite text at 14px/600 — and the filename in Slate beside it. Every file input in the app renders through one component so the three upload surfaces cannot drift apart. Never replace it with a custom drop zone.
+- **Key cells.** Facts the reader compares sit in a row of cells under a 1px Rule top border, each cell 20px by 10px and divided from its neighbour by a 1px Rule: an **Annot key in Slate over a Body value in Ink** ("Closes" over the date and its days-left line; "Slots left" over "8 of 12"; "Student number" over the number in Spline Sans Mono).
+- **Open-scholarship box.** Title with its type mark top right; the parcel without its caption; the Closes and Slots left cells; then a footer row under a 1px Rule with the document count in Slate and a Seal Green **Apply** plate, which is a cue inside the link rather than a second control. Every box in the grid carries exactly these cells in this order.
+- **The student's own waiting application** is a **Gold Wash box with a Gold Deep border**, and its status mark is the **paper** mark (white, Ink), because a Gold Wash mark on a Gold Wash box disappears. Decided or voided applications stay white boxes with their usual marks.
+- **Republic Act 10931** is a **Grant Wash box** with a Grant hairline at 30% that warms to full Grant on hover, its text in Grant Deep, and the school years it covers drawn as wide lots, the years reached hatched as awarded. While the student is on leave it falls back to a white box saying so.
+- **Places left.** One box states how many more scholarships the student can apply to as a sentence carrying a single Figure, with the places drawn beneath as wide lots, the used ones staked in Gold. While nothing can be applied to, it says why in one short sentence instead, and the Available pane shows one empty box rather than repeating the reason.
+- **Empty.** An empty pane is one white box, 20px by 32px, with a centred Slate sentence.
 
-### Navigation (the rail)
-- **Style:** A 240px column on the Bond Paper ground with a 1px Rule Line right border, holding the circular CvSU seal and two-line Deep Seal wordmark, role-filtered links, and an account block pinned to the bottom behind a Rule Line divider.
-- **Default / Active:** Idle items are Slate at 500 weight on no fill; hover takes a 60%-opacity Rule Line fill. The active item is lifted out of the desk onto a Record White pill (6px radius, Seat shadow) with Ink text at 600 weight — the same white as the content sheet, so the current destination reads as continuous with the page it opens. It also carries `aria-current="page"`.
-- **No colored edge marker.** The active state is a fill change, never a thick tinted left border; the desk-to-sheet tonal shift already says it.
-- **Focus:** Rings offset against the rail's own ground (`ring-offset-gray-100`), not white, so the ring never sits on a mismatched halo.
-- **Account block:** Name in Ink, role beneath in Slate as plain text, then Profile and Log Out as ordinary rail items. Log Out is a real submit button styled to match, so the destructive-ish action is never a bare link.
-- **Below 1024px:** the identical rail contents render inside a slide-over; the two instances never appear at once, so only one is ever in the accessibility tree.
+**The One Clause Rule.** On the student panes, copy states the count or the reason in one short clause and stops. It never explains the rules behind it: "You can apply to 1 more scholarship.", not a paragraph on the limit before the limit is shown.
 
-### The Decision Queue (signature component)
-The admin dashboard's working surface: the scholarships that still have applicants waiting, as ruled lists on the Record White sheet with **no card wrapper**, split by whether a pass list can settle them yet. A pass list rejects every pending applicant it does not name, so a scholarship belongs under **Ready for a pass list** only once students can no longer apply — OSAS closed it, its deadline passed, or every slot is filled. Those rows lead, longest wait first. The rest sit under **Still taking applications**, soonest deadline first, beneath one Slate line warning that a pass list rejects everyone not on it. Scholarships with nothing pending are left to the Scholarships index: the dashboard is a queue of work, not a register of the whole cycle.
+### Inputs
+White fill, 1px Rule Strong border, 2px radius, Body size, 12px by 9px. **Focus:** border and ring both go Seal Green. **Error:** the message renders in Oxide at Body size, 8px below the field, and the field takes an Oxide border — the error container renders unconditionally so `aria-describedby` is never a dangling reference. File fields render through one component with `::file-selector-button` styled as a secondary button; never a custom drop zone.
 
-Each row is a single link. The title sets in Ink at 600 weight and turns Seal Green on hover; beneath it a Slate meta line states availability first — "Closed by OSAS", "Closed 4 days ago", "Full", or "Closes in 9 days" — then "3 of 10 slots filled". Availability comes from the same check that stops applications, so a full or closed scholarship never reads as closing later. On the right, the pending count is an 18px Ink numeral at 600 weight in tabular figures over the word "pending", then "Review →" in Seal Green, which becomes a Slate chevron below 640px. Rows are divided by hairlines, fill Ledger Gray on hover without moving, and bleed 12px past the text column so the fill frames the text rather than clipping it. No row is red: the students' deadline is not the office's, so urgency is carried by group and position.
+### The rail
+A 240px Seal Green column with a Seal Green Line right border, holding the CvSU seal and a two-line white wordmark, role-filtered links, and an account block pinned to the bottom behind a Seal Green Line divider. Idle items are Seal Tint; hover fills Seal Deep at 60%; the active item is a Seal Deep plate with white text at 600 and `aria-current="page"`. The account block's name is white and the role beneath it is Seal Tint — never grey. Log Out is a real submit button styled to match. Below 1024px the identical contents render in a slide-over, which **moves focus in on open, traps it while open, returns it to the trigger on close**, and marks the page behind it `inert`.
 
-Above the queue sits **the standing line**: one sentence of ordinary prose with only the numbers emphasised. It counts pass lists due, not applications — "2 scholarships are ready for a pass list. 2 more are still taking applications." — or says plainly that no pass lists are due yet, that the office is caught up, or that nothing has been posted. It replaces a KPI tile grid outright.
-
-### Page Loading Skeleton
-A full-screen white overlay that intercepts same-origin link clicks and form submits, showing a nav-bar stub and three pulsing card placeholders in gray-200. It reproduces the real layout's proportions — 64px bar, `max-w-7xl` container, 24px-padded cards — so the transition doesn't jump. It self-clears on `pageshow` when the user returns via the back-forward cache.
+### Empty states
+Every list and table has one: a centred Body sentence in Slate inside the sheet, saying what would appear there and what to do about it. A heading never renders above an empty container — the previous system printed "Documents you sent" over an empty box on the rejection screen, which reads as lost paperwork.
 
 ## Do's and Don'ts
 
-### Do:
-- **Do** use Seal Green (#0B6E4F) for exactly three things: committing actions, forward navigation links, and settled/approved status. Deep Seal (#074A35) is its hover, never its resting state.
-- **Do** put a 2px Citation Gold focus ring with a 2px offset on every green button. It is the system's signature interaction detail and it must be consistent. On white or neutral controls the ring is Seal Green instead — see the Two-Ring Rule.
-- **Do** set every button label at 14px in 600 weight, sentence case, on every variant. Separate the tiers with fill, border, and corner radius.
-- **Do** render every disabled control at 70% opacity with a not-allowed cursor.
-- **Do** reserve gold for the unresolved and the focused — pending decisions and keyboard focus. If you are reaching for gold and neither applies, reach for a neutral.
-- **Do** border cards with the same value as the page ground (#F3F4F6). Records sit in the desk, they don't hover over it.
-- **Do** build hierarchy from Figtree's weights (400/500/600/700) and the six type roles. Never add a second font family.
-- **Do** pick containers by task: `max-w-7xl` for administrative comparison surfaces, `max-w-5xl` for lists read top to bottom (the student's scholarship list, the admin decision queue), `max-w-sm` for auth forms.
-- **Do** set every compared number in tabular numerals and right-align it in its column.
-- **Do** say it in a sentence when a sentence will do. A line of prose naming what is waiting beats a row of tiles restating the same counts.
-- **Do** pair every colour-or-glyph-only signal (an em-dash for "none", a coloured deadline) with `sr-only` text carrying the same meaning.
-- **Do** write a real empty state for every list and table — a centered sentence at 14px in Mist or Slate, inside the card, saying what would appear here and what to do about it ("Nothing needs review right now.", "No scholarships have been posted yet.").
-- **Do** give every progress or status graphic an accessible text equivalent, such as `role="img"` with a spelled-out aria-label.
-- **Do** keep state transitions at 150ms `ease-in-out`, overlay entrances at 200–300ms, and overlay exits faster than their entrances (75–200ms).
+### Do
+- **Do** make the shell a Seal Green field, and tint any secondary text on it from Seal Green rather than greying it.
+- **Do** draw a capacity as countable lots and write the same number beside them.
+- **Do** mark the reader's own record in Gold, and nothing else in Gold.
+- **Do** keep to four interior type sizes, and change weight, case or rule when something needs rank.
+- **Do** put uppercase tracking only on Archivo Narrow annotation around data.
+- **Do** give every region exactly one Figure, inside a sentence or a title block that says what it counts.
+- **Do** set a page title on every screen and print the page's name in the narrow strip.
+- **Do** write a real empty state for every list, and never render a heading above an empty container.
+- **Do** state the elapsed wait on a pending record. The office can already see it; the student is the one who needs it.
+- **Do** print a record's reference number wherever that record is shown, in Spline Sans Mono.
+- **Do** pair every colour-only or glyph-only signal with `sr-only` words.
+- **Do** build the student Dashboard and Scholarships page as two panes of same-anatomy boxes, each setting the same facts in the same Annot-over-Body cells.
+- **Do** state a count or a reason on the student panes in one short clause.
+- **Do** keep state transitions at 150ms, overlay entrances at 200–300ms with an exponential ease-out, and exits faster than entrances.
 
-### Don't:
-- **Don't** reintroduce `focus:ring-indigo-500`. Both Laravel Breeze instances — the secondary button and the profile form's resend-verification button — have been removed; indigo belongs to no part of this palette. Pick a ring hue with the Two-Ring Rule.
-- **Don't** uppercase a button label. `uppercase tracking-widest` was Breeze residue on the secondary and danger buttons and has been removed; uppercase belongs only to table column headers.
-- **Don't** shrink a supporting button's type to signal that it is secondary. All three variants share 14px/600; the hierarchy lives in fill and border.
-- **Don't** disable a control below 70% opacity. The Breeze default of 25% left the label unreadable.
-- **Don't** add shadows to convey importance. Surfaces are flat at rest and stay flat on hover — deepen a border or add a heading instead. Only dropdowns and modals may exceed the Seat shadow.
-- **Don't** lift, scale, or translate a card on hover. The interactive response is a border warming to `cvsu-green/40` or a Ledger Gray row fill.
-- **Don't** introduce a third neutral between the page ground and the card border to "separate" a card.
-- **Don't** use gold as a large surface fill or a general brand accent on interior screens. Its maximum interior footprint is a 20%-opacity pill.
-- **Don't** put Seal Green on a destructive, dismissive, or cancelling control. Destructive is red (#DC2626) and nothing else.
-- **Don't** collapse data tables into stacked cards on mobile — scroll them horizontally inside `overflow-x-auto`.
-- **Don't** give any element a 0px corner radius.
-- **Don't** add gradients, glass effects, decorative iconography, or animated counters to authenticated screens. The green gradient lives on the sign-in branding panel and nowhere else.
-- **Don't** build a KPI tile grid. Counts belong in a sentence, or in a column next to the row they describe.
-- **Don't** represent a distribution as a stacked bar, donut, progress ring, or sparkline. This system states quantities as aligned figures; a reader should never have to estimate a length to learn a number.
-- **Don't** put navigation in a horizontal bar. The rail is the only wayfinding surface.
-- **Don't** set gold or Mist as text. See the Gold Is Not Ink and Readable Neutral rules.
-- **Don't** wrap a table or the decision queue in a card. A list of records is the document, not something sitting on top of one.
+### Don't
+- **Don't** reintroduce a neutral shell with one accent colour. That is the look this system replaced.
+- **Don't** set grey text on any coloured surface. Tint it from the surface's hue.
+- **Don't** use Gold as a text colour, a brand accent, or a large fill.
+- **Don't** put Seal Green on a destructive, dismissive or cancelling control. Destructive is Oxide and nothing else.
+- **Don't** represent a quantity as a progress bar, ring, donut, or sparkline.
+- **Don't** add a fifth interior type size, and don't use `display` inside the application.
+- **Don't** put a kicker or eyebrow above a heading. The heading carries its own weight. A title block goes beneath.
+- **Don't** build a grid of same-size sheets as a page's structure, and never nest a sheet in a sheet. The student Dashboard and Scholarships page are the one approved exception, under the Two Panes Rule; the no-nesting half holds there too.
+- **Don't** explain the rules on a student surface before or instead of showing the count. One clause, then the drawing.
+- **Don't** uppercase a button label or shrink a secondary button's type.
+- **Don't** round the plan geometry, and don't introduce a third radius.
+- **Don't** dress a standard control as a drafting instrument. The world lends type, palette, density and the parcel — never the controls or the navigation model.
+- **Don't** collapse a data table into stacked cards on mobile; scroll it inside `overflow-x-auto`.
+- **Don't** use a glyph or emoji in place of an icon. Icons are authored SVG at one consistent stroke.
 - **Don't** use `diffForHumans()` for a deadline. It phrases futures as "1 day from now" and truncates fractional days, so a date two days out reads as one. Count whole calendar days between day boundaries.
+- **Don't** show a deadline alone on a scholarship that is full, closed or ended. State the binding reason first; a bare deadline reads as open.

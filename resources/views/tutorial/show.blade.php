@@ -1,7 +1,7 @@
-<x-app-layout :sheet="true">
-    <div class="border-b border-gray-200 bg-gray-50 px-6 py-3 lg:px-10">
-        <p class="text-sm text-gray-600">
-            <span class="font-semibold text-gray-900">{{ __('Practice tour') }}</span>
+<x-app-layout :title="__('Tutorial')" :sheet="true">
+    <div class="border-b border-rule bg-linen-sunk px-6 py-3 lg:px-10">
+        <p class="text-graphite">
+            <span class="font-semibold text-ink">{{ __('Practice tour') }}</span>
             <span aria-hidden="true">&middot;</span>
             {{ __('Sample data only. Nothing here is saved or sent to anyone.') }}
         </p>

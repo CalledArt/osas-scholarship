@@ -68,8 +68,13 @@ return [
             'bucket' => env('SUPABASE_STORAGE_BUCKET'),
             'endpoint' => env('SUPABASE_STORAGE_ENDPOINT'),
             'use_path_style_endpoint' => true,
+            'retain_visibility' => false,
             'throw' => false,
             'report' => false,
+            // Supabase Storage refuses a single object larger than the project's
+            // upload limit (50 MB unless raised on a paid plan). The applications
+            // report splits itself into parts to stay under it.
+            'max_upload_bytes' => (int) env('SUPABASE_STORAGE_MAX_UPLOAD_BYTES', 50 * 1024 * 1024),
         ],
 
     ],

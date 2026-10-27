@@ -18,7 +18,7 @@
         'steps' => $steps,
         'locateHint' => __('You will find this under :item in the menu. Press Show me to open it.'),
      ]))"
-     x-show="open"
+ x-show="open"
      x-cloak
      @keydown.escape.window="open && finish()"
      @keydown.tab.window="open && trapFocus($event)"
@@ -29,7 +29,7 @@
     <div class="fixed inset-0 z-[80]" aria-hidden="true">
         <div x-show="! spot" class="absolute inset-0 bg-gray-900/50"></div>
         <div x-show="spot"
-             class="absolute rounded-lg transition-all duration-200 ease-out motion-reduce:transition-none"
+ class="absolute rounded-sheet transition-all duration-200 ease-out motion-reduce:transition-none"
              :style="spot && {
                  top: spot.top + 'px',
                  left: spot.left + 'px',
@@ -40,59 +40,59 @@
     </div>
 
     <div x-ref="card"
-         role="dialog"
-         aria-modal="true"
-         aria-labelledby="tutorial-title"
-         aria-describedby="tutorial-body"
-         class="fixed z-[81] w-[min(22rem,calc(100vw-2rem))] rounded-lg bg-white p-5 shadow-xl ring-1 ring-black/5"
+ role="dialog"
+ aria-modal="true"
+ aria-labelledby="tutorial-title"
+ aria-describedby="tutorial-body"
+ class="fixed z-[81] w-[min(22rem,calc(100vw-2rem))] rounded-sheet bg-white p-5 shadow-xl ring-1 ring-black/5"
          :style="card">
         <div class="flex items-start justify-between gap-3">
-            <h2 id="tutorial-title" class="text-base font-semibold text-gray-900" x-text="step.title"></h2>
+            <h2 id="tutorial-title" class="text-lead font-semibold text-ink" x-text="step.title"></h2>
             <button type="button"
                     @click="finish()"
-                    class="-m-1 shrink-0 rounded-md p-1 text-gray-500 transition duration-150 ease-in-out hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green">
+ class="-m-1 shrink-0 rounded-sheet p-1 text-slate transition duration-150 ease-in-out hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-seal">
                 <span class="sr-only">{{ __('Exit tour') }}</span>
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
         </div>
-        <p :class="{ 'hidden': ! step.location, 'bg-cvsu-gold/20': locating }"
-           class="-mx-1.5 mt-1 rounded-md px-1.5 py-0.5 text-xs leading-5 text-gray-600 transition-colors duration-150 ease-in-out">
+        <p :class="{ 'hidden': ! step.location, 'bg-gold/20': locating }"
+ class="-mx-1.5 mt-1 rounded-sheet px-1.5 py-0.5  leading-5 text-graphite transition-colors duration-150 ease-in-out">
             <span class="font-medium">{{ __('In the menu:') }}</span>
             <template x-for="(crumb, position) in (step.location ? step.location.trail : [])" :key="position">
                 <span>
-                    <svg :class="{ 'hidden': position === 0 }" class="inline h-3 w-3 text-gray-500" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <svg :class="{ 'hidden': position === 0 }" class="inline h-3 w-3 text-slate" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m8 5 5 5-5 5" />
                     </svg>
-                    <span :class="position === 0 ? 'font-semibold text-gray-900' : 'text-gray-700'" x-text="crumb"></span>
+                    <span :class="position === 0 ? 'font-semibold text-ink' : 'text-graphite'" x-text="crumb"></span>
                 </span>
             </template>
         </p>
-        <p id="tutorial-body" class="mt-2 text-sm leading-6 text-gray-600" aria-live="polite" x-text="locating ? locateHint() : step.body"></p>
+        <p id="tutorial-body" class="mt-2  leading-6 text-graphite" aria-live="polite" x-text="locating ? locateHint() : step.body"></p>
 
         <button type="button"
                 :class="{ 'hidden': step.actions.length === 0 || locating }"
                 @click="present()"
-                class="mt-3 rounded-sm text-sm font-semibold text-cvsu-green transition duration-150 ease-in-out hover:text-cvsu-green-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2">
+ class="mt-3 rounded-sm  font-semibold text-seal transition duration-150 ease-in-out hover:text-seal-deep focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">
             {{ __('Play again') }}
         </button>
 
         <div class="mt-5 flex items-center justify-between gap-3">
-            <p class="text-xs tabular-nums text-gray-500" x-text="`${index + 1} of ${steps.length}`"></p>
+            <p class="tabular-nums text-slate" x-text="`${index + 1} of ${steps.length}`"></p>
 
             <div class="flex gap-2">
                 <button type="button"
-                        x-show="index > 0"
+ x-show="index > 0"
                         @click="back()"
-                        class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2">
+ class="rounded-sheet border border-rule-strong bg-white px-3 py-1.5  font-semibold text-graphite transition duration-150 ease-in-out hover:bg-linen-sunk focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">
                     {{ __('Back') }}
                 </button>
                 <button type="button"
-                        x-ref="next"
+ x-ref="next"
                         @click="locating ? arrive() : (waiting ? proceed() : next())"
-                        class="rounded-lg bg-cvsu-green px-3 py-1.5 text-sm font-semibold text-white transition duration-150 ease-in-out hover:bg-cvsu-green-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-gold focus-visible:ring-offset-2"
-                        x-text="locating ? @js(__('Show me')) : (waiting || (index === steps.length - 1 ? @js(__('Done')) : @js(__('Next'))))"></button>
+ class="rounded-sheet bg-seal px-3 py-1.5  font-semibold text-white transition duration-150 ease-in-out hover:bg-seal-deep focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+ x-text="locating ? @js(__('Show me')) : (waiting || (index === steps.length - 1 ? @js(__('Done')) : @js(__('Next'))))"></button>
             </div>
         </div>
     </div>

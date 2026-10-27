@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
@@ -19,6 +20,79 @@ class ProfileTest extends TestCase
             ->get('/profile');
 
         $response->assertOk();
+    }
+
+    public function test_staff_get_one_form_with_one_save_for_their_details_and_password(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->actingAs($admin)->get('/profile');
+
+        $response->assertSeeInOrder(['Profile information', 'Last Name', 'Middle Name', 'placeholder="Optional"', 'Email', 'Password', 'Confirm Password', 'Save', 'Delete Account'], false);
+        $response->assertDontSee('action="'.route('password.update').'"', false);
+        $response->assertDontSee('Optional. Leave blank if you do not use one.');
+    }
+
+    public function test_staff_can_change_their_password_with_the_profile_save(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->actingAs($admin)->patch('/profile', [
+            'first_name' => $admin->first_name,
+            'last_name' => $admin->last_name,
+            'email' => $admin->email,
+            'current_password' => 'password',
+            'password' => 'new-password-123',
+            'password_confirmation' => 'new-password-123',
+        ]);
+
+        $response->assertSessionHasNoErrors()->assertRedirect('/profile');
+        $this->assertTrue(Hash::check('new-password-123', $admin->fresh()->password));
+    }
+
+    public function test_a_new_password_needs_the_right_current_password(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->actingAs($admin)->patch('/profile', [
+            'first_name' => 'Changed',
+            'last_name' => $admin->last_name,
+            'email' => $admin->email,
+            'current_password' => 'wrong-password',
+            'password' => 'new-password-123',
+            'password_confirmation' => 'new-password-123',
+        ]);
+
+        $response->assertSessionHasErrors('current_password');
+        $admin->refresh();
+        $this->assertTrue(Hash::check('password', $admin->password));
+        $this->assertNotSame('Changed', $admin->first_name);
+    }
+
+    public function test_a_student_cannot_set_a_password_through_the_profile(): void
+    {
+        $student = User::factory()->create();
+        $passwordBefore = $student->password;
+
+        $this->actingAs($student)->patch('/profile', [
+            'first_name' => $student->first_name,
+            'last_name' => $student->last_name,
+            'password' => 'new-password-123',
+            'password_confirmation' => 'new-password-123',
+        ]);
+
+        $this->assertSame($passwordBefore, $student->fresh()->password);
+    }
+
+    public function test_students_keep_the_spaced_profile_form_with_its_hints(): void
+    {
+        $student = User::factory()->create();
+
+        $response = $this->actingAs($student)->get('/profile');
+
+        $response->assertSee('Optional. Leave blank if you do not use one.');
+        $response->assertSee('Include the full surname, for example &quot;Dela Cruz&quot;.', false);
+        $response->assertDontSee('placeholder="Optional"', false);
     }
 
     public function test_staff_can_update_their_profile_and_email(): void
@@ -214,5 +288,26 @@ class ProfileTest extends TestCase
 
         $response->assertSessionHasErrors(['date_of_birth', 'contact_number' => 'The contact number field is required.', 'address']);
         $this->assertSame('09171234567', $student->refresh()->contact_number);
+    }
+
+    public function test_a_student_contact_number_must_be_exactly_eleven_digits(): void
+    {
+        $student = User::factory()->named('Juan', null, 'Cruz')->create(['contact_number' => '09171234567']);
+
+        $response = $this->actingAs($student)->from('/profile')->patch('/profile', [
+            'first_name' => 'Juan',
+            'last_name' => 'Cruz',
+            'contact_number' => '+639998887777',
+        ]);
+
+        $response->assertSessionHasErrors(['contact_number' => 'The contact number field must be 11 digits.']);
+        $this->assertSame('09171234567', $student->refresh()->contact_number);
+    }
+
+    public function test_the_profile_contact_number_field_drops_anything_but_digits_as_it_is_typed(): void
+    {
+        $response = $this->actingAs(User::factory()->create())->get('/profile');
+
+        $this->assertMatchesRegularExpression('/<input[^>]*id="contact_number"[^>]*pattern="\[0-9\]\{11\}" maxlength="11" x-data="" x-on:input="\$el\.value = \$el\.value\.replace\(\/\[\^0-9\]\/g, \'\'\)"/', $response->getContent());
     }
 }

@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
                 'role' => UserRole::Student,
                 'email_verified_at' => now(),
                 'date_of_birth' => '2003-05-14',
-                'student_number' => '21-00123',
+                'student_number' => '202400123',
                 'course' => 'BS Information Technology',
                 'year_level' => 3,
                 'program_years' => 4,
@@ -46,5 +46,7 @@ class DatabaseSeeder extends Seeder
                 'address' => 'Indang, Cavite',
             ]
         );
+
+        $this->call(TestStudentsSeeder::class);
     }
 }

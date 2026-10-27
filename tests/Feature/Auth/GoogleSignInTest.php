@@ -111,7 +111,7 @@ class GoogleSignInTest extends TestCase
             'first_name' => 'Juan',
             'middle_name' => 'Santos',
             'last_name' => 'Dela Cruz',
-            'student_number' => '21-00123',
+            'student_number' => '202100123',
             'course' => 'BS Information Technology',
             'year_level' => 3,
             'program_years' => 4,
@@ -125,7 +125,7 @@ class GoogleSignInTest extends TestCase
         $this->assertSame(self::EMAIL, $user->email);
         $this->assertSame('109876543210987654321', $user->google_id);
         $this->assertSame('Juan Santos Dela Cruz', $user->name);
-        $this->assertSame('21-00123', $user->student_number);
+        $this->assertSame('202100123', $user->student_number);
         $this->assertSame('BS Information Technology', $user->course);
         $this->assertSame(3, $user->year_level);
         $this->assertNull($user->password);

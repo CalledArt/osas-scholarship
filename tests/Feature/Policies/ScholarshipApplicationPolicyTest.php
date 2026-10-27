@@ -26,11 +26,15 @@ class ScholarshipApplicationPolicyTest extends TestCase
         return [
             'no applications' => [[], true],
             'one pending' => [[[ApplicationStatus::Pending, ScholarshipStatus::Open]], true],
+            'one active scholarship' => [[[ApplicationStatus::Approved, ScholarshipStatus::Open]], false],
+            'one active scholarship closed to new applicants' => [[[ApplicationStatus::Approved, ScholarshipStatus::Closed]], false],
+            'one approved on an ended scholarship' => [[[ApplicationStatus::Approved, ScholarshipStatus::Ended]], true],
             'two pending' => [[[ApplicationStatus::Pending, ScholarshipStatus::Open], [ApplicationStatus::Pending, ScholarshipStatus::Open]], false],
             'one pending and one approved' => [[[ApplicationStatus::Pending, ScholarshipStatus::Open], [ApplicationStatus::Approved, ScholarshipStatus::Open]], false],
             'approved on a closed scholarship still counts' => [[[ApplicationStatus::Pending, ScholarshipStatus::Open], [ApplicationStatus::Approved, ScholarshipStatus::Closed]], false],
             'pending on a closed scholarship still counts' => [[[ApplicationStatus::Pending, ScholarshipStatus::Open], [ApplicationStatus::Pending, ScholarshipStatus::Closed]], false],
             'rejected does not count' => [[[ApplicationStatus::Pending, ScholarshipStatus::Open], [ApplicationStatus::Rejected, ScholarshipStatus::Open]], true],
+            'voided does not count' => [[[ApplicationStatus::Pending, ScholarshipStatus::Open], [ApplicationStatus::Voided, ScholarshipStatus::Open]], true],
             'approved on an ended scholarship does not count' => [[[ApplicationStatus::Pending, ScholarshipStatus::Open], [ApplicationStatus::Approved, ScholarshipStatus::Ended]], true],
             'pending on an ended scholarship does not count' => [[[ApplicationStatus::Pending, ScholarshipStatus::Open], [ApplicationStatus::Pending, ScholarshipStatus::Ended]], true],
         ];
@@ -69,6 +73,7 @@ class ScholarshipApplicationPolicyTest extends TestCase
             'filled by pending applicants' => [[ApplicationStatus::Pending, ApplicationStatus::Pending], false],
             'filled by approved applicants' => [[ApplicationStatus::Approved, ApplicationStatus::Approved], false],
             'rejected applicants give their slots back' => [[ApplicationStatus::Pending, ApplicationStatus::Rejected, ApplicationStatus::Rejected], true],
+            'voided applicants give their slots back' => [[ApplicationStatus::Pending, ApplicationStatus::Voided, ApplicationStatus::Voided], true],
         ];
     }
 
@@ -114,5 +119,48 @@ class ScholarshipApplicationPolicyTest extends TestCase
         $allowed = $student->can('create', [ScholarshipApplication::class, $scholarship]);
 
         $this->assertSame($canApply, $allowed);
+    }
+
+    /**
+     * The student's application to another posting, as its status, that
+     * posting's status and preset, and whether they may apply to a TDP posting.
+     *
+     * @return array<string, array{ApplicationStatus, ScholarshipStatus, ?string, bool}>
+     */
+    public static function applicationsToAnotherPosting(): array
+    {
+        return [
+            'pending on a closed TDP posting' => [ApplicationStatus::Pending, ScholarshipStatus::Closed, 'tdp', false],
+            'pending on a TDP posting still open' => [ApplicationStatus::Pending, ScholarshipStatus::Open, 'tdp', false],
+            'rejected on a TDP posting' => [ApplicationStatus::Rejected, ScholarshipStatus::Closed, 'tdp', true],
+            'pending on a TDP posting whose grant period ended' => [ApplicationStatus::Pending, ScholarshipStatus::Ended, 'tdp', true],
+            'pending on a TES posting' => [ApplicationStatus::Pending, ScholarshipStatus::Closed, 'tes', true],
+            'pending on a posting from no preset' => [ApplicationStatus::Pending, ScholarshipStatus::Closed, null, true],
+        ];
+    }
+
+    #[DataProvider('applicationsToAnotherPosting')]
+    public function test_student_holds_at_most_one_posting_of_each_preset(ApplicationStatus $applicationStatus, ScholarshipStatus $scholarshipStatus, ?string $preset, bool $canApply): void
+    {
+        $student = User::factory()->create();
+        ScholarshipApplication::factory()->for($student)
+            ->for(Scholarship::factory()->state(['preset' => $preset, 'status' => $scholarshipStatus]))
+            ->state(['status' => $applicationStatus])
+            ->create();
+        $scholarship = Scholarship::factory()->fromPreset('tdp')->create();
+
+        $allowed = $student->can('create', [ScholarshipApplication::class, $scholarship]);
+
+        $this->assertSame($canApply, $allowed);
+    }
+
+    public function test_a_student_on_leave_of_absence_cannot_apply(): void
+    {
+        $student = User::factory()->onLeaveOfAbsence()->create();
+        $scholarship = Scholarship::factory()->create();
+
+        $allowed = $student->can('create', [ScholarshipApplication::class, $scholarship]);
+
+        $this->assertFalse($allowed);
     }
 }

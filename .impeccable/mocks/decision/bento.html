@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Bento</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Narrow:wght@500;600&family=Spline+Sans+Mono&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden;font:400 15px/22px Archivo,sans-serif;color:#3D4654;background:#FBFAF7;font-variant-numeric:tabular-nums}
+.shell{display:grid;grid-template-columns:240px 1fr;height:900px}
+.rail{background:#0B6E4F;border-right:1px solid #1C9A6F;padding:20px 12px;color:#BFE5D6;display:flex;flex-direction:column}
+.brand{display:flex;gap:10px;align-items:center;padding:0 8px 20px;color:#fff;font-weight:600;line-height:1.2}
+.seal{width:36px;height:36px;border-radius:50%;border:2px solid #FFC72C}
+.rail a{display:block;padding:9px 12px;border-radius:2px;margin-bottom:4px}
+.rail a.on{background:#064532;color:#fff;font-weight:600}
+.acct{margin-top:auto;border-top:1px solid #1C9A6F;padding:12px}
+.acct b{color:#fff;font-weight:500;display:block}
+main{padding:32px 40px;background:#fff}
+h1{font:600 18px/26px Archivo;color:#10213A}
+.annot{font:500 12px/16px "Archivo Narrow";letter-spacing:.08em;text-transform:uppercase;color:#5A6472}
+.mono{font-family:"Spline Sans Mono",monospace}
+.sub{color:#5A6472}
+.v{color:#10213A;font-weight:500}
+.bento{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:150px 150px;gap:16px;margin-top:20px}
+.b{border:1px solid #D8D4CB;background:#fff;padding:18px 20px;display:flex;flex-direction:column}
+.b h2{font:600 15px/22px Archivo;color:#10213A}
+.places{grid-column:span 2;background:#0B6E4F;border-color:#064532;color:#BFE5D6}
+.places .fig{color:#fff}
+.places h2{color:#fff}
+.ra{grid-row:span 2;background:#DCFCE7;border-color:#15803D66}
+.ra h2,.ra .v{color:#116430}
+.ra .sub{color:#116430}
+.wait{grid-column:span 2;background:#FDF3DA;border-color:#B87F00}
+.fig{font:700 32px/1 Archivo;color:#10213A;letter-spacing:-.02em}
+.years{display:grid;gap:6px;margin-top:auto}
+.years div{display:flex;align-items:center;gap:8px;color:#116430}
+.years i{width:16px;height:16px;border:1px solid #116430;display:inline-block}
+.years i.done{background:#15803D}
+.lots{display:flex;gap:3px;flex-wrap:wrap}
+.lot{width:13px;height:13px;border:1px solid #8C8678;background:#FBFAF7}
+.places .lot{width:18px;height:18px;border-color:#BFE5D6;background:transparent}
+.places .lot.mine{background:#FDF3DA;border-color:#FFC72C}
+.lot.held{background:repeating-linear-gradient(45deg,#3D4654 0 1.5px,#F4F2ED 1.5px 4px);border-color:#3D4654}
+.lot:nth-child(5n){border-bottom:2px solid #0B6E4F}
+.mark{display:inline-block;padding:2px 8px;border-radius:2px;font:500 12px/16px "Archivo Narrow";letter-spacing:.08em;text-transform:uppercase}
+.m-gold{background:#fff;color:#10213A;border:1px solid #B87F00}.m-gray{background:#F4F2ED;color:#3D4654}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin-top:28px}
+.sec h2{font:600 18px/26px Archivo;color:#10213A}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:12px}
+.box{border:1px solid #D8D4CB;background:#fff;box-shadow:0 1px 2px rgb(16 33 58/.06)}
+.pad{padding:14px 18px}
+.t{font:600 15px/22px Archivo;color:#10213A}
+.cells{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid #D8D4CB}
+.cells>div{padding:8px 18px}
+.cells>div+div{border-left:1px solid #D8D4CB}
+.foot{display:flex;justify-content:space-between;align-items:center;padding:10px 18px;border-top:1px solid #D8D4CB}
+.btn{background:#0B6E4F;color:#fff;font-weight:600;padding:7px 16px;border-radius:2px}
+.soon{color:#862715;font-weight:600}
+</style></head><body>
+<div class="shell">
+<aside class="rail">
+ <div class="brand"><span class="seal"></span><span>OSAS Scholarship<br>Allocation System</span></div>
+ <a class="on">Dashboard</a><a>Scholarships</a><a>My Applications</a>
+ <div class="acct"><b>Juan Santos Dela Cruz</b><span class="annot" style="color:#BFE5D6">Student</span></div>
+</aside>
+<main>
+ <h1>Dashboard</h1>
+ <p>Welcome, Juan Santos Dela Cruz!</p>
+ <div class="bento">
+  <section class="b places">
+   <h2>Places left</h2>
+   <div style="display:flex;align-items:end;justify-content:space-between;margin-top:auto">
+    <p><span class="fig">1</span> more scholarship you can apply to</p>
+    <div class="lots"><span class="lot mine"></span><span class="lot"></span></div>
+   </div>
+  </section>
+  <section class="b ra">
+   <h2>Republic Act No. 10931</h2><p class="sub">Free tuition</p>
+   <div class="years">
+    <div><i class="done"></i>Year 1</div><div><i class="done"></i>Year 2</div><div><i class="done"></i><b>Year 3 · now</b></div><div><i></i>Year 4</div><div><i></i>Year 5</div>
+   </div>
+  </section>
+  <section class="b">
+   <h2>Juan Santos Dela Cruz</h2><p class="sub">BS Information Technology</p>
+   <div style="margin-top:auto;display:flex;gap:24px"><div><p class="annot">Student no.</p><p class="v mono">202312345</p></div><div><p class="annot">Year</p><p class="v">3</p></div></div>
+  </section>
+  <section class="b wait">
+   <h2>Waiting for a decision</h2>
+   <div style="display:flex;justify-content:space-between;align-items:end;margin-top:auto">
+    <div><p class="v">CHED Merit Scholarship Program</p><p class="sub"><span class="mono">2026-00041</span> · applied Oct 14</p></div>
+    <p><span class="fig">9</span> <span class="sub">days</span></p>
+   </div>
+  </section>
+  <section class="b">
+   <h2>Active scholarship</h2>
+   <p class="sub" style="margin-top:auto">None yet. It appears here once OSAS approves you.</p>
+  </section>
+ </div>
+ <div class="sec"><h2>Available to apply <span class="sub" style="font-weight:400">(4)</span></h2><span class="sub">View all</span></div>
+ <div class="grid3">
+  <article class="box"><div class="pad"><p class="t">DOST-SEI Undergraduate Scholarship</p>
+   <div class="lots" style="margin-top:10px"><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span></div></div>
+   <div class="cells"><div><p class="annot">Closes</p><p class="v soon">Oct 30</p></div><div><p class="annot">Slots left</p><p class="v">8 of 12</p></div><div><p class="annot">Docs</p><p class="v">5</p></div></div>
+   <div class="foot"><span class="mark m-gray">Government</span><span class="btn">Apply</span></div></article>
+  <article class="box"><div class="pad"><p class="t">Tulong Dunong Program</p>
+   <div class="lots" style="margin-top:10px"><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span></div></div>
+   <div class="cells"><div><p class="annot">Closes</p><p class="v">Nov 8</p></div><div><p class="annot">Slots left</p><p class="v">5 of 20</p></div><div><p class="annot">Docs</p><p class="v">3</p></div></div>
+   <div class="foot"><span class="mark m-gray">Government</span><span class="btn">Apply</span></div></article>
+  <article class="box"><div class="pad"><p class="t">CvSU Academic Scholarship</p>
+   <div class="lots" style="margin-top:10px"><span class="lot held"></span><span class="lot held"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span></div></div>
+   <div class="cells"><div><p class="annot">Closes</p><p class="v">Nov 28</p></div><div><p class="annot">Slots left</p><p class="v">13 of 15</p></div><div><p class="annot">Docs</p><p class="v">2</p></div></div>
+   <div class="foot"><span class="mark m-gray">Academic</span><span class="btn">Apply</span></div></article>
+ </div>
+</main>
+</div>
+</body></html>

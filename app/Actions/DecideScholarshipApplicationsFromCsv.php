@@ -34,24 +34,34 @@ class DecideScholarshipApplicationsFromCsv
      * Approve every pending application matched by the given CSV, and
      * reject every other pending application for this scholarship.
      *
-     * A row is matched two ways, in order:
+     * The student number is the key. A row is matched one of two ways:
      *
-     * 1. By student number (exact, case-insensitive) — since it's unique
-     *    per student, this can never be ambiguous and is tried first.
-     * 2. By name (trimmed, whitespace-collapsed, case-insensitive) for
-     *    whichever pending applications a student number didn't already
-     *    resolve. A name shared by more than one still-unresolved pending
-     *    applicant is left untouched and reported as ambiguous, since
-     *    guessing which one passed would be silently wrong.
+     * 1. A row with a student number matches only the applicant with that
+     *    number (exact, case-insensitive). Its name is never used, so a row
+     *    whose number matches no one is reported as unmatched even when
+     *    its name is an applicant's: the number says it is someone else.
+     * 2. A row with no student number matches by name (trimmed,
+     *    whitespace-collapsed, case-insensitive) among the pending
+     *    applications no number resolved. A name shared by more than one
+     *    still-unresolved pending applicant is left untouched and reported
+     *    as ambiguous, since guessing which one passed would be silently
+     *    wrong.
      *
-     * Approvals stop once the scholarship's remaining slots run out; those
-     * rows are reported instead of being approved. A single-column,
+     * A matched student who already holds an active scholarship elsewhere is
+     * rejected rather than approved, since a student may hold only
+     * User::ACTIVE_SCHOLARSHIP_LIMIT at a time; the rejection is flagged so
+     * their page says they passed, and they are reported apart. They take no
+     * slot. A pending applicant on leave of absence is voided, not decided:
+     * putting a student on leave voids their applications, so this only
+     * catches one submitted in that same moment. Approvals stop once the scholarship's remaining slots run out;
+     * those rows are reported instead of being approved. A single-column,
      * header-less file is still accepted and treated as a list of names,
      * for backward compatibility.
      *
      * @return array{
      *     approved: array<int, array{name: string, email: string}>,
      *     rejected: array<int, array{name: string, email: string}>,
+     *     already_active: array<int, array{name: string, email: string, active_scholarship: string}>,
      *     ambiguous: array<int, array{name: string, count: int}>,
      *     skipped_capacity: array<int, array{name: string, email: string}>,
      *     unmatched: array<int, array{name: ?string, student_number: ?string}>,
@@ -67,8 +77,7 @@ class DecideScholarshipApplicationsFromCsv
         foreach ($rows as $index => $row) {
             if ($row['student_number'] !== null) {
                 $byNumber[$this->normalize($row['student_number'])] ??= $index;
-            }
-            if ($row['name'] !== null) {
+            } elseif ($row['name'] !== null) {
                 $byName[$this->normalize($row['name'])] ??= $index;
             }
         }
@@ -76,16 +85,24 @@ class DecideScholarshipApplicationsFromCsv
         $consumedRows = [];
         $approved = [];
         $rejected = [];
+        $alreadyActive = [];
         $ambiguous = [];
         $skippedCapacity = [];
         // Pending applicants hold slots too, but this list is what decides them,
         // so only approvals already made count against the room left.
         $remainingSlots = $scholarship->slots - $scholarship->approvedApplicationsCount();
 
-        $pendingApplications = $scholarship->applications()
+        [$voidedApplications, $pendingApplications] = $scholarship->applications()
             ->where('status', ApplicationStatus::Pending)
             ->with('user')
-            ->get();
+            ->get()
+            ->partition(fn (ScholarshipApplication $application): bool => $application->user->isOnLeaveOfAbsence());
+
+        if ($voidedApplications->isNotEmpty()) {
+            ScholarshipApplication::query()->whereKey($voidedApplications->modelKeys())->update(['status' => ApplicationStatus::Voided]);
+        }
+
+        $activeScholarshipTitles = $this->activeScholarshipTitlesElsewhere($scholarship, $pendingApplications->pluck('user_id')->all());
 
         // Pass 1: resolve by student number. Unique per student, so never ambiguous.
         $unresolved = collect();
@@ -95,16 +112,16 @@ class DecideScholarshipApplicationsFromCsv
 
             if ($number !== null && isset($byNumber[$number])) {
                 $consumedRows[$byNumber[$number]] = true;
-                $this->approveOrSkip($application, $approved, $skippedCapacity, $remainingSlots);
+                $this->approveOrSkip($application, $activeScholarshipTitles, $approved, $alreadyActive, $skippedCapacity, $remainingSlots);
             } else {
                 $unresolved->push($application);
             }
         }
 
-        // Pass 2: resolve whatever is left by name.
+        // Pass 2: resolve whatever is left by name, from the rows that carry no student number.
         foreach ($unresolved->groupBy(fn (ScholarshipApplication $application) => $this->normalize($application->user->name)) as $normalizedName => $applications) {
             if ($applications->count() > 1) {
-                $ambiguous[] = ['name' => $applications->first()->user->name, 'count' => $applications->count()];
+                $ambiguous[] = ['name' => $applications->first()->user->surname_first_name, 'count' => $applications->count()];
 
                 continue;
             }
@@ -113,13 +130,13 @@ class DecideScholarshipApplicationsFromCsv
 
             if (isset($byName[$normalizedName]) && ! isset($consumedRows[$byName[$normalizedName]])) {
                 $consumedRows[$byName[$normalizedName]] = true;
-                $this->approveOrSkip($application, $approved, $skippedCapacity, $remainingSlots);
+                $this->approveOrSkip($application, $activeScholarshipTitles, $approved, $alreadyActive, $skippedCapacity, $remainingSlots);
 
                 continue;
             }
 
             $application->update(['status' => ApplicationStatus::Rejected]);
-            $rejected[] = ['name' => $application->user->name, 'email' => $application->user->email];
+            $rejected[] = ['name' => $application->user->surname_first_name, 'email' => $application->user->email];
         }
 
         if ($remainingSlots < 1 && $scholarship->status === ScholarshipStatus::Open) {
@@ -135,6 +152,7 @@ class DecideScholarshipApplicationsFromCsv
         return [
             'approved' => $approved,
             'rejected' => $rejected,
+            'already_active' => $alreadyActive,
             'ambiguous' => $ambiguous,
             'skipped_capacity' => $skippedCapacity,
             'unmatched' => $unmatched,
@@ -142,12 +160,41 @@ class DecideScholarshipApplicationsFromCsv
     }
 
     /**
+     * The title of the active scholarship each of the given students already
+     * holds on another scholarship, keyed by student: approved there, and not
+     * ended. Fetched for every pending applicant in one query.
+     *
+     * @param  array<int, int>  $userIds
+     * @return array<int, string>
+     */
+    private function activeScholarshipTitlesElsewhere(Scholarship $scholarship, array $userIds): array
+    {
+        return ScholarshipApplication::query()
+            ->join('scholarships', 'scholarships.id', '=', 'scholarship_applications.scholarship_id')
+            ->whereIn('scholarship_applications.user_id', $userIds)
+            ->where('scholarship_applications.scholarship_id', '!=', $scholarship->id)
+            ->where('scholarship_applications.status', ApplicationStatus::Approved)
+            ->where('scholarships.status', '!=', ScholarshipStatus::Ended)
+            ->pluck('scholarships.title', 'scholarship_applications.user_id')
+            ->all();
+    }
+
+    /**
+     * @param  array<int, string>  $activeScholarshipTitles
      * @param  array<int, array{name: string, email: string}>  $approved
+     * @param  array<int, array{name: string, email: string, active_scholarship: string}>  $alreadyActive
      * @param  array<int, array{name: string, email: string}>  $skippedCapacity
      */
-    private function approveOrSkip(ScholarshipApplication $application, array &$approved, array &$skippedCapacity, int &$remainingSlots): void
+    private function approveOrSkip(ScholarshipApplication $application, array $activeScholarshipTitles, array &$approved, array &$alreadyActive, array &$skippedCapacity, int &$remainingSlots): void
     {
-        $summary = ['name' => $application->user->name, 'email' => $application->user->email];
+        $summary = ['name' => $application->user->surname_first_name, 'email' => $application->user->email];
+
+        if (isset($activeScholarshipTitles[$application->user_id])) {
+            $application->update(['status' => ApplicationStatus::Rejected, 'passed_while_holding_active' => true]);
+            $alreadyActive[] = [...$summary, 'active_scholarship' => $activeScholarshipTitles[$application->user_id]];
+
+            return;
+        }
 
         if ($remainingSlots < 1) {
             $skippedCapacity[] = $summary;

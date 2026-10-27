@@ -1,68 +1,57 @@
-@props(['applications', 'student', 'grid' => false])
+@props(['applications', 'student'])
 
 {{--
-    The scholarships a student holds: Republic Act 10931 while they are within
-    the years it covers, then approved applications whose scholarship has not
-    ended. Rows read `scholarship_title`, which
-    User::scholarshipApplicationsWithScholarship() joins in. `grid` lays them
-    out as record cards (the Scholarships page) instead of ruled rows (the
-    Dashboard).
+    What the student holds, as boxes for the page's "Mine" column: Republic
+    Act 10931 while they are within the years it covers, then each approved
+    application whose scholarship has not ended. Renders sibling boxes with no
+    wrapper, so the column's own grid lays them out. Rows read
+    `scholarship_title`, which User::scholarshipApplicationsWithScholarship()
+    joins in.
+
+    While in force, RA 10931 counts the student's year of study against the
+    years it covers ("Year 4 of 5"); while paused it shows no count.
 --}}
-@php($hasFreeTertiaryEducation = $student->hasFreeTertiaryEducation())
+@php
+    $isPaused = $student->isOnLeaveOfAbsence() && $student->isWithinFreeTertiaryEducationYears();
+    $yearOfStudy = $student->yearOfStudy();
+    $coveredYears = $student->freeTertiaryEducationYears();
+@endphp
 
-<section aria-labelledby="active-heading" {{ $attributes }}>
-    <h2 id="active-heading" class="text-base font-semibold text-gray-900">{{ __('Active scholarships') }}</h2>
+@if ($student->hasFreeTertiaryEducation() || $isPaused)
+    <a href="{{ route('scholarships.republic-act-10931') }}" @class([
+        'group block border px-5 py-4 shadow-seat transition duration-150 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2 focus-visible:ring-offset-linen',
+        'border-grant/30 bg-grant-wash hover:border-grant' => ! $isPaused,
+        'border-rule bg-white hover:border-seal' => $isPaused,
+    ])>
+        <h3 @class(['font-semibold', 'text-grant-deep' => ! $isPaused, 'text-ink group-hover:text-seal' => $isPaused])>{{ __('Republic Act No. 10931') }}</h3>
 
-    @if (! $hasFreeTertiaryEducation && $applications->isEmpty())
-        <p class="mt-3 border-y border-gray-200 py-6 text-sm text-gray-500">
-            {{ __("You don't hold a scholarship right now. Once OSAS approves one of your applications, it appears here until the scholarship ends.") }}
-        </p>
-    @elseif ($grid)
-        <ul class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            @if ($hasFreeTertiaryEducation)
-                <x-free-tertiary-education :card="true" :year-of-study="$student->yearOfStudy()" :covered-years="$student->freeTertiaryEducationYears()" />
-            @endif
+        @if ($isPaused)
+            <p class="mt-0.5 text-slate">{{ __('Free tuition paused during leave of absence (LOA).') }}</p>
+        @else
+            <p class="mt-0.5 text-grant-deep">
+                {{ __('Free tuition') }}
+                @if ($yearOfStudy !== null && $coveredYears !== null)
+                    <span aria-hidden="true">&middot;</span>
+                    <span class="tabular-nums">{{ __('Year :year of :covered', ['year' => $yearOfStudy, 'covered' => $coveredYears]) }}</span>
+                @endif
+            </p>
+            <x-badge class="mt-2" color="paper">{{ __('In force') }}</x-badge>
+        @endif
+    </a>
+@endif
 
-            @foreach ($applications as $application)
-                <li>
-                    <a href="{{ route('scholarship-applications.show', $application) }}"
-                       class="group flex h-full flex-col rounded-lg border border-gray-200 bg-white p-5 transition-colors duration-150 ease-in-out hover:border-cvsu-green/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2">
-                        <div class="flex items-start justify-between gap-3">
-                            <p data-vt-title class="text-base font-semibold leading-snug text-gray-900 [overflow-wrap:anywhere] group-hover:text-cvsu-green">{{ $application->scholarship_title }}</p>
-                            <x-badge class="shrink-0" color="green">{{ __('Active') }}</x-badge>
-                        </div>
-                        <p class="mt-auto pt-6 text-sm text-gray-500">
-                            {{ __('Applied :date', ['date' => ($application->submitted_at ?? $application->created_at)->format('M j, Y')]) }}
-                        </p>
-                    </a>
-                </li>
-            @endforeach
-        </ul>
-    @else
-        <ul class="-mx-3 mt-3 divide-y divide-gray-100 border-y border-gray-200">
-            @if ($hasFreeTertiaryEducation)
-                <x-free-tertiary-education :year-of-study="$student->yearOfStudy()" :covered-years="$student->freeTertiaryEducationYears()" />
-            @endif
-
-            @foreach ($applications as $application)
-                <li>
-                    <a href="{{ route('scholarship-applications.show', $application) }}"
-                       class="group flex items-center gap-4 px-3 py-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cvsu-green">
-                        <div class="min-w-0 flex-1">
-                            <p data-vt-title class="text-sm font-semibold text-gray-900 [overflow-wrap:anywhere] group-hover:text-cvsu-green">{{ $application->scholarship_title }}</p>
-                            <p class="mt-1 text-sm text-gray-500">
-                                {{ __('Applied :date', ['date' => ($application->submitted_at ?? $application->created_at)->format('M j, Y')]) }}
-                            </p>
-                        </div>
-
-                        <x-badge class="shrink-0" color="green">{{ __('Active') }}</x-badge>
-
-                        <svg class="h-5 w-5 shrink-0 text-gray-500" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m8 5 5 5-5 5" />
-                        </svg>
-                    </a>
-                </li>
-            @endforeach
-        </ul>
-    @endif
-</section>
+@forelse ($applications as $application)
+    <a href="{{ route('scholarship-applications.show', $application) }}"
+       class="group block border border-rule bg-white px-5 py-4 shadow-seat transition duration-150 ease-in-out hover:border-seal focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2 focus-visible:ring-offset-linen">
+        <div class="flex items-start justify-between gap-3">
+            <h3 data-vt-title class="font-semibold text-ink [overflow-wrap:anywhere] group-hover:text-seal">{{ $application->scholarship_title }}</h3>
+            <x-badge class="shrink-0" color="green">{{ __('Active') }}</x-badge>
+        </div>
+        <p class="mt-1 text-slate">{{ __('Ref') }} <span class="font-mono">{{ $application->reference }}</span></p>
+    </a>
+@empty
+    <div class="border border-rule bg-white px-5 py-4 shadow-seat">
+        <h3 class="font-semibold text-ink">{{ __('Active scholarship') }}</h3>
+        <p class="mt-0.5 text-slate">{{ __('None yet.') }}</p>
+    </div>
+@endforelse

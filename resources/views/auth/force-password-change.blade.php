@@ -1,7 +1,7 @@
-<x-guest-layout>
+<x-guest-layout :title="__('Set a new password')">
     <div class="mb-8">
-        <h2 class="text-2xl font-bold text-gray-900">{{ __('Set a new password') }}</h2>
-        <p class="mt-1 text-sm text-gray-500">
+        <h2 class="text-lead font-semibold text-ink">{{ __('Set a new password') }}</h2>
+        <p class="mt-1  text-slate">
             {{ __('Your account was created with a temporary password. Choose a new one before continuing.') }}
         </p>
     </div>
@@ -33,6 +33,6 @@
 
     <form method="POST" action="{{ route('logout') }}" class="mt-6 text-center">
         @csrf
-        <button type="submit" class="text-sm font-medium text-gray-500 hover:text-gray-700">{{ __('Log out instead') }}</button>
+        <button type="submit" class="font-medium text-slate hover:text-graphite">{{ __('Log out instead') }}</button>
     </form>
 </x-guest-layout>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\StudentStatus;
 use App\Models\User;
 use App\Support\CvsuPrograms;
 use App\Support\PersonName;
@@ -38,10 +39,11 @@ class UpdateStudentRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'student_number' => ['required', 'string', 'max:255', Rule::unique(User::class)->ignore($this->route('student'))],
+            'student_number' => ['required', 'string', 'digits:9', Rule::unique(User::class)->ignore($this->route('student'))],
             'course' => ['required', 'string', Rule::in(array_filter([...CvsuPrograms::all(), $this->route('student')->course]))],
             'year_level' => ['required', 'integer', 'between:1,6'],
             'program_years' => ['required', 'integer', 'between:2,6'],
+            'student_status' => ['required', Rule::enum(StudentStatus::class)],
         ];
     }
 
@@ -54,6 +56,7 @@ class UpdateStudentRequest extends FormRequest
     {
         return [
             'program_years' => 'program length',
+            'student_status' => 'student status',
         ];
     }
 

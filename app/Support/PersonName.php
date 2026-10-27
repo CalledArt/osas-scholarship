@@ -44,4 +44,20 @@ class PersonName
 
         return implode(' ', array_filter($parts, fn (string $part): bool => $part !== ''));
     }
+
+    /**
+     * Join name parts as "last, first middle", the order an alphabetical list
+     * is read in. Without a surname it is just the given names.
+     */
+    public static function surnameFirst(?string $firstName, ?string $middleName, ?string $lastName): string
+    {
+        $surname = trim((string) $lastName);
+        $givenNames = self::assemble($firstName, $middleName, null);
+
+        return match (true) {
+            $surname === '' => $givenNames,
+            $givenNames === '' => $surname,
+            default => "{$surname}, {$givenNames}",
+        };
+    }
 }

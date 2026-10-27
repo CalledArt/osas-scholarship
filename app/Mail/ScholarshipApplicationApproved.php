@@ -10,8 +10,9 @@ use Illuminate\Mail\Mailables\Envelope;
 /**
  * Tells applicants who made the pass list that their application was approved.
  *
- * Every approved applicant of one pass list gets the same copy through
- * BccMailer, so nothing in it is addressed to a particular student.
+ * Every approved applicant of one pass list gets their own message through
+ * StudentMailer, but with the same content, so nothing in it names a
+ * particular student.
  */
 class ScholarshipApplicationApproved extends Mailable
 {

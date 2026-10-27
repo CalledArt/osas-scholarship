@@ -4,12 +4,12 @@
     status share a row from 640px; the status note runs the full width under
     them instead of stretching one column three times taller than the rest.
 --}}
-<x-app-layout :sheet="true">
+<x-app-layout :title="__('Edit Scholarship')" :sheet="true">
     <div class="px-6 py-10 lg:px-10">
-        <div class="mx-auto max-w-3xl">
-            <a href="{{ route('admin.scholarships.show', $scholarship) }}" class="rounded text-sm font-medium text-gray-600 underline underline-offset-4 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2">{{ __('Back to scholarship') }}</a>
+        <div class="mx-auto max-w-leaf">
+            <a href="{{ route('admin.scholarships.show', $scholarship) }}" class="rounded  font-medium text-graphite underline underline-offset-4 hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Back to scholarship') }}</a>
 
-            <h1 class="mt-6 text-xl font-semibold leading-tight text-gray-900">{{ __('Edit Scholarship') }}</h1>
+            <h1 class="mt-6 text-lead font-semibold leading-tight text-ink">{{ __('Edit Scholarship') }}</h1>
 
             <form method="POST" action="{{ route('admin.scholarships.update', $scholarship) }}" class="mt-8 space-y-5">
                 @csrf
@@ -23,7 +23,7 @@
 
                 <div>
                     <x-input-label for="type" :value="__('Type')" />
-                    <select id="type" name="type" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-cvsu-green focus:ring-cvsu-green" required>
+                    <select id="type" name="type" class="mt-1 block w-full rounded-sheet border-rule-strong shadow-sm focus:border-seal focus:ring-seal" required>
                         @foreach (\App\Enums\ScholarshipType::cases() as $type)
                             <option value="{{ $type->value }}" @selected(old('type', $scholarship->type->value) === $type->value)>{{ $type->label() }}</option>
                         @endforeach
@@ -33,7 +33,7 @@
 
                 <div>
                     <x-input-label for="description" :value="__('Description')" />
-                    <textarea id="description" name="description" rows="6" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-cvsu-green focus:ring-cvsu-green" required>{{ old('description', $scholarship->description) }}</textarea>
+                    <textarea id="description" name="description" rows="6" class="mt-1 block w-full rounded-sheet border-rule-strong shadow-sm focus:border-seal focus:ring-seal" required>{{ old('description', $scholarship->description) }}</textarea>
                     <x-input-error :messages="$errors->get('description')" class="mt-2" />
                 </div>
 
@@ -53,7 +53,7 @@
 
                         <div>
                             <x-input-label for="status" :value="__('Status')" />
-                            <select id="status" name="status" aria-describedby="status-help" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-cvsu-green focus:ring-cvsu-green">
+                            <select id="status" name="status" aria-describedby="status-help" class="mt-1 block w-full rounded-sheet border-rule-strong shadow-sm focus:border-seal focus:ring-seal">
                                 @foreach (\App\Enums\ScholarshipStatus::cases() as $status)
                                     <option value="{{ $status->value }}" @selected(old('status', $scholarship->status->value) === $status->value)>
                                         {{ $status->label() }}
@@ -64,53 +64,52 @@
                         </div>
                     </div>
 
-                    <p id="status-help" class="mt-2 max-w-prose text-sm text-gray-500">
-                        {{ __('Closed stops new applications. Set Ended once the grant period is over: approved students stop holding it, freeing one of their :limit scholarship places.', ['limit' => \App\Models\User::SCHOLARSHIP_LIMIT]) }}
+                    <p id="status-help" class="mt-2 max-w-prose  text-slate">
+                        {{ __('Closed stops new applications. Set Ended once the grant period is over: approved students stop holding it as their active scholarship, so they can apply to others again.') }}
                     </p>
                 </div>
 
-                <div>
-                    <label for="stem_courses_only" class="flex cursor-pointer items-start gap-3">
-                        <input id="stem_courses_only" type="checkbox" name="stem_courses_only" value="1" @checked(old('stem_courses_only', $scholarship->stem_courses_only))
-                               class="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-cvsu-green focus:ring-cvsu-green">
-                        <span class="text-sm">
-                            <span class="font-medium text-gray-900">{{ __('STEM courses only') }}</span>
-                            <span class="mt-0.5 block text-gray-500">{{ __('Only students in a STEM course can apply. Students who already applied keep their applications.') }}</span>
-                        </span>
-                    </label>
-                    <x-stem-courses class="ms-7 mt-2" />
-                </div>
+                {{-- Set by the DOST preset when the scholarship was posted, so it is shown, not edited. --}}
+                @if ($scholarship->stem_courses_only)
+                    <div>
+                        <p>
+                            <span class="font-medium text-ink">{{ __('STEM courses only') }}</span>
+                            <span class="mt-0.5 block text-slate">{{ __('Posted as the DOST Scholarship, so only students in a STEM course can apply.') }}</span>
+                        </p>
+                        <x-stem-courses class="mt-2" />
+                    </div>
+                @endif
 
                 <div class="flex items-center justify-end gap-4 pt-3">
-                    <a href="{{ route('admin.scholarships.show', $scholarship) }}" class="rounded text-sm font-medium text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2">{{ __('Cancel') }}</a>
+                    <a href="{{ route('admin.scholarships.show', $scholarship) }}" class="rounded  font-medium text-graphite hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Cancel') }}</a>
                     <x-primary-button>{{ __('Save Changes') }}</x-primary-button>
                 </div>
             </form>
 
-            <section aria-labelledby="documents-heading" class="mt-12 border-t border-gray-200 pt-10">
-                <h2 id="documents-heading" class="text-base font-semibold text-gray-900">{{ __('Required Documents') }}</h2>
-                <p class="mt-1 max-w-prose text-sm text-gray-500">{{ __('Documents applicants must upload for this scholarship. Post a sample so applicants can see what a correct one looks like.') }}</p>
+            <section aria-labelledby="documents-heading" class="mt-12 border-t border-rule pt-10">
+                <h2 id="documents-heading" class="text-lead font-semibold text-ink">{{ __('Required Documents') }}</h2>
+                <p class="mt-1 max-w-prose  text-slate">{{ __('Documents applicants must upload for this scholarship. Post a sample so applicants can see what a correct one looks like.') }}</p>
 
-                <ul class="mt-4 divide-y divide-gray-100 border-y border-gray-200">
+                <ul class="mt-4 divide-y divide-rule border-y border-rule">
                     @forelse ($scholarship->requiredDocuments as $document)
                         <li class="flex flex-col gap-3 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
                             <div class="min-w-0">
-                                <p class="text-sm font-medium text-gray-900">{{ $document->name }}</p>
+                                <p class="font-medium text-ink">{{ $document->name }}</p>
                                 @if ($document->description)
-                                    <p class="mt-1 text-sm text-gray-500">{{ $document->description }}</p>
+                                    <p class="mt-1  text-slate">{{ $document->description }}</p>
                                 @endif
                                 @if ($document->hasSample())
-                                    <p class="mt-1 text-sm text-gray-500 [overflow-wrap:anywhere]">{{ $document->sample_original_name }}</p>
+                                    <p class="mt-1  text-slate [overflow-wrap:anywhere]">{{ $document->sample_original_name }}</p>
                                     <x-sample-preview :document="$document" class="mt-3 w-full sm:w-64" />
                                 @else
-                                    <p class="mt-1 text-sm text-gray-500">{{ __('No sample posted.') }}</p>
+                                    <p class="mt-1  text-slate">{{ __('No sample posted.') }}</p>
                                 @endif
                             </div>
                             <div class="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2">
                                 <form method="POST" action="{{ route('admin.scholarships.required-documents.sample.update', [$scholarship, $document]) }}" enctype="multipart/form-data">
                                     @csrf
                                     @method('PUT')
-                                    <label class="cursor-pointer rounded-sm text-sm font-semibold text-cvsu-green hover:text-cvsu-green-dark focus-within:ring-2 focus-within:ring-cvsu-green focus-within:ring-offset-2">
+                                    <label class="cursor-pointer rounded-sm  font-semibold text-seal hover:text-seal-deep focus-within:ring-2 focus-within:ring-seal focus-within:ring-offset-2">
                                         {{ $document->hasSample() ? __('Replace sample') : __('Upload sample') }}
                                         <input type="file" name="sample" accept=".jpg,.jpeg,.png,.pdf" class="sr-only" onchange="this.form.requestSubmit()">
                                     </label>
@@ -119,22 +118,22 @@
                                     <form method="POST" action="{{ route('admin.scholarships.required-documents.sample.destroy', [$scholarship, $document]) }}" onsubmit="return confirm('{{ __('Remove the sample for this document?') }}')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="rounded text-sm font-medium text-gray-600 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">{{ __('Remove sample') }}</button>
+                                        <button type="submit" class="rounded  font-medium text-graphite hover:text-oxide focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">{{ __('Remove sample') }}</button>
                                     </form>
                                 @endif
                                 <form method="POST" action="{{ route('admin.scholarships.required-documents.destroy', [$scholarship, $document]) }}" onsubmit="return confirm('{{ __('Remove this required document?') }}')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="rounded text-sm font-medium text-red-600 hover:text-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">{{ __('Remove') }}</button>
+                                    <button type="submit" class="rounded  font-medium text-oxide hover:text-oxide-deep focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">{{ __('Remove') }}</button>
                                 </form>
                             </div>
                         </li>
                     @empty
-                        <li class="py-6 text-sm text-gray-500">{{ __('No documents required yet.') }}</li>
+                        <li class="py-6  text-slate">{{ __('No documents required yet.') }}</li>
                     @endforelse
                 </ul>
 
-                <form method="POST" action="{{ route('admin.scholarships.required-documents.store', $scholarship) }}" enctype="multipart/form-data" class="mt-6 rounded-lg border border-gray-200 p-4">
+                <form method="POST" action="{{ route('admin.scholarships.required-documents.store', $scholarship) }}" enctype="multipart/form-data" class="mt-6 rounded-sheet border border-rule p-4">
                     @csrf
                     <div class="space-y-3">
                         <x-text-input name="name" type="text" class="block w-full" placeholder="{{ __('Document name (e.g. 2x2 Picture)') }}" aria-label="{{ __('Document name') }}" required />
@@ -142,7 +141,7 @@
                         <div>
                             <x-input-label for="new-document-sample" :value="__('Sample for applicants (optional)')" />
                             <x-file-input id="new-document-sample" name="sample" accept=".jpg,.jpeg,.png,.pdf" class="mt-1 w-full" />
-                            <p class="mt-1 text-xs text-gray-500">{{ __('JPG, PNG, or PDF, max 5MB.') }}</p>
+                            <p class="mt-1  text-slate">{{ __('JPG, PNG, or PDF, max 5MB.') }}</p>
                         </div>
                     </div>
                     <div class="mt-4 flex justify-end">
@@ -152,17 +151,17 @@
                 <x-input-error :messages="$errors->get('sample')" class="mt-2" />
             </section>
 
-            <section aria-labelledby="delete-heading" class="mt-12 border-t border-gray-200 pt-10 sm:flex sm:items-start sm:justify-between sm:gap-8">
+            <section aria-labelledby="delete-heading" class="mt-12 border-t border-rule pt-10 sm:flex sm:items-start sm:justify-between sm:gap-8">
                 <div>
-                    <h2 id="delete-heading" class="text-base font-semibold text-gray-900">{{ __('Delete Scholarship') }}</h2>
-                    <p class="mt-1 max-w-prose text-sm text-gray-500">
+                    <h2 id="delete-heading" class="text-lead font-semibold text-ink">{{ __('Delete Scholarship') }}</h2>
+                    <p class="mt-1 max-w-prose  text-slate">
                         {{ __('Permanently removes this scholarship, its required documents and samples, and every application with the documents students uploaded. To stop accepting applications but keep the records, set the status to Closed instead.') }}
                     </p>
                 </div>
                 <x-danger-button
-                    type="button"
-                    class="mt-4 shrink-0 sm:mt-0"
-                    x-data=""
+ type="button"
+ class="mt-4 shrink-0 sm:mt-0"
+ x-data=""
                     x-on:click.prevent="$dispatch('open-modal', 'confirm-scholarship-deletion')"
                 >{{ __('Delete') }}</x-danger-button>
             </section>
@@ -172,11 +171,11 @@
                     @csrf
                     @method('DELETE')
 
-                    <h2 class="text-lg font-medium text-gray-900 [overflow-wrap:anywhere]">
+                    <h2 class="text-lg font-medium text-ink [overflow-wrap:anywhere]">
                         {{ __('Delete ":title"?', ['title' => $scholarship->title]) }}
                     </h2>
 
-                    <p class="mt-2 text-sm text-gray-600">
+                    <p class="mt-2  text-graphite">
                         @if ($scholarship->applications_count > 0)
                             {{ trans_choice('{1} This also deletes 1 student application and the documents uploaded with it.|[2,*] This also deletes :count student applications and every document uploaded with them.', $scholarship->applications_count, ['count' => $scholarship->applications_count]) }}
                         @else

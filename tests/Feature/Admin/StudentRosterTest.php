@@ -39,7 +39,7 @@ class StudentRosterTest extends TestCase
             ->assertOk()
             ->assertSee('Search Student')
             ->assertSee('juan@cvsu.edu.ph')
-            ->assertSee('Juan Cruz')
+            ->assertSee('Cruz, Juan')
             ->assertSee('21-00123')
             ->assertSeeInOrder(['BS Information Technology</td>', 'Year 3</td>'], false)
             ->assertDontSee('osas.staff@cvsu.edu.ph')
@@ -60,13 +60,13 @@ class StudentRosterTest extends TestCase
     /**
      * @param  list<string>  $expectedNames
      */
-    #[TestWith(['name_asc', ['Bea Alba', 'Ana Cruz', 'Zoe Cruz', 'Luis Diaz']])]
-    #[TestWith(['name_desc', ['Luis Diaz', 'Zoe Cruz', 'Ana Cruz', 'Bea Alba']])]
-    #[TestWith(['student_number_asc', ['Luis Diaz', 'Bea Alba', 'Zoe Cruz', 'Ana Cruz']])]
-    #[TestWith(['student_number_desc', ['Ana Cruz', 'Zoe Cruz', 'Bea Alba', 'Luis Diaz']])]
-    #[TestWith(['year_level_asc', ['Bea Alba', 'Ana Cruz', 'Luis Diaz', 'Zoe Cruz']])]
-    #[TestWith(['year_level_desc', ['Zoe Cruz', 'Ana Cruz', 'Luis Diaz', 'Bea Alba']])]
-    #[TestWith(['email desc', ['Bea Alba', 'Ana Cruz', 'Zoe Cruz', 'Luis Diaz']])]
+    #[TestWith(['name_asc', ['Alba, Bea', 'Cruz, Ana', 'Cruz, Zoe', 'Diaz, Luis']])]
+    #[TestWith(['name_desc', ['Diaz, Luis', 'Cruz, Zoe', 'Cruz, Ana', 'Alba, Bea']])]
+    #[TestWith(['student_number_asc', ['Diaz, Luis', 'Alba, Bea', 'Cruz, Zoe', 'Cruz, Ana']])]
+    #[TestWith(['student_number_desc', ['Cruz, Ana', 'Cruz, Zoe', 'Alba, Bea', 'Diaz, Luis']])]
+    #[TestWith(['year_level_asc', ['Alba, Bea', 'Cruz, Ana', 'Diaz, Luis', 'Cruz, Zoe']])]
+    #[TestWith(['year_level_desc', ['Cruz, Zoe', 'Cruz, Ana', 'Diaz, Luis', 'Alba, Bea']])]
+    #[TestWith(['email desc', ['Alba, Bea', 'Cruz, Ana', 'Cruz, Zoe', 'Diaz, Luis']])]
     public function test_students_are_listed_in_the_selected_order(string $sort, array $expectedNames): void
     {
         User::factory()->named('Zoe', null, 'Cruz')->create(['student_number' => '23-00030', 'year_level' => 3]);

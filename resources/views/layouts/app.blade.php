@@ -4,8 +4,9 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="theme-color" content="#0B6E4F">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ $documentTitle() }}</title>
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -64,7 +65,8 @@
 
                 window.addEventListener('pageswap', function (event) {
                     if (event.viewTransition && event.activation && event.activation.entry) {
-                        name(titleFor(pathOf(event.activation.entry.url)), event.viewTransition);
+                        // While a draft stands in for the next page (x-page-skeleton), its heading is the one that carries over.
+                        name(document.querySelector('[data-draft] [data-vt-title]') || titleFor(pathOf(event.activation.entry.url)), event.viewTransition);
                     }
                 });
 
@@ -77,42 +79,80 @@
                 });
             })();
         </script>
+
+        {{--
+            Fetch a page while the pointer rests on its link (or is pressed on a
+            phone), so the server's answer is on its way before the click lands.
+            Prefetch only, never prerender: a prefetch runs no script, and Laravel
+            leaves the session's previous URL alone for it, which prerender's
+            Sec-Purpose does not match. Every GET here is read-only; the report
+            builds and stored files are left out because each one is a download.
+        --}}
+        <script type="speculationrules">
+            {
+                "prefetch": [{
+                    "where": {
+                        "and": [
+                            { "href_matches": "/*" },
+                            { "not": { "or": [
+                                { "href_matches": "/*/report" },
+                                { "href_matches": "/scholarship-applications/*/documents/*" },
+                                { "href_matches": "/scholarships/*/required-documents/*" }
+                            ] } }
+                        ]
+                    },
+                    "eagerness": "moderate"
+                }]
+            }
+        </script>
     </head>
-    <body class="font-sans antialiased">
+    <body class="bg-linen font-sans text-body text-graphite antialiased">
         <x-page-progress />
 
-        <div x-data="{ navOpen: false }" @keydown.escape.window="navOpen = false" @tutorial-nav.window="navOpen = $event.detail" class="min-h-screen bg-gray-100 lg:flex">
+        {{-- First focusable element on every screen: past the rail, straight to the work. --}}
+        <a href="#main"
+           class="sr-only rounded-sheet focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:block focus:bg-seal focus:px-4 focus:py-2.5 focus:font-semibold focus:text-white focus:shadow-sheet focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2">
+            {{ __('Skip to content') }}
+        </a>
+
+        {{-- A link pressed in the slide-over closes it at once, so the page being opened shows. --}}
+        <div x-data="appShell"
+             @keydown.escape.window="closeNav()"
+             @tutorial-nav.window="$event.detail ? openTourNav() : closeNav()"
+             @page-leaving.window="closeNav()"
+             class="min-h-screen bg-linen lg:flex">
             @include('layouts.rail')
 
-            <div class="flex min-h-screen min-w-0 flex-1 flex-col {{ $sheet ? 'bg-white' : 'bg-gray-100' }}">
-                <!-- Rail trigger, below the rail's own breakpoint -->
-                <div class="flex items-center gap-2 border-b border-gray-200 bg-white px-4 py-3 [view-transition-name:strip] lg:hidden">
+            {{-- Isolated from the keyboard and the accessibility tree while the
+                 slide-over is open, so the panel is a real dialog. --}}
+            <div x-effect="isolate($el)"
+                 class="flex min-h-screen min-w-0 flex-1 flex-col {{ $sheet ? 'bg-white' : 'bg-linen' }}">
+                {{-- Below the rail's breakpoint: the disclosure control, the seal,
+                     and the name of the screen you are on. No links, by rule. --}}
+                <div data-strip class="flex h-14 items-center gap-3 border-b border-rule bg-seal px-4 [view-transition-name:strip] lg:hidden">
                     <button type="button"
-                            @click="navOpen = true"
-                            class="-ml-2 inline-flex items-center justify-center rounded-md p-2 text-gray-500 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green"
+                            @click="openNav($event)"
+                            class="relative -ml-2 inline-flex items-center justify-center rounded-sheet p-2 text-seal-tint transition duration-150 ease-in-out hover:bg-seal-deep hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-seal"
                             aria-label="{{ __('Open navigation') }}">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
                         </svg>
                     </button>
 
-                    <a href="{{ Auth::user()->isAdmin() ? route('admin.dashboard') : route('dashboard') }}" class="flex items-center gap-2">
-                        <x-application-logo class="h-7 w-7 shrink-0" />
-                        <span class="text-sm font-semibold text-cvsu-green-dark">{{ __('OSAS Scholarships') }}</span>
-                    </a>
+                    <x-application-logo class="h-8 w-8 shrink-0" aria-hidden="true" />
+
+                    <span data-strip-label class="truncate font-annot text-annot uppercase text-seal-tint">
+                        {{ $title ?? __('OSAS Scholarships') }}
+                    </span>
                 </div>
 
-                @isset($header)
-                    <div class="border-b border-gray-200 bg-white px-6 py-5 lg:px-10">
-                        {{ $header }}
-                    </div>
-                @endisset
-
-                <main class="flex-1">
+                <main id="main" class="flex-1">
                     {{ $slot }}
                     <div id="page-end" hidden></div>
                 </main>
             </div>
         </div>
+
+        <x-page-skeleton />
     </body>
 </html>

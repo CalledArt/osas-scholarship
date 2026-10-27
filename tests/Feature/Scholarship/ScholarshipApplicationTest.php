@@ -7,8 +7,10 @@ use App\Models\Scholarship;
 use App\Models\ScholarshipApplication;
 use App\Models\ScholarshipRequiredDocument;
 use App\Models\User;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -28,7 +30,7 @@ class ScholarshipApplicationTest extends TestCase
         $response = $this->actingAs($student)->get(route('scholarships.apply', $scholarship));
 
         $response->assertOk();
-        $response->assertSeeInOrder(['First Name', 'Juan', 'Middle Name', 'Santos', 'Last Name', 'Dela Cruz']);
+        $response->assertSeeInOrder(['Last Name', 'DELA CRUZ', 'First Name', 'JUAN', 'Middle Name', 'SANTOS']);
         $response->assertSee('20');
         $response->assertSee('21-00123');
     }
@@ -40,7 +42,7 @@ class ScholarshipApplicationTest extends TestCase
 
         $this->actingAs($student)
             ->get(route('scholarships.apply', $scholarship))
-            ->assertSeeInOrder(['Middle Name', '—', 'Last Name', 'Dela Cruz']);
+            ->assertSeeInOrder(['Last Name', 'DELA CRUZ', 'First Name', 'JUAN', 'Middle Name', '—']);
     }
 
     public function test_application_form_still_uploads_each_document_as_a_file_without_javascript(): void
@@ -191,6 +193,24 @@ class ScholarshipApplicationTest extends TestCase
         Storage::disk('supabase')->assertEmpty();
     }
 
+    public function test_student_on_leave_of_absence_is_forbidden_from_submitting_an_application(): void
+    {
+        Storage::fake('supabase');
+        $student = User::factory()->onLeaveOfAbsence()->create();
+        $scholarship = Scholarship::factory()->create();
+        $requiredDocument = $scholarship->requiredDocuments()->create(['name' => '2x2 Picture']);
+
+        $response = $this->actingAs($student)->post(route('scholarships.apply.store', $scholarship), [
+            'documents' => [
+                $requiredDocument->id => UploadedFile::fake()->create('picture.pdf', 100, 'application/pdf'),
+            ],
+        ]);
+
+        $response->assertForbidden();
+        $this->assertDatabaseMissing('scholarship_applications', ['scholarship_id' => $scholarship->id]);
+        Storage::disk('supabase')->assertEmpty();
+    }
+
     public function test_student_cannot_apply_after_the_deadline_has_passed(): void
     {
         $student = User::factory()->create();
@@ -288,5 +308,54 @@ class ScholarshipApplicationTest extends TestCase
         $this->actingAs($admin)
             ->get(route('scholarship-applications.documents.show', [$application, $document]))
             ->assertOk();
+    }
+
+    public function test_submission_confirms_with_the_application_reference_and_what_was_received(): void
+    {
+        Storage::fake('supabase');
+        $student = User::factory()->create();
+        $scholarship = Scholarship::factory()->create(['slots' => 5]);
+        $cor = $scholarship->requiredDocuments()->create(['name' => 'Certificate of Registration']);
+        $itr = $scholarship->requiredDocuments()->create(['name' => 'Income Tax Return']);
+
+        $response = $this->actingAs($student)->post(route('scholarships.apply.store', $scholarship), [
+            'documents' => [
+                $cor->id => UploadedFile::fake()->create('cor.pdf', 64, 'application/pdf'),
+                $itr->id => UploadedFile::fake()->create('itr.pdf', 64, 'application/pdf'),
+            ],
+            'certification' => '1',
+        ]);
+
+        $application = ScholarshipApplication::sole();
+
+        $response->assertSessionHas('status', fn (string $status): bool => str_contains($status, $application->reference)
+            && str_contains($status, '2 documents'));
+    }
+
+    public function test_application_reference_is_the_submission_year_and_a_padded_id(): void
+    {
+        $application = ScholarshipApplication::factory()->create(['submitted_at' => '2026-09-23 08:00:00']);
+
+        $this->assertSame('2026-'.str_pad((string) $application->id, 5, '0', STR_PAD_LEFT), $application->reference);
+    }
+
+    public function test_two_applications_to_postings_of_one_preset_sent_at_the_same_moment_are_taken_only_once(): void
+    {
+        $student = User::factory()->create();
+        $otherPosting = Scholarship::factory()->fromPreset('tdp')->create();
+        $scholarship = Scholarship::factory()->fromPreset('tdp')->create();
+        // Stands in for the other application: it lands just after this one passed the policy.
+        $otherApplicationLanded = false;
+        DB::listen(function (QueryExecuted $query) use (&$otherApplicationLanded, $student, $otherPosting): void {
+            if (! $otherApplicationLanded && str_contains($query->sql, 'as "scholarship_preset"')) {
+                $otherApplicationLanded = true;
+                ScholarshipApplication::factory()->for($student)->for($otherPosting)->create();
+            }
+        });
+
+        $response = $this->actingAs($student)->post(route('scholarships.apply.store', $scholarship), ['certification' => '1']);
+
+        $response->assertForbidden();
+        $this->assertSame(0, $scholarship->applications()->count());
     }
 }

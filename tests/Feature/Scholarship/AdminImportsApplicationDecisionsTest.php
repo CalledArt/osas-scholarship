@@ -57,10 +57,34 @@ class AdminImportsApplicationDecisionsTest extends TestCase
         );
 
         $response->assertSessionHas('status', 'Emailed the result to 2 applicants.');
-        Mail::assertSent(ScholarshipApplicationApproved::class, fn (ScholarshipApplicationApproved $mail) => $mail->hasBcc($passed->email)
-            && ! $mail->hasBcc($failed->email));
-        Mail::assertSent(ScholarshipApplicationRejected::class, fn (ScholarshipApplicationRejected $mail) => $mail->hasBcc($failed->email)
-            && ! $mail->hasBcc($passed->email));
+        Mail::assertSent(ScholarshipApplicationApproved::class, fn (ScholarshipApplicationApproved $mail) => $mail->hasTo($passed->email));
+        Mail::assertNotSent(ScholarshipApplicationApproved::class, fn (ScholarshipApplicationApproved $mail) => $mail->hasTo($failed->email));
+        Mail::assertSent(ScholarshipApplicationRejected::class, fn (ScholarshipApplicationRejected $mail) => $mail->hasTo($failed->email));
+        Mail::assertNotSent(ScholarshipApplicationRejected::class, fn (ScholarshipApplicationRejected $mail) => $mail->hasTo($passed->email));
+    }
+
+    public function test_a_passed_student_already_holding_an_active_scholarship_is_emailed_why_and_listed_apart(): void
+    {
+        Mail::fake();
+        $admin = User::factory()->admin()->create();
+        $student = User::factory()->create(['name' => 'Juan Dela Cruz']);
+        ScholarshipApplication::factory()->approved()->for($student)
+            ->for(Scholarship::factory()->create(['title' => 'CHED Merit Grant']))
+            ->create();
+        $scholarship = Scholarship::factory()->for($admin, 'postedBy')->create(['slots' => 5]);
+        ScholarshipApplication::factory()->for($scholarship)->for($student)->create();
+
+        $response = $this->actingAs($admin)->post(
+            route('admin.scholarships.applications.import-decisions', $scholarship),
+            ['file' => $this->csvFile("name\nJuan Dela Cruz\n")]
+        );
+
+        $response->assertSessionHas('status', 'Emailed the result to 1 applicant.');
+        Mail::assertSent(ScholarshipApplicationRejected::class, fn (ScholarshipApplicationRejected $mail) => $mail->passedWhileHoldingActive
+            && $mail->hasTo($student->email));
+        $this->followRedirects($response)
+            ->assertSee('Passed but rejected — already holds an active scholarship:')
+            ->assertSee('holds CHED Merit Grant');
     }
 
     public function test_applicants_the_pass_list_leaves_pending_are_not_emailed(): void

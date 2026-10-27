@@ -1,0 +1,9 @@
+---
+paths:
+  - 'resources/views/profile/**'
+---
+
+# Profile
+
+## Staff profile is one wide form with one Save; students keep the full form
+Decided 2026-10-24 at OSAS's request: the staff profile must fit one laptop screen without scrolling. profile/edit renders it at max-w-[88rem] (the admin dashboard's width until it widened to 100rem on 2026-10-25): profile.partials.staff-account-form is one card holding Profile information (first, middle, last name in a row, with "Optional" as the middle name's placeholder so the inputs line up, and email) and Password (current, new, confirm in a row), each section's title on the left from lg, and a single Save. Delete Account is one bar beneath. The password change rides on PATCH profile.update: ProfileUpdateRequest adds current_password (required_with:password) and password (confirmed) for staff only, blank keeps the password, and ProfileController keeps both out of fill(). password.update stays for the forced-change page. update-profile-information-form is now students only. Since 2026-10-25 (the user's request) the student profile copies this staff design: the same plain h1 at max-w-[88rem] (no banner), and update-profile-information-form is one card of the same rows (14rem title column with a one-line description, gap-3 fields, Save in a white bar at the foot). Its rows are Profile information (first, middle, last name, each still carrying its hint, which ProfileTest asserts for students, then the read-only Google email), Personal details (date of birth, contact number, address; the "only you can see" note is the row's description) and a read-only Enrollment row (student number, year level, course) whose "Managed by OSAS" description is tied to its fields by aria-describedby. Students have no Delete Account bar (deleting needs a password). It fits one 1366x768 screen.

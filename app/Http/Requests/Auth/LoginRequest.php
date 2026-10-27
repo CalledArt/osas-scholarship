@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Support\TestStudents;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -59,7 +60,9 @@ class LoginRequest extends FormRequest
 
         $user = Auth::getLastAttempted();
 
-        if ($user->isStudent()) {
+        // Students sign in with Google; only the test accounts, and only on a
+        // local machine, may use a password (see TestStudents).
+        if ($user->isStudent() && ! TestStudents::maySignInWithPassword($user)) {
             throw ValidationException::withMessages([
                 'email' => __('Students sign in with their CvSU Google account using the Sign in with Google button.'),
             ]);

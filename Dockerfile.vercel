@@ -15,8 +15,14 @@ FROM dunglas/frankenphp:1-php8.4-bookworm AS base
 # pdo_pgsql is what reaches Supabase; intl and zip match the development image.
 # opcache earns more here than it does there: instances are short lived, so the
 # compile cost is paid on close to every cold start.
+# gd and qpdf build the applications report: gd turns phone photos upright and
+# resamples them, qpdf puts students' own PDFs into the report page for page.
 RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends qpdf \
+    && rm -rf /var/lib/apt/lists/* \
     && install-php-extensions \
+        gd \
         intl \
         opcache \
         pdo_pgsql \
@@ -80,6 +86,7 @@ RUN mkdir -p \
         storage/app/private \
         storage/app/public \
         storage/framework/cache/data \
+        storage/framework/opcache \
         storage/framework/sessions \
         storage/framework/views \
         storage/logs
@@ -92,14 +99,38 @@ RUN composer dump-autoload --no-dev --classmap-authoritative \
     && php artisan event:cache \
     && php artisan view:cache
 
+# Compiled bytecode, so a fresh instance's first request loads PHP instead of
+# compiling it: measured at 1 CPU, that request fell from ~215ms to ~60ms.
+# Rendering /login through the front controller writes every file a request
+# boots with; the second pass adds what signed-in pages use and no guest page
+# loads. Not all of vendor: that is ~120MB of bytecode, mostly AWS service
+# models, against ~27MB for this. Bytecode holds no env() results, so the
+# throwaway key and drivers here reach nothing at runtime. After view:cache, so
+# the compiled views are in it. The two passes must stay separate processes:
+# compiling a file the request already loaded fails with "Cannot redeclare".
+RUN OPCACHE="-d opcache.enable_cli=1 -d opcache.file_cache=/app/storage/framework/opcache -d opcache.file_cache_only=1" \
+    && APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= \
+       SESSION_DRIVER=array CACHE_STORE=array LOG_CHANNEL=stderr \
+       REQUEST_METHOD=GET REQUEST_URI=/login \
+       php $OPCACHE public/index.php > /dev/null \
+    && find /app/app /app/storage/framework/views \
+            /app/vendor/laravel/framework/src/Illuminate/Database \
+            /app/vendor/laravel/framework/src/Illuminate/Pagination \
+            -name '*.php' \
+       | php $OPCACHE -r 'while (($file = fgets(STDIN)) !== false) { opcache_compile_file(trim($file)); }'
+
 # ---------------------------------------------------------------------------
 FROM base AS runtime
 
 COPY --from=app --chown=www-data:www-data /app /app
 COPY --chown=www-data:www-data Caddyfile /etc/frankenphp/Caddyfile
 
+# Read the bytecode primed above. Nothing in the image changes after the build,
+# so checking each file's timestamp on every request buys nothing.
 RUN setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp \
-    && chown -R www-data:www-data /config/caddy /data/caddy
+    && chown -R www-data:www-data /config/caddy /data/caddy \
+    && printf 'opcache.file_cache=/app/storage/framework/opcache\nopcache.validate_timestamps=0\n' \
+        > "$PHP_INI_DIR/conf.d/zz-opcache.ini"
 
 # Defaults only. Anything set in the Vercel project environment overrides these,
 # which is where APP_KEY, APP_URL, DB_URL and the SUPABASE_STORAGE_* values go —

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\StudentStatus;
 use App\Enums\UserRole;
 use App\Models\User;
 use App\Support\PersonName;
@@ -73,6 +74,16 @@ class UserFactory extends Factory
             'first_name' => $firstName,
             'middle_name' => $middleName,
             'last_name' => $lastName,
+        ]);
+    }
+
+    /**
+     * Indicate that the student is on leave of absence.
+     */
+    public function onLeaveOfAbsence(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'student_status' => StudentStatus::LeaveOfAbsence,
         ]);
     }
 

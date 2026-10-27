@@ -31,6 +31,18 @@ class RepublicAct10931Test extends TestCase
         $response->assertSee('Your free tuition under this Act has ended. You are in year 6 of study, past the 5 years it covers for your 4-year program');
     }
 
+    public function test_a_student_on_leave_of_absence_is_told_their_free_tuition_is_paused(): void
+    {
+        $this->travelTo('2026-10-12');
+        $student = User::factory()->onLeaveOfAbsence()->create(['student_number' => '202312345', 'program_years' => 4]);
+
+        $response = $this->actingAs($student)->get(route('scholarships.republic-act-10931'));
+
+        $response->assertSee('Your free tuition under this Act is paused while you are on leave of absence (LOA).');
+        $response->assertDontSee('Your free tuition under this Act has ended.');
+        $response->assertDontSee('Your year of study');
+    }
+
     public function test_admin_is_forbidden_from_the_student_page(): void
     {
         $admin = User::factory()->admin()->create();
@@ -45,5 +57,26 @@ class RepublicAct10931Test extends TestCase
         $response = $this->get(route('scholarships.republic-act-10931'));
 
         $response->assertRedirect(route('login'));
+    }
+
+    public function test_the_act_page_counts_a_covered_students_year_of_study(): void
+    {
+        $this->travelTo('2026-10-12');
+        $student = User::factory()->create(['student_number' => '202312345', 'program_years' => 4]);
+
+        $response = $this->actingAs($student)->get(route('scholarships.republic-act-10931'));
+
+        $response->assertSeeInOrder(['Your year of study', 'Year 4 of 5', 'your 4-year program plus one year.']);
+        $response->assertDontSee('This is your last covered school year.');
+    }
+
+    public function test_the_act_page_marks_a_students_last_covered_school_year(): void
+    {
+        $this->travelTo('2026-10-12');
+        $student = User::factory()->create(['student_number' => '202212345', 'program_years' => 4]);
+
+        $response = $this->actingAs($student)->get(route('scholarships.republic-act-10931'));
+
+        $response->assertSeeInOrder(['Year 5 of 5', 'This is your last covered school year.']);
     }
 }

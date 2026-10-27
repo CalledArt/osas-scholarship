@@ -4,9 +4,13 @@ namespace App\Http\Requests\Admin;
 
 use App\Enums\ScholarshipType;
 use App\Models\Scholarship;
+use App\Support\ScholarshipPresets;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Validator;
 
 class StoreScholarshipRequest extends FormRequest
 {
@@ -16,17 +20,6 @@ class StoreScholarshipRequest extends FormRequest
     public function authorize(): bool
     {
         return $this->user()->can('create', Scholarship::class);
-    }
-
-    /**
-     * Prepare the data for validation.
-     *
-     * An unticked checkbox sends nothing, so the course limit is read as a
-     * boolean up front; otherwise unticking it could never switch it off.
-     */
-    protected function prepareForValidation(): void
-    {
-        $this->merge(['stem_courses_only' => $this->boolean('stem_courses_only')]);
     }
 
     /**
@@ -40,7 +33,7 @@ class StoreScholarshipRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'type' => ['required', new Enum(ScholarshipType::class)],
-            'stem_courses_only' => ['boolean'],
+            'preset' => ['nullable', Rule::in(array_keys(ScholarshipPresets::ALL))],
             'slots' => ['required', 'integer', 'min:1'],
             'deadline' => ['nullable', 'date', 'after:today'],
             'required_documents' => ['nullable', 'array'],
@@ -60,5 +53,47 @@ class StoreScholarshipRequest extends FormRequest
         return [
             'required_documents.*.sample' => 'sample',
         ];
+    }
+
+    /**
+     * Refuse a preset, or a title, while another posting of it is still open for applications.
+     *
+     * The controller checks the preset again under a lock, since two posts of
+     * one preset sent at the same moment both pass this check. A title is
+     * checked only here: the form disables its button once sent, so a double
+     * click cannot post it twice. A refused preset skips the title check,
+     * whose message would only repeat it.
+     *
+     * @return array<callable(Validator): void>
+     */
+    public function after(): array
+    {
+        return [function (Validator $validator): void {
+            $preset = $this->input('preset');
+
+            if (! $validator->errors()->has('preset') && filled($preset) && Scholarship::openFromPreset($preset)->exists()) {
+                $validator->errors()->add('preset', self::presetAlreadyOpenMessage($preset));
+
+                return;
+            }
+
+            $title = $this->input('title');
+
+            if (! $validator->errors()->has('title') && is_string($title) && Scholarship::hasOpenPostingTitled($title)) {
+                $validator->errors()->add('title', __('A scholarship titled “:title” is still open for applications. Close it before posting it again.', [
+                    'title' => Str::squish($title),
+                ]));
+            }
+        }];
+    }
+
+    /**
+     * Why a preset cannot be posted again yet.
+     */
+    public static function presetAlreadyOpenMessage(string $preset): string
+    {
+        return __('A :title posting is already open for applications. Close it before posting another one.', [
+            'title' => ScholarshipPresets::ALL[$preset]['title'],
+        ]);
     }
 }

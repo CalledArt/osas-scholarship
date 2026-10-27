@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Mine | Open</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Narrow:wght@500;600&family=Spline+Sans+Mono&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden;font:400 15px/22px Archivo,sans-serif;color:#3D4654;background:#FBFAF7;font-variant-numeric:tabular-nums}
+.shell{display:grid;grid-template-columns:240px 1fr;height:900px}
+.rail{background:#0B6E4F;border-right:1px solid #1C9A6F;padding:20px 12px;color:#BFE5D6;display:flex;flex-direction:column}
+.brand{display:flex;gap:10px;align-items:center;padding:0 8px 20px;color:#fff;font-weight:600;line-height:1.2}
+.seal{width:36px;height:36px;border-radius:50%;background:#0B6E4F;border:2px solid #FFC72C}
+.rail a{display:block;padding:9px 12px;border-radius:2px;margin-bottom:4px}
+.rail a.on{background:#064532;color:#fff;font-weight:600}
+.acct{margin-top:auto;border-top:1px solid #1C9A6F;padding:12px}
+.acct b{color:#fff;font-weight:500;display:block}
+main{padding:32px 40px;background:#fff}
+h1{font:600 18px/26px Archivo;color:#10213A}
+.hello{color:#3D4654;margin-top:2px}
+.annot{font:500 12px/16px "Archivo Narrow";letter-spacing:.08em;text-transform:uppercase;color:#5A6472}
+.mono{font-family:"Spline Sans Mono",monospace}
+.panes{display:grid;grid-template-columns:352px 1fr;gap:24px;margin-top:24px}
+.col{display:grid;gap:16px;align-content:start}
+.box{border:1px solid #D8D4CB;background:#fff;box-shadow:0 1px 2px rgb(16 33 58/.06)}
+.box h2{font:600 15px/22px Archivo;color:#10213A}
+.pad{padding:16px 20px}
+.cells{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #D8D4CB}
+.cells>div{padding:10px 20px}
+.cells>div+div{border-left:1px solid #D8D4CB}
+.cells.row2>div:nth-child(n+3){border-top:1px solid #D8D4CB}
+.cells.row2>div:nth-child(3){border-left:0}
+.v{color:#10213A;font-weight:500}
+.grant{background:#DCFCE7;border-color:#15803D55}
+.grant h2,.grant .v{color:#116430}
+.years{display:flex;gap:4px;margin-top:10px}
+.years i{width:28px;height:10px;border:1px solid #116430}
+.years i.done{background:#15803D}
+.fig{font:700 32px/1 Archivo;color:#10213A;letter-spacing:-.02em}
+.lots{display:flex;gap:3px;flex-wrap:wrap}
+.lot{width:13px;height:13px;border:1px solid #8C8678;background:#FBFAF7}
+.lot.held{background:repeating-linear-gradient(45deg,#3D4654 0 1.5px,#F4F2ED 1.5px 4px);border-color:#3D4654}
+.lot.mine{background:#FDF3DA;border-color:#B87F00;box-shadow:inset 0 0 0 1px #FFC72C}
+.lot:nth-child(5n){border-bottom:2px solid #0B6E4F}
+.mark{display:inline-block;padding:2px 8px;border-radius:2px;font:500 12px/16px "Archivo Narrow";letter-spacing:.08em;text-transform:uppercase}
+.m-gold{background:#FDF3DA;color:#10213A}.m-gray{background:#F4F2ED;color:#3D4654}.m-red{background:#F7E4E0;color:#862715}
+.app{border:1px solid #B87F00;background:#FDF3DA;padding:12px 16px;margin-top:12px}
+.right h2.sec{font:600 18px/26px Archivo;color:#10213A}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+.sch .top{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.sch .t{font:600 15px/22px Archivo;color:#10213A}
+.sch .foot{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-top:1px solid #D8D4CB}
+.btn{background:#0B6E4F;color:#fff;font-weight:600;padding:8px 16px;border-radius:2px}
+.soon{color:#862715;font-weight:600}
+.sub{color:#5A6472}
+</style></head><body>
+<div class="shell">
+<aside class="rail">
+ <div class="brand"><span class="seal"></span><span>OSAS Scholarship<br>Allocation System</span></div>
+ <a class="on">Dashboard</a><a>Scholarships</a><a>My Applications</a>
+ <div class="acct"><b>Juan Santos Dela Cruz</b><span class="annot" style="color:#BFE5D6">Student</span></div>
+</aside>
+<main>
+ <h1>Dashboard</h1>
+ <p class="hello">Welcome, Juan Santos Dela Cruz!</p>
+ <div class="panes">
+  <div class="col">
+   <section class="box">
+    <div class="pad"><h2>Juan Santos Dela Cruz</h2><p class="sub">BS Information Technology</p></div>
+    <div class="cells"><div><p class="annot">Student no.</p><p class="v mono">202312345</p></div><div><p class="annot">Year level</p><p class="v">Year 3</p></div></div>
+   </section>
+   <section class="box grant">
+    <div class="pad"><h2>Republic Act No. 10931</h2><p class="v">Free tuition · Year 3 of 5</p>
+     <div class="years"><i class="done"></i><i class="done"></i><i class="done"></i><i></i><i></i></div></div>
+   </section>
+   <section class="box">
+    <div class="pad" style="display:flex;justify-content:space-between;align-items:center">
+     <div><p class="fig">1</p><p class="sub">more scholarship you can apply to</p></div>
+     <div class="lots"><span class="lot mine"></span><span class="lot"></span></div>
+    </div>
+   </section>
+   <section class="box">
+    <div class="pad"><h2>My applications</h2>
+     <div class="app"><p class="v">CHED Merit Scholarship Program</p>
+      <p class="sub"><span class="mono">2026-00041</span> · 9 days waiting</p>
+      <span class="mark m-gold" style="margin-top:6px">Pending</span></div>
+    </div>
+   </section>
+  </div>
+  <div class="right">
+   <h2 class="sec">Available to apply <span class="sub" style="font-weight:400">(4)</span></h2>
+   <div class="grid2">
+    <article class="box sch"><div class="pad"><div class="top"><p class="t">DOST-SEI Undergraduate Scholarship</p><span class="mark m-gray">Government</span></div>
+     <div class="lots" style="margin-top:12px"><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span></div></div>
+     <div class="cells"><div><p class="annot">Closes</p><p class="v soon">Oct 30 · 7 days</p></div><div><p class="annot">Slots left</p><p class="v">8 of 12</p></div></div>
+     <div class="foot"><span class="sub">5 documents</span><span class="btn">Apply</span></div></article>
+    <article class="box sch"><div class="pad"><div class="top"><p class="t">Tulong Dunong Program</p><span class="mark m-gray">Government</span></div>
+     <div class="lots" style="margin-top:12px"><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span></div></div>
+     <div class="cells"><div><p class="annot">Closes</p><p class="v">Nov 8 · 16 days</p></div><div><p class="annot">Slots left</p><p class="v">5 of 20</p></div></div>
+     <div class="foot"><span class="sub">3 documents</span><span class="btn">Apply</span></div></article>
+    <article class="box sch"><div class="pad"><div class="top"><p class="t">Cavite Provincial Scholarship</p><span class="mark m-gray">Government</span></div>
+     <div class="lots" style="margin-top:12px"><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot held"></span><span class="lot"></span></div></div>
+     <div class="cells"><div><p class="annot">Closes</p><p class="v">Nov 15 · 23 days</p></div><div><p class="annot">Slots left</p><p class="v">1 of 10</p></div></div>
+     <div class="foot"><span class="sub">4 documents</span><span class="btn">Apply</span></div></article>
+    <article class="box sch"><div class="pad"><div class="top"><p class="t">CvSU Academic Scholarship</p><span class="mark m-gray">Academic</span></div>
+     <div class="lots" style="margin-top:12px"><span class="lot held"></span><span class="lot held"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span><span class="lot"></span></div></div>
+     <div class="cells"><div><p class="annot">Closes</p><p class="v">Nov 28 · 36 days</p></div><div><p class="annot">Slots left</p><p class="v">13 of 15</p></div></div>
+     <div class="foot"><span class="sub">2 documents</span><span class="btn">Apply</span></div></article>
+   </div>
+  </div>
+ </div>
+</main>
+</div>
+</body></html>

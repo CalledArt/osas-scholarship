@@ -1,104 +1,76 @@
-@props(['scholarships', 'remainingPlaces', 'grid' => false])
+@props(['scholarships', 'remainingPlaces', 'activeLimitReached' => false, 'onLeave' => false, 'count' => null])
 
 {{--
-    The scholarships a student can apply to right now, under the limit on how
-    many they may hold. At the limit the list gives way to how to free a place,
-    since nothing in it could be applied to. The slot is for a trailing link.
+    The scholarships a student can apply to right now, as a grid of boxes for
+    the page's "Open" pane, soonest closing first. Every box sets the same
+    facts in the same cells (when it closes, slots left) so two can be compared
+    at a glance, and the whole box opens the scholarship, where the student
+    applies. While nothing can be applied to, one box says so and the places
+    box beside it says why, so the reason is stated once. The slot is for a
+    trailing link.
 
-    `grid` lays them out as record cards (the Scholarships page): the title and
-    how soon it closes, what the scholarship is for, then its facts as aligned
-    figures. The document count is there only where the page loaded
-    `required_documents_count`.
+    `held_slots_count` is eager-loaded by Scholarship::availableTo(), so the
+    slot squares cost no query per box; `required_documents_count` rides along
+    as a subquery where the page loaded it. `count` is the full number
+    available when the page shows only some of them.
 --}}
+@php($isBlocked = $onLeave || $activeLimitReached || $remainingPlaces === 0)
+
 <section aria-labelledby="available-heading" {{ $attributes }}>
-    <h2 id="available-heading" class="text-base font-semibold text-gray-900">
+    <h2 id="available-heading" class="text-lead font-semibold text-ink">
         {{ __('Available to apply') }}
-        @if ($grid && $remainingPlaces > 0 && $scholarships->isNotEmpty())
-            <span class="font-normal tabular-nums text-gray-500">({{ $scholarships->count() }})</span>
+        @if (! $isBlocked && $scholarships->isNotEmpty())
+            <span class="font-normal text-slate">({{ $count ?? $scholarships->count() }})</span>
         @endif
     </h2>
 
-    <p class="mt-1 text-sm text-gray-500">
-        {{ __('You can hold up to :limit scholarships at a time, counting applications waiting for a decision.', ['limit' => \App\Models\User::SCHOLARSHIP_LIMIT]) }}
-        @if ($remainingPlaces > 0)
-            <span class="font-semibold tabular-nums text-gray-900">{{ __('You can apply to :count more.', ['count' => $remainingPlaces]) }}</span>
-        @endif
-    </p>
-
-    @if ($remainingPlaces === 0)
-        <p class="mt-3 border-y border-gray-200 py-6 text-sm text-gray-500">
-            {{ __("You've reached the limit. You can apply again once an application is rejected or one of your scholarships ends.") }}
+    @if ($isBlocked || $scholarships->isEmpty())
+        <p class="mt-4 border border-rule bg-white px-5 py-8 text-center text-slate shadow-seat">
+            @if ($onLeave)
+                {{ __('On leave of absence (LOA): applying is paused.') }}
+            @elseif ($activeLimitReached)
+                {{ __('You hold an active scholarship. Apply again once it ends.') }}
+            @elseif ($isBlocked)
+                {{ __('You already have :limit applications waiting for a decision. You can apply again once one of them is rejected.', ['limit' => \App\Models\User::SCHOLARSHIP_LIMIT]) }}
+            @else
+                {{ __('No scholarships are open to you right now. New ones appear here when OSAS posts them.') }}
+            @endif
         </p>
-    @elseif ($scholarships->isEmpty())
-        <p class="mt-3 border-y border-gray-200 py-6 text-sm text-gray-500">
-            {{ __('No scholarships are accepting applications from you right now. New ones will appear here when OSAS posts them.') }}
-        </p>
-    @elseif ($grid)
-        <ul class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    @else
+        <ul class="mt-4 grid gap-4 sm:grid-cols-2" role="list">
             @foreach ($scholarships as $scholarship)
-                <li>
+                <li class="flex">
                     <a href="{{ route('scholarships.show', $scholarship) }}"
-                       class="group flex h-full flex-col rounded-lg border border-gray-200 bg-white p-5 transition-colors duration-150 ease-in-out hover:border-cvsu-green/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2">
-                        <p data-vt-title class="text-base font-semibold leading-snug text-gray-900 [overflow-wrap:anywhere] group-hover:text-cvsu-green">{{ $scholarship->title }}</p>
-                        <p class="mt-1 text-sm text-gray-500">
-                            <x-deadline :scholarship="$scholarship" :urgent="true" />
-                        </p>
-
-                        <p class="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-600">{{ \Illuminate\Support\Str::of($scholarship->description)->squish()->limit(220) }}</p>
-
-                        {{-- Pinned to the card's foot, so the facts line up across a row of cards. --}}
-                        <div class="mt-auto pt-5">
-                        <dl class="grid grid-cols-3 gap-3 border-t border-gray-100 pt-4">
-                            <div>
-                                <dt class="text-xs text-gray-500">{{ __('Slots left') }}</dt>
-                                <dd class="mt-0.5 tabular-nums text-gray-500">
-                                    <span class="text-lg font-semibold text-gray-900">{{ $scholarship->remainingSlots() }}</span>
-                                    <span class="text-sm">{{ __('of :slots', ['slots' => $scholarship->slots]) }}</span>
-                                </dd>
+                       class="group flex w-full flex-col border border-rule bg-white shadow-seat transition duration-150 ease-in-out hover:border-seal focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2 focus-visible:ring-offset-linen">
+                        <div class="flex-1 px-5 py-4">
+                            <div class="flex items-start justify-between gap-3">
+                                <h3 data-vt-title class="font-semibold text-ink [overflow-wrap:anywhere] group-hover:text-seal">{{ $scholarship->title }}</h3>
+                                <x-badge class="shrink-0">{{ $scholarship->type->label() }}</x-badge>
                             </div>
-                            @isset($scholarship->required_documents_count)
-                                <div>
-                                    <dt class="text-xs text-gray-500">{{ __('Documents') }}</dt>
-                                    <dd class="mt-0.5 text-lg font-semibold tabular-nums text-gray-900">{{ $scholarship->required_documents_count }}</dd>
-                                </div>
-                            @endisset
-                            <div>
-                                <dt class="text-xs text-gray-500">{{ __('Deadline') }}</dt>
-                                <dd class="mt-0.5 text-lg font-semibold tabular-nums text-gray-900">
+                        </div>
+
+                        <dl class="border-t border-rule">
+                            <div class="px-5 py-2.5">
+                                <dt class="font-annot text-annot uppercase text-slate">{{ __('Closes') }}</dt>
+                                <dd class="text-ink">
                                     @if ($scholarship->deadline)
-                                        <time datetime="{{ $scholarship->deadline->toDateString() }}">{{ $scholarship->deadline->format('M j') }}</time>
+                                        <time datetime="{{ $scholarship->deadline->toDateString() }}">{{ $scholarship->deadline->format('M j, Y') }}</time>
+                                        <span class="block text-slate"><x-deadline :scholarship="$scholarship" :urgent="true" /></span>
                                     @else
-                                        <span aria-hidden="true">&mdash;</span><span class="sr-only">{{ __('No deadline') }}</span>
+                                        {{ __('No deadline') }}
                                     @endif
                                 </dd>
                             </div>
                         </dl>
-                        </div>
 
-                        <span class="mt-4 text-sm font-semibold text-cvsu-green" aria-hidden="true">{{ __('Apply') }} &rarr;</span>
-                    </a>
-                </li>
-            @endforeach
-        </ul>
-    @else
-        <ul class="-mx-3 mt-3 divide-y divide-gray-100 border-y border-gray-200">
-            @foreach ($scholarships as $scholarship)
-                <li>
-                    <a href="{{ route('scholarships.show', $scholarship) }}"
-                       class="group flex items-center gap-4 px-3 py-4 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cvsu-green">
-                        <div class="min-w-0 flex-1">
-                            <p data-vt-title class="text-sm font-semibold text-gray-900 [overflow-wrap:anywhere] group-hover:text-cvsu-green">{{ $scholarship->title }}</p>
-                            <p class="mt-1 text-sm text-gray-500">
-                                <x-deadline :scholarship="$scholarship" :urgent="true" />
-                                <span aria-hidden="true">&middot;</span>
-                                <span class="tabular-nums">{{ trans_choice(':count slot left|:count slots left', $scholarship->remainingSlots(), ['count' => $scholarship->remainingSlots()]) }}</span>
-                            </p>
+                        <div class="flex items-center justify-between gap-3 border-t border-rule px-5 py-2.5">
+                            <span class="text-slate">
+                                @isset($scholarship->required_documents_count)
+                                    {{ trans_choice('{0} No documents|{1} :count document|[2,*] :count documents', $scholarship->required_documents_count, ['count' => $scholarship->required_documents_count]) }}
+                                @endisset
+                            </span>
+                            <span class="rounded-sheet bg-seal px-4 py-1.5 font-semibold text-white transition duration-150 ease-in-out group-hover:bg-seal-deep" aria-hidden="true">{{ __('Apply') }}</span>
                         </div>
-
-                        <span class="hidden shrink-0 text-sm font-semibold text-cvsu-green sm:inline">{{ __('Apply') }} &rarr;</span>
-                        <svg class="h-5 w-5 shrink-0 text-gray-500 sm:hidden" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m8 5 5 5-5 5" />
-                        </svg>
                     </a>
                 </li>
             @endforeach

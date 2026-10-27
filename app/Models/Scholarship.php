@@ -7,6 +7,7 @@ use App\Enums\ScholarshipAvailability;
 use App\Enums\ScholarshipStatus;
 use App\Enums\ScholarshipType;
 use App\Support\CvsuPrograms;
+use App\Support\Peso;
 use Database\Factories\ScholarshipFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -16,9 +17,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
-#[Fillable(['title', 'description', 'type', 'stem_courses_only', 'slots', 'deadline', 'status'])]
+#[Fillable(['title', 'description', 'type', 'preset', 'stem_courses_only', 'slots', 'total_funds', 'deadline', 'status'])]
 class Scholarship extends Model
 {
     /** @use HasFactory<ScholarshipFactory> */
@@ -36,7 +39,22 @@ class Scholarship extends Model
             'status' => ScholarshipStatus::class,
             'type' => ScholarshipType::class,
             'stem_courses_only' => 'boolean',
+            'total_funds' => 'decimal:2',
         ];
+    }
+
+    /**
+     * Give each new posting its reference number: "SCH-", the year it was
+     * posted, and its id to five digits (SCH-2026-00012). The id exists only
+     * once the row is inserted, so the number is written straight after.
+     */
+    protected static function booted(): void
+    {
+        static::created(function (Scholarship $scholarship): void {
+            $scholarship->forceFill([
+                'reference' => sprintf('SCH-%d-%05d', ($scholarship->created_at ?? now())->year, $scholarship->id),
+            ])->saveQuietly();
+        });
     }
 
     public function postedBy(): BelongsTo
@@ -97,6 +115,32 @@ class Scholarship extends Model
         return $this->slots - $this->filledSlots();
     }
 
+    /**
+     * The fund OSAS set for the scholarship, in centavos; null until it is set.
+     */
+    public function totalFundsInCentavos(): ?int
+    {
+        return $this->total_funds === null ? null : Peso::toCentavos($this->total_funds);
+    }
+
+    /**
+     * Each passed student's equal share of the fund, in centavos.
+     *
+     * Rounded down to the centavo so the shares never add up to more than
+     * the fund; the centavos left over stay in it. Null until OSAS sets the
+     * fund or anyone passes.
+     */
+    public function fundShareInCentavos(int $passedCount): ?int
+    {
+        $totalFunds = $this->totalFundsInCentavos();
+
+        if ($totalFunds === null || $passedCount === 0) {
+            return null;
+        }
+
+        return intdiv($totalFunds, $passedCount);
+    }
+
     public function hasPassedDeadline(): bool
     {
         return $this->deadline !== null && $this->deadline->isPast();
@@ -124,6 +168,45 @@ class Scholarship extends Model
     public function admitsCourse(?string $course): bool
     {
         return ! $this->stem_courses_only || CvsuPrograms::isStem($course);
+    }
+
+    /**
+     * Whether a posting OSAS still has open for applications already carries
+     * the given title, ignoring capitals and extra spaces. Like a preset, a
+     * title may be posted again once its earlier posting is closed or ended.
+     *
+     * Titles are compared in PHP, since collapsing inner spaces has no
+     * portable SQL; only open postings are fetched, and only their titles.
+     */
+    public static function hasOpenPostingTitled(string $title, ?self $except = null): bool
+    {
+        $normalizedTitle = self::normalizedTitle($title);
+
+        return self::query()
+            ->where('status', ScholarshipStatus::Open)
+            ->when($except !== null, fn (Builder $query) => $query->whereKeyNot($except->getKey()))
+            ->pluck('title')
+            ->contains(fn (string $openTitle): bool => self::normalizedTitle($openTitle) === $normalizedTitle);
+    }
+
+    /**
+     * A title as duplicate checks compare it: lower case, with runs of
+     * spaces collapsed and the ends trimmed.
+     */
+    public static function normalizedTitle(string $title): string
+    {
+        return Str::lower(Str::squish($title));
+    }
+
+    /**
+     * Narrow to the postings of the given preset that OSAS still has open for
+     * applications. Only one may be open at a time; a posting the slots
+     * filled or the deadline passed still counts until OSAS closes it.
+     */
+    #[Scope]
+    protected function openFromPreset(Builder $query, string $preset): void
+    {
+        $query->where('preset', $preset)->where('status', ScholarshipStatus::Open);
     }
 
     /**
@@ -175,19 +258,38 @@ class Scholarship extends Model
      * and their document rows, but not to storage. Applicants' uploads and
      * OSAS's samples are looked up first and removed once the rows are gone,
      * so students' personal documents are not left behind in the bucket.
+     *
+     * A completed fund allocation is archived first (ScholarshipArchive), in
+     * one transaction with the delete. The files are removed only after it
+     * commits, since a rollback cannot bring them back.
      */
-    public function deleteWithStoredFiles(): void
+    public function deleteWithStoredFiles(?User $deletedBy = null): void
     {
         $applicantUploads = ScholarshipApplicationDocument::query()
             ->whereIn('scholarship_application_id', $this->applications()->select('id'))
             ->get(['disk', 'path']);
         $samples = $this->requiredDocuments()->whereNotNull('sample_path')->get();
+        $reportDirectory = $this->reportDirectory();
 
-        $this->delete();
+        DB::transaction(function () use ($deletedBy): void {
+            ScholarshipArchive::recordFor($this, $deletedBy);
+
+            $this->delete();
+        });
 
         $applicantUploads->groupBy('disk')->each(
             fn (Collection $uploads, string $disk) => Storage::disk($disk)->delete($uploads->pluck('path')->all())
         );
         $samples->each->deleteSampleFile();
+        // Built reports carry copies of every applicant's documents.
+        Storage::disk('supabase')->deleteDirectory($reportDirectory);
+    }
+
+    /**
+     * Where the applications reports built for this scholarship are stored.
+     */
+    public function reportDirectory(): string
+    {
+        return "scholarship-reports/{$this->id}";
     }
 }

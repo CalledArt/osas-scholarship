@@ -4,9 +4,9 @@
 
 <div class="flex h-full flex-col">
     <a href="{{ $isAdmin ? route('admin.dashboard') : route('dashboard') }}"
-       class="flex items-center gap-2.5 px-5 py-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cvsu-green">
-        <x-application-logo class="h-9 w-9 shrink-0" />
-        <span class="text-sm font-semibold leading-tight text-cvsu-green-dark">
+       class="flex items-center gap-2.5 px-5 py-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold">
+        <x-application-logo class="h-9 w-9 shrink-0" aria-hidden="true" />
+        <span class="font-semibold leading-tight text-white">
             {{ __('OSAS Scholarship') }}<br>{{ __('Allocation System') }}
         </span>
     </a>
@@ -18,6 +18,9 @@
             </x-rail-link>
             <x-rail-link :href="route('admin.scholarships.index')" :active="request()->routeIs('admin.scholarships.*')" data-tour="nav-scholarships">
                 {{ __('Scholarships') }}
+            </x-rail-link>
+            <x-rail-link :href="route('admin.fund-allocation.index')" :active="request()->routeIs('admin.fund-allocation.*')" data-tour="nav-allocation">
+                {{ __('Fund Allocation') }}
             </x-rail-link>
             <x-rail-link :href="route('admin.roster.index')" :active="request()->routeIs('admin.roster.*')" data-tour="nav-roster">
                 {{ __('Search Student') }}
@@ -38,10 +41,12 @@
         @endif
     </nav>
 
-    <div class="border-t border-gray-200 px-3 py-3">
+    <div class="border-t border-seal-line px-3 py-3">
+        {{-- The role sits in Prussian Tint, drawn from the shell's own hue. Grey
+             here is what put the previous system's account block at 4.39:1. --}}
         <div class="px-3 pb-2">
-            <p class="truncate text-sm font-medium text-gray-900">{{ Auth::user()->full_name }}</p>
-            <p class="truncate text-xs text-gray-500">{{ Auth::user()->role->label() }}</p>
+            <p class="font-medium uppercase text-white [overflow-wrap:anywhere]">{{ Auth::user()->surname_first_name }}</p>
+            <p class="truncate font-annot text-annot uppercase text-seal-tint">{{ Auth::user()->role->label() }}</p>
         </div>
 
         <x-rail-link :href="route('tutorial')" :active="request()->routeIs('tutorial')" data-tour="nav-tutorial">
@@ -56,7 +61,7 @@
             @csrf
 
             <button type="submit"
-                    class="block w-full rounded-md px-3 py-2 text-left text-sm font-medium text-gray-600 transition duration-150 ease-in-out hover:bg-gray-200/60 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2 focus-visible:ring-offset-gray-100">
+                    class="block w-full rounded-sheet px-3 py-2 text-left font-medium text-seal-tint transition duration-150 ease-in-out hover:bg-seal-deep hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-seal">
                 {{ __('Log Out') }}
             </button>
         </form>

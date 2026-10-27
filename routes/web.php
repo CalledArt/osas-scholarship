@@ -1,14 +1,18 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Controllers\Admin\ApplicationsReportBuildController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\FundAllocationController;
 use App\Http\Controllers\Admin\ScholarshipApplicationController as AdminScholarshipApplicationController;
 use App\Http\Controllers\Admin\ScholarshipController as AdminScholarshipController;
+use App\Http\Controllers\Admin\ScholarshipFundController;
 use App\Http\Controllers\Admin\ScholarshipRequiredDocumentController;
 use App\Http\Controllers\Admin\ScholarshipRequiredDocumentSampleController as AdminScholarshipRequiredDocumentSampleController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Admin\StudentRosterController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScholarshipApplicationController;
 use App\Http\Controllers\ScholarshipApplicationDocumentController;
@@ -76,6 +80,18 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     Route::post('scholarships/{scholarship}/applications/import-decisions', [AdminScholarshipApplicationController::class, 'importDecisions'])
         ->name('scholarships.applications.import-decisions');
+    Route::get('scholarships/{scholarship}/applications/report', [AdminScholarshipApplicationController::class, 'report'])
+        ->name('scholarships.applications.report');
+    Route::post('scholarships/{scholarship}/applications/report-builds', [ApplicationsReportBuildController::class, 'store'])
+        ->name('scholarships.applications.report-builds.store');
+    Route::post('scholarships/{scholarship}/applications/report-builds/{build}/step', [ApplicationsReportBuildController::class, 'step'])
+        ->whereUuid('build')
+        ->name('scholarships.applications.report-builds.step');
+
+    Route::get('fund-allocation', [FundAllocationController::class, 'index'])->name('fund-allocation.index');
+    Route::get('fund-allocation/{scholarship}', [FundAllocationController::class, 'show'])->name('fund-allocation.show');
+    Route::get('fund-allocation/{scholarship}/report', [FundAllocationController::class, 'report'])->name('fund-allocation.report');
+    Route::put('fund-allocation/{scholarship}/funds', [ScholarshipFundController::class, 'update'])->name('fund-allocation.funds.update');
 
     Route::get('roster', [StudentRosterController::class, 'index'])->name('roster.index');
 
@@ -83,6 +99,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 });
 
 Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
+    Route::post('notifications/read', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::post('notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
+
     Route::get('scholarships', [ScholarshipController::class, 'index'])->name('scholarships.index');
     // Registered ahead of scholarships/{scholarship}, which would otherwise capture this path.
     Route::view('scholarships/republic-act-10931', 'scholarships.republic-act-10931')->name('scholarships.republic-act-10931');

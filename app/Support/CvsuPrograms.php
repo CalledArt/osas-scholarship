@@ -116,6 +116,64 @@ class CvsuPrograms
     ];
 
     /**
+     * The short form of each program, as the fund allocation sheet prints it.
+     *
+     * Each abbreviation is unique, so Agriculture keeps BSA and Accountancy
+     * is BSAcc, and the Industrial Technology majors are BSIndT so they never
+     * read as BSIT (Information Technology).
+     *
+     * @var array<string, string>
+     */
+    public const ABBREVIATIONS = [
+        'Bachelor of Agricultural Entrepreneurship' => 'BAE',
+        'BS Agriculture' => 'BSA',
+        'BS Environmental Science' => 'BSES',
+        'BS Food Technology' => 'BSFT',
+        'BA English Language Studies' => 'BAELS',
+        'BA Journalism' => 'BAJ',
+        'BA Political Science' => 'BAPS',
+        'BS Applied Mathematics' => 'BSAM',
+        'BS Biology' => 'BSBio',
+        'BS Psychology' => 'BSPsych',
+        'BS Social Work' => 'BSSW',
+        'BS Criminology' => 'BSCrim',
+        'BS Industrial Security Management' => 'BSISM',
+        'BS Accountancy' => 'BSAcc',
+        'BS Business Management' => 'BSBM',
+        'BS Development Management' => 'BSDM',
+        'BS Economics' => 'BSEcon',
+        'BS International Studies' => 'BSIS',
+        'BS Office Administration' => 'BSOA',
+        'Bachelor of Early Childhood Education' => 'BECEd',
+        'Bachelor of Elementary Education' => 'BEEd',
+        'Bachelor of Secondary Education' => 'BSEd',
+        'Bachelor of Special Needs Education' => 'BSNEd',
+        'Bachelor of Technology and Livelihood Education' => 'BTLEd',
+        'BS Hospitality Management' => 'BSHM',
+        'BS Tourism Management' => 'BSTM',
+        'Teacher Certificate Program' => 'TCP',
+        'BS Agricultural and Biosystems Engineering' => 'BSABE',
+        'BS Architecture' => 'BSArch',
+        'BS Civil Engineering' => 'BSCE',
+        'BS Computer Engineering' => 'BSCpE',
+        'BS Computer Science' => 'BSCS',
+        'BS Electrical Engineering' => 'BSEE',
+        'BS Electronics Engineering' => 'BSECE',
+        'BS Industrial Engineering' => 'BSIE',
+        'BS Industrial Technology major in Automotive Technology' => 'BSIndT-AT',
+        'BS Industrial Technology major in Electrical Technology' => 'BSIndT-ELT',
+        'BS Industrial Technology major in Electronics Technology' => 'BSIndT-ECT',
+        'BS Information Technology' => 'BSIT',
+        'BS Medical Technology' => 'BSMT',
+        'BS Midwifery' => 'BSM',
+        'BS Nursing' => 'BSN',
+        'Diploma in Midwifery' => 'DM',
+        'Bachelor of Physical Education' => 'BPEd',
+        'Bachelor of Exercise and Sports Sciences' => 'BESS',
+        'Doctor of Veterinary Medicine' => 'DVM',
+    ];
+
+    /**
      * Every program, across all colleges.
      *
      * @return list<string>
@@ -132,5 +190,14 @@ class CvsuPrograms
     public static function isStem(?string $course): bool
     {
         return in_array($course, self::STEM, true);
+    }
+
+    /**
+     * The course's abbreviation. A course saved before the program list
+     * existed has none, so it is returned as stored.
+     */
+    public static function abbreviation(?string $course): ?string
+    {
+        return $course === null ? null : (self::ABBREVIATIONS[$course] ?? $course);
     }
 }

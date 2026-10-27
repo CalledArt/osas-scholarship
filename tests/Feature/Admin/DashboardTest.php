@@ -22,6 +22,45 @@ class DashboardTest extends TestCase
         $response->assertForbidden();
     }
 
+    public function test_admin_is_welcomed_by_name_above_the_dashboard_status(): void
+    {
+        $admin = User::factory()->admin()->named('Maria', null, 'Santos')->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertSeeInOrder(['Welcome back, SANTOS, MARIA!', 'No scholarships have been posted yet.', 'Post scholarship']);
+    }
+
+    public function test_stat_boxes_count_scholarships_by_whether_students_can_apply_and_students_by_status(): void
+    {
+        $admin = User::factory()->admin()->create();
+        Scholarship::factory()->create();
+        Scholarship::factory()->closed()->create();
+        Scholarship::factory()->create(['deadline' => now()->subDay()]);
+        Scholarship::factory()->ended()->create();
+        User::factory()->count(2)->create();
+        User::factory()->onLeaveOfAbsence()->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertSeeTextInOrder([
+            'Total scholarships', '4', '1 open', '2 closed', '1 ended',
+            'Students with Active status', '2', 'of 3 registered students',
+            'Students on leave of absence', '1', 'Free tuition and applying paused',
+        ]);
+    }
+
+    public function test_student_counts_show_before_any_scholarship_is_posted(): void
+    {
+        $admin = User::factory()->admin()->create();
+        User::factory()->create();
+        User::factory()->onLeaveOfAbsence()->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertSeeTextInOrder(['Students with Active status', '1', 'of 2 registered students', 'Students on leave of absence', '1']);
+    }
+
     public function test_admin_is_told_when_nothing_is_posted(): void
     {
         $admin = User::factory()->admin()->create();
@@ -31,9 +70,10 @@ class DashboardTest extends TestCase
         $response->assertOk();
         $response->assertSee('No scholarships have been posted yet.');
         $response->assertSee(route('admin.scholarships.create'));
+        $response->assertSeeInOrder(['Recent scholarship postings', 'Scholarships you post will be listed here.']);
     }
 
-    public function test_only_scholarships_awaiting_a_decision_are_listed(): void
+    public function test_only_scholarships_awaiting_a_decision_are_queued(): void
     {
         $admin = User::factory()->admin()->create();
 
@@ -45,10 +85,55 @@ class DashboardTest extends TestCase
 
         $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
-        $response->assertOk();
-        $response->assertSee('Waiting Grant');
-        $response->assertDontSee('Settled Grant');
-        $response->assertSee('View all 2 scholarships');
+        $response->assertViewHas('takingApplications', fn (Collection $queue): bool => $queue->pluck('title')->all() === ['Waiting Grant']);
+        $response->assertViewHas('readyForPassList', fn (Collection $queue): bool => $queue->isEmpty());
+    }
+
+    public function test_postings_table_lists_the_newest_first_with_whether_students_can_apply(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $this->travelTo('2026-10-10');
+        Scholarship::factory()->closed()->create(['title' => 'Older Grant']);
+        $this->travelTo('2026-10-20');
+        $newest = Scholarship::factory()->create(['title' => 'Newest Grant', 'deadline' => '2026-11-30']);
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertSeeTextInOrder([
+            'Recent scholarship postings',
+            'Newest Grant', 'Government', 'Nov 30, 2026', 'Open',
+            'Older Grant', 'Closed',
+        ]);
+        $response->assertSee(route('admin.scholarships.show', $newest));
+        $response->assertDontSee(route('admin.scholarships.edit', $newest));
+    }
+
+    public function test_postings_table_marks_a_posting_whose_grant_period_ended(): void
+    {
+        $admin = User::factory()->admin()->create();
+        Scholarship::factory()->ended()->create(['title' => 'Finished Grant']);
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertSeeTextInOrder(['Recent scholarship postings', 'Finished Grant', 'Ended']);
+    }
+
+    public function test_a_third_posting_pushes_the_oldest_off_the_table_without_deleting_it(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $postings = collect(range(1, 3))->map(function (int $day): Scholarship {
+            $this->travelTo("2026-10-0{$day} 09:00:00");
+
+            return Scholarship::factory()->create(['title' => "Grant posted on day {$day}"]);
+        });
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertViewHas('postings', fn (Collection $table): bool => $table->pluck('title')->all() === [
+            'Grant posted on day 3', 'Grant posted on day 2',
+        ]);
+        $response->assertDontSeeText('Grant posted on day 1');
+        $this->assertModelExists($postings->first());
     }
 
     public function test_scholarships_still_taking_applications_are_ordered_by_soonest_deadline(): void
@@ -94,7 +179,8 @@ class DashboardTest extends TestCase
         $response->assertViewHas('takingApplications', function (Collection $takingApplications): bool {
             return $takingApplications->pluck('title')->all() === ['Open Grant'];
         });
-        $response->assertSeeInOrder(['Ready for a pass list', 'Still taking applications', 'Open Grant']);
+        $response->assertDontSee('Ready for a pass list');
+        $response->assertDontSee('Still taking applications');
     }
 
     public function test_scholarships_ready_for_a_pass_list_are_ordered_by_longest_wait(): void
@@ -116,43 +202,6 @@ class DashboardTest extends TestCase
         $response->assertViewHas('readyForPassList', function (Collection $readyForPassList): bool {
             return $readyForPassList->pluck('title')->all() === ['Open Ended Grant', 'Middle Grant', 'Recent Grant'];
         });
-    }
-
-    public function test_a_full_scholarship_reads_as_full_rather_than_closing_later(): void
-    {
-        $admin = User::factory()->admin()->create();
-        $scholarship = Scholarship::factory()->create(['title' => 'Municipal Grant', 'slots' => 1, 'deadline' => now()->addDays(21)]);
-        ScholarshipApplication::factory()->approved()->for($scholarship)->create();
-        ScholarshipApplication::factory()->for($scholarship)->create();
-
-        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
-
-        $response->assertSeeInOrder(['Municipal Grant', 'Full', '1 of 1 slots filled']);
-        $response->assertDontSee('Closes in 21 days');
-    }
-
-    public function test_a_scholarship_osas_closed_early_reads_as_closed_rather_than_closing_later(): void
-    {
-        $admin = User::factory()->admin()->create();
-        $scholarship = Scholarship::factory()->closed()->create(['title' => 'Closed Early Grant', 'deadline' => now()->addDays(21)]);
-        ScholarshipApplication::factory()->for($scholarship)->create();
-
-        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
-
-        $response->assertSeeInOrder(['Closed Early Grant', 'Closed by OSAS']);
-        $response->assertDontSee('Closes in 21 days');
-    }
-
-    public function test_a_deadline_of_today_reads_as_closed_because_applications_already_stopped(): void
-    {
-        $admin = User::factory()->admin()->create();
-        $scholarship = Scholarship::factory()->create(['deadline' => today()]);
-        ScholarshipApplication::factory()->for($scholarship)->create();
-
-        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
-
-        $response->assertSee('Closed today');
-        $response->assertDontSee('Closes today');
     }
 
     public function test_summary_counts_the_pass_lists_due_and_the_scholarships_still_open(): void
@@ -177,38 +226,19 @@ class DashboardTest extends TestCase
         $response->assertSee('scholarship with applicants is still taking applications.');
     }
 
-    public function test_each_scholarship_shows_its_pending_count_and_filled_slots(): void
+    public function test_only_pending_applications_count_as_waiting_on_a_pass_list(): void
     {
         $admin = User::factory()->admin()->create();
-        $scholarship = Scholarship::factory()->create(['slots' => 10]);
+        $scholarship = Scholarship::factory()->closed()->create(['slots' => 10]);
         ScholarshipApplication::factory()->count(2)->for($scholarship)->create();
         ScholarshipApplication::factory()->approved()->for($scholarship)->create();
         ScholarshipApplication::factory()->rejected()->for($scholarship)->create();
 
         $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
-        $response->assertViewHas('takingApplications', function (Collection $takingApplications): bool {
-            return (int) $takingApplications->first()->pending_count === 2;
+        $response->assertViewHas('readyForPassList', function (Collection $readyForPassList): bool {
+            return (int) $readyForPassList->first()->pending_count === 2;
         });
-        $response->assertSee('3 of 10 slots filled');
-    }
-
-    public function test_deadlines_are_counted_in_whole_calendar_days(): void
-    {
-        $admin = User::factory()->admin()->create();
-
-        $closing = Scholarship::factory()->create(['deadline' => now()->addDays(2)]);
-        ScholarshipApplication::factory()->for($closing)->create();
-
-        $overdue = Scholarship::factory()->create(['deadline' => now()->subDays(20)]);
-        ScholarshipApplication::factory()->for($overdue)->create();
-
-        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
-
-        $response->assertOk();
-        // Counted between day boundaries, so the time of day never rounds this down.
-        $response->assertSee('Closes in 2 days');
-        $response->assertSee('Closed 20 days ago');
     }
 
     public function test_admin_is_told_when_nothing_needs_a_decision(): void

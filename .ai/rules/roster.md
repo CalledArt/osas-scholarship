@@ -1,0 +1,9 @@
+---
+paths:
+  - resources/views/admin/roster/index.blade.php
+---
+
+# Roster
+
+## Search Student: banner, one-row filters, roster panel
+Decided 2026-10-25 at the user's request: admin.roster.index runs at max-w-[100rem] under x-welcome-banner ("Search Student", "Find registered students by name, email or student number."). Filters sit in one row from lg (search, course, year level, sort, then Search/Reset). The roster stays a table (50 a page, sortable), in a rounded-lg bordered panel drawn like the admin dashboard's postings table: "Registered students" with the count found on the right, linen-sunk header row and divide-y rows. The per-row initials discs were removed at the user's request (2026-10-25); don't add them back. Emails and header cells are whitespace-nowrap (overflow-wrap:anywhere split addresses mid-word); the table scrolls sideways instead. StudentRosterTest expects the course and year-level cells to end right at </td>, so keep no whitespace before it. From lg the page fits the screen (lg:h-screen flex column, min-h-0 down to the table wrapper) and only the student list scrolls (lg:overflow-y-auto) under a sticky thead, asked by the user 2026-10-25, like admin/fund-allocation/show. Keep the wrapper `relative` and the panel's overflow-hidden (it lets the panel shrink); pagination stays below the panel. Below lg the page scrolls normally. Choosing a Sort by option submits the filter form at once (x-on:change requestSubmit, asked 2026-10-25), carrying whatever is typed in the other filters; the Search button still submits without JavaScript. Student names in the table show in capitals (CSS uppercase, asked 2026-10-25, overriding DESIGN.md's annotation-only uppercase); the stored name and what screen readers read are unchanged, and the tour's sample roster matches.

@@ -1,7 +1,7 @@
-<x-guest-layout>
+<x-guest-layout :title="__('Forgot your password?')">
     <div class="mb-8">
-        <h2 class="text-2xl font-bold text-gray-900">{{ __('Forgot your password?') }}</h2>
-        <p class="mt-1 text-sm text-gray-500">
+        <h2 class="text-lead font-semibold text-ink">{{ __('Forgot your password?') }}</h2>
+        <p class="mt-1  text-slate">
             {{ __('No problem. Enter your email address and we will send you a link to choose a new one.') }}
         </p>
     </div>
@@ -24,8 +24,8 @@
         </x-primary-button>
     </form>
 
-    <p class="mt-8 text-center text-sm text-gray-500">
-        <a class="font-medium text-cvsu-green hover:text-cvsu-green-dark" href="{{ route('login') }}">
+    <p class="mt-8 text-center  text-slate">
+        <a class="font-medium text-seal hover:text-seal-deep" href="{{ route('login') }}">
             {{ __('Back to sign in') }}
         </a>
     </p>

@@ -22,4 +22,14 @@ class ScholarshipApplicationRejectedTest extends TestCase
         $mailable->assertSeeInHtml(route('scholarships.index'));
         $mailable->assertSeeInText(route('scholarships.index'));
     }
+
+    public function test_it_tells_a_student_who_passed_while_holding_an_active_scholarship_why_they_were_not_approved(): void
+    {
+        $scholarship = Scholarship::factory()->create(['title' => 'STEM Excellence Grant']);
+
+        $mailable = new ScholarshipApplicationRejected($scholarship, passedWhileHoldingActive: true);
+
+        $mailable->assertSeeInOrderInText(['Your name was included in the final list', 'a student may hold only one active scholarship at a time']);
+        $mailable->assertDontSeeInText('your name was not included');
+    }
 }

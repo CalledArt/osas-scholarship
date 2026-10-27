@@ -1,0 +1,41 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "narrow",
+        "createdAt": "2026-10-23T11:00:14.493Z",
+        "reason": "agent: DESIGN.md typography.annot declares Archivo Narrow; the detector split the family name 'Archivo Narrow'"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/mine-open.html"
+        ],
+        "createdAt": "2026-10-23T11:10:32.329Z",
+        "reason": "agent: decision-round sketch, not shipping; DESIGN.md Four Sizes Rule ranks by weight within 15/18/32px"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/status-board.html"
+        ],
+        "createdAt": "2026-10-23T11:10:32.341Z",
+        "reason": "agent: decision-round sketch, not shipping; DESIGN.md Four Sizes Rule ranks by weight within 15/18/32px"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/bento.html"
+        ],
+        "createdAt": "2026-10-23T11:10:32.351Z",
+        "reason": "agent: decision-round sketch, not shipping; DESIGN.md Four Sizes Rule ranks by weight within 15/18/32px"
+      }
+    ]
+  }
+}

@@ -93,7 +93,7 @@ class TutorialTest extends TestCase
         $response->assertSee('22-04567');
         $response->assertSee('BS Agriculture');
         $response->assertSee('09171234567');
-        $response->assertSeeInOrder(['First Name', 'Middle Name', 'Last Name']);
+        $response->assertSeeInOrder(['Last Name', 'First Name', 'Middle Name']);
     }
 
     public function test_every_menu_item_the_tour_points_at_is_in_the_menu(): void

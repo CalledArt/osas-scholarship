@@ -8,12 +8,13 @@ use Database\Factories\ScholarshipApplicationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['user_id', 'status', 'submitted_at'])]
+#[Fillable(['user_id', 'status', 'submitted_at', 'passed_while_holding_active'])]
 class ScholarshipApplication extends Model
 {
     /** @use HasFactory<ScholarshipApplicationFactory> */
@@ -29,6 +30,7 @@ class ScholarshipApplication extends Model
         return [
             'status' => ApplicationStatus::class,
             'submitted_at' => 'datetime',
+            'passed_while_holding_active' => 'boolean',
         ];
     }
 
@@ -48,11 +50,61 @@ class ScholarshipApplication extends Model
     }
 
     /**
+     * Narrow to the applications whose students passed, which make up the
+     * scholarship's fund allocation.
+     *
+     * The column is qualified so the scope still works when users are joined in.
+     */
+    #[Scope]
+    protected function approved(Builder $query): void
+    {
+        $query->where($query->qualifyColumn('status'), ApplicationStatus::Approved);
+    }
+
+    /**
+     * Order alphabetically by the student's surname, then given names, ignoring
+     * case, as OSAS's printed lists run. Students without name parts sort by
+     * their stored full name.
+     *
+     * Joins users, so only the application's own columns are selected.
+     */
+    #[Scope]
+    protected function orderedByStudentName(Builder $query): void
+    {
+        $query->join('users', 'users.id', '=', 'scholarship_applications.user_id')
+            ->select('scholarship_applications.*')
+            ->orderByRaw('lower(coalesce(users.last_name, users.name))')
+            ->orderByRaw('lower(users.first_name)')
+            ->orderByRaw('lower(users.middle_name)')
+            ->orderBy('scholarship_applications.id');
+    }
+
+    /**
+     * The office's handle for this application, as "2026-00029".
+     *
+     * A records office gives you a number. Without one a student phoning OSAS
+     * about their application has nothing to quote, and the id lived only in
+     * the URL. Derived from the year it was submitted and the id, so it is
+     * stable, needs no column, and sorts with the record.
+     */
+    protected function reference(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => sprintf(
+                '%d-%05d',
+                ($this->submitted_at ?? $this->created_at)?->year ?? now()->year,
+                $this->id,
+            ),
+        );
+    }
+
+    /**
      * Narrow to the applications holding one of their scholarship's slots.
      *
      * Pending applications hold a slot along with approved ones, so a
      * scholarship stops taking applications once enough students have
-     * applied to fill it. A rejection gives the slot back.
+     * applied to fill it. A rejection gives the slot back, and so does
+     * voiding, when OSAS puts the student on leave of absence.
      */
     #[Scope]
     protected function holdingSlot(Builder $query): void
@@ -74,12 +126,27 @@ class ScholarshipApplication extends Model
      *
      * Pending applications count along with active ones, so approving every
      * application a student has waiting can never put them over the limit.
-     * Rejected ones never count, and nothing counts once the scholarship ends.
+     * Rejected and voided ones never count, and nothing counts once the
+     * scholarship ends.
      */
     public function holdsScholarshipPlace(): bool
     {
-        return $this->status !== ApplicationStatus::Rejected
+        return in_array($this->status, [ApplicationStatus::Pending, ApplicationStatus::Approved], true)
             && $this->scholarshipStatus() !== ScholarshipStatus::Ended;
+    }
+
+    /**
+     * The preset the scholarship was posted from, read from the
+     * `scholarship_preset` column that User::scholarshipApplicationsWithScholarship()
+     * joins in when available, like scholarshipStatus().
+     */
+    public function scholarshipPreset(): ?string
+    {
+        if (array_key_exists('scholarship_preset', $this->attributes)) {
+            return $this->attributes['scholarship_preset'];
+        }
+
+        return $this->scholarship->preset;
     }
 
     /**

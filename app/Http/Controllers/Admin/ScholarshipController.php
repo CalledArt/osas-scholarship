@@ -2,21 +2,26 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\ApplyTestStudents;
+use App\Enums\ScholarshipStatus;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreScholarshipRequest;
 use App\Http\Requests\Admin\UpdateScholarshipRequest;
-use App\Mail\ScholarshipPosted;
 use App\Models\Scholarship;
 use App\Models\User;
-use App\Support\BccMailer;
+use App\Notifications\ScholarshipPosted;
 use App\Support\CvsuPrograms;
 use App\Support\ScholarshipPresets;
+use App\Support\StudentNotifier;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class ScholarshipController extends Controller
@@ -33,7 +38,8 @@ class ScholarshipController extends Controller
             'applications as held_slots_count' => fn (Builder $query) => $query->holdingSlot(),
         ])
             ->latest()
-            ->paginate(10);
+            // Twelve, so the card grid closes square at two, three or four across.
+            ->paginate(12);
 
         return view('admin.scholarships.index', [
             'scholarships' => $scholarships,
@@ -49,21 +55,42 @@ class ScholarshipController extends Controller
 
         return view('admin.scholarships.create', [
             'presets' => ScholarshipPresets::ALL,
+            'openPresets' => Scholarship::query()
+                ->where('status', ScholarshipStatus::Open)
+                ->whereNotNull('preset')
+                ->distinct()
+                ->pluck('preset')
+                ->all(),
         ]);
     }
 
     /**
-     * Store a newly created resource in storage, then email every student who can apply.
+     * Store a newly created resource in storage, then notify every student who can apply in their bell.
      *
-     * A scholarship limited to STEM courses is announced only to students in
-     * those courses. It stays posted even if the email fails; the admin is
-     * told how many students it actually reached.
+     * Only a scholarship posted from the DOST preset is limited to STEM
+     * courses, and it is announced only to students in those courses.
+     * Posting sends no email. A preset may have only one posting open for
+     * applications at a time.
      */
-    public function store(StoreScholarshipRequest $request, BccMailer $mailer): RedirectResponse
+    public function store(StoreScholarshipRequest $request, StudentNotifier $notifier, ApplyTestStudents $applyTestStudents): RedirectResponse
     {
-        $scholarship = $request->user()->postedScholarships()->create(
-            $request->safe()->only(['title', 'description', 'type', 'stem_courses_only', 'slots', 'deadline'])
-        );
+        $preset = $request->validated('preset');
+        $post = fn (): Scholarship => $request->user()->postedScholarships()->create([
+            ...$request->safe()->only(['title', 'description', 'type', 'slots', 'deadline']),
+            'preset' => $preset,
+            'stem_courses_only' => ScholarshipPresets::limitsToStemCourses($preset),
+        ]);
+
+        // Two posts of one preset sent at the same moment both pass validation,
+        // so the check is made again while holding the preset's lock, and only
+        // the first one lands.
+        $scholarship = $preset === null ? $post() : Cache::lock("scholarships:post-preset:{$preset}", 10)->block(5, function () use ($preset, $post): Scholarship {
+            if (Scholarship::openFromPreset($preset)->exists()) {
+                throw ValidationException::withMessages(['preset' => StoreScholarshipRequest::presetAlreadyOpenMessage($preset)]);
+            }
+
+            return $post();
+        });
 
         foreach ($request->validated('required_documents', []) as $index => $document) {
             $requiredDocument = $scholarship->requiredDocuments()->make(Arr::only($document, ['name', 'description']));
@@ -75,23 +102,25 @@ class ScholarshipController extends Controller
             }
         }
 
-        $studentEmails = User::where('role', UserRole::Student)
+        $students = User::where('role', UserRole::Student)
             ->when($scholarship->stem_courses_only, fn (Builder $query) => $query->whereIn('course', CvsuPrograms::STEM))
-            ->pluck('email')
-            ->all();
-        $studentCount = count($studentEmails);
-        $emailed = $mailer->send($studentEmails, new ScholarshipPosted($scholarship));
+            ->get(['id']);
+        $notifiedCount = $notifier->send($students, new ScholarshipPosted($scholarship));
 
-        $redirect = redirect()->route('admin.scholarships.show', $scholarship);
+        // On a local machine only, the hardcoded test students apply at once,
+        // so the pass list and Fund Allocation can be tried straight away.
+        // Never on the live site, where they would take real students' slots.
+        $testApplicantCount = app()->isLocal() ? $applyTestStudents->handle($scholarship) : 0;
 
-        if ($emailed < $studentCount) {
-            return $redirect->with('status', 'Scholarship posted.')
-                ->with('error', "The announcement email reached only {$emailed} of {$studentCount} students. Check the mail settings and the application log.");
+        $status = $notifiedCount > 0
+            ? "Scholarship posted and {$notifiedCount} ".Str::plural('student', $notifiedCount).' notified.'
+            : 'Scholarship posted.';
+
+        if ($testApplicantCount > 0) {
+            $status .= " {$testApplicantCount} test ".Str::plural('student', $testApplicantCount).' applied (local machine only).';
         }
 
-        return $redirect->with('status', $studentCount > 0
-            ? "Scholarship posted and emailed to {$studentCount} ".Str::plural('student', $studentCount).'.'
-            : 'Scholarship posted.');
+        return redirect()->route('admin.scholarships.show', $scholarship)->with('status', $status);
     }
 
     /**
@@ -142,13 +171,13 @@ class ScholarshipController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage, archiving its fund allocation if it was completed.
      */
-    public function destroy(Scholarship $scholarship): RedirectResponse
+    public function destroy(Request $request, Scholarship $scholarship): RedirectResponse
     {
         Gate::authorize('delete', $scholarship);
 
-        $scholarship->deleteWithStoredFiles();
+        $scholarship->deleteWithStoredFiles($request->user());
 
         return redirect()->route('admin.scholarships.index')
             ->with('status', 'Scholarship deleted.');

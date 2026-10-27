@@ -1,79 +1,144 @@
 /*
- * Figtree, self-hosted (SIL Open Font License 1.1, see resources/fonts/figtree/OFL.txt).
- * Vite fingerprints these files into /build, which Caddy serves as immutable, so the
- * first render no longer waits on a connection to a second origin. Each weight is
- * split into Latin and Latin Extended; the browser fetches the second only for the
- * characters that need it, such as the peso sign.
+ * Lot and Claim — see DESIGN.md.
+ *
+ * Three self-hosted families (SIL Open Font License 1.1; each directory under
+ * resources/fonts carries its own OFL.txt). Vite fingerprints these into
+ * /build, which Caddy serves as immutable, so the first render never waits on
+ * a second origin. Every weight is split into Latin and Latin Extended; the
+ * browser fetches the second only for the characters that need it, such as the
+ * peso sign (U+20B1), which fund allocation prints.
+ *
+ * Archivo          body, headings, controls, figures
+ * Archivo Narrow   plan annotations: column headers, field labels, status marks
+ * Spline Sans Mono values a reader must transcribe exactly
  */
+
+/* ---------- Archivo ---------- */
 @font-face {
-    font-family: 'Figtree';
+    font-family: 'Archivo';
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url('../fonts/figtree/figtree-latin-400-normal.woff2') format('woff2');
+    src: url('../fonts/archivo/archivo-latin-400-normal.woff2') format('woff2');
     unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-    font-family: 'Figtree';
+    font-family: 'Archivo';
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url('../fonts/figtree/figtree-latin-ext-400-normal.woff2') format('woff2');
+    src: url('../fonts/archivo/archivo-latin-ext-400-normal.woff2') format('woff2');
     unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
 @font-face {
-    font-family: 'Figtree';
+    font-family: 'Archivo';
     font-style: normal;
     font-weight: 500;
     font-display: swap;
-    src: url('../fonts/figtree/figtree-latin-500-normal.woff2') format('woff2');
+    src: url('../fonts/archivo/archivo-latin-500-normal.woff2') format('woff2');
     unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-    font-family: 'Figtree';
+    font-family: 'Archivo';
     font-style: normal;
     font-weight: 500;
     font-display: swap;
-    src: url('../fonts/figtree/figtree-latin-ext-500-normal.woff2') format('woff2');
+    src: url('../fonts/archivo/archivo-latin-ext-500-normal.woff2') format('woff2');
     unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
 @font-face {
-    font-family: 'Figtree';
+    font-family: 'Archivo';
     font-style: normal;
     font-weight: 600;
     font-display: swap;
-    src: url('../fonts/figtree/figtree-latin-600-normal.woff2') format('woff2');
+    src: url('../fonts/archivo/archivo-latin-600-normal.woff2') format('woff2');
     unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-    font-family: 'Figtree';
+    font-family: 'Archivo';
     font-style: normal;
     font-weight: 600;
     font-display: swap;
-    src: url('../fonts/figtree/figtree-latin-ext-600-normal.woff2') format('woff2');
+    src: url('../fonts/archivo/archivo-latin-ext-600-normal.woff2') format('woff2');
     unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
 @font-face {
-    font-family: 'Figtree';
+    font-family: 'Archivo';
     font-style: normal;
     font-weight: 700;
     font-display: swap;
-    src: url('../fonts/figtree/figtree-latin-700-normal.woff2') format('woff2');
+    src: url('../fonts/archivo/archivo-latin-700-normal.woff2') format('woff2');
     unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-    font-family: 'Figtree';
+    font-family: 'Archivo';
     font-style: normal;
     font-weight: 700;
     font-display: swap;
-    src: url('../fonts/figtree/figtree-latin-ext-700-normal.woff2') format('woff2');
+    src: url('../fonts/archivo/archivo-latin-ext-700-normal.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ---------- Archivo Narrow ---------- */
+@font-face {
+    font-family: 'Archivo Narrow';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('../fonts/archivo-narrow/archivo-narrow-latin-500-normal.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Archivo Narrow';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('../fonts/archivo-narrow/archivo-narrow-latin-ext-500-normal.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: 'Archivo Narrow';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('../fonts/archivo-narrow/archivo-narrow-latin-600-normal.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Archivo Narrow';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('../fonts/archivo-narrow/archivo-narrow-latin-ext-600-normal.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ---------- Spline Sans Mono ---------- */
+@font-face {
+    font-family: 'Spline Sans Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/spline-sans-mono/spline-sans-mono-latin-400-normal.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Spline Sans Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/spline-sans-mono/spline-sans-mono-latin-ext-400-normal.woff2') format('woff2');
     unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
@@ -86,13 +151,419 @@
     display: none !important;
 }
 
+@layer base {
+    /*
+     * Every number in this product is compared against another — lots against
+     * slots, days against deadlines, pesos against a fund. Proportional digits
+     * make a column ragged, so tabular figures are the default everywhere and
+     * are never something a component has to remember.
+     */
+    html {
+        font-variant-numeric: tabular-nums;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        @apply bg-linen text-body text-graphite;
+    }
+
+    /*
+     * The surfaces we did not draw. Left at their browser defaults these belong
+     * to no design system, and they are the cheapest tell that a page was
+     * assembled rather than built.
+     */
+    ::selection {
+        background-color: theme('colors.gold.wash');
+        color: theme('colors.ink');
+    }
+
+    :root {
+        caret-color: theme('colors.seal.DEFAULT');
+        accent-color: theme('colors.seal.DEFAULT');
+        scrollbar-color: theme('colors.rule.strong') theme('colors.linen.sunk');
+        scrollbar-width: thin;
+    }
+
+    ::-webkit-scrollbar {
+        width: 11px;
+        height: 11px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: theme('colors.linen.sunk');
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: theme('colors.rule.strong');
+        border: 3px solid theme('colors.linen.sunk');
+        border-radius: 999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: theme('colors.slate');
+    }
+
+    a {
+        text-underline-offset: 0.2em;
+        text-decoration-thickness: from-font;
+    }
+
+    /*
+     * A floor, not the design. Components state their own ring; this guarantees
+     * nothing is ever left wearing the user agent's default outline.
+     */
+    :focus-visible {
+        outline: 2px solid theme('colors.seal.DEFAULT');
+        outline-offset: 2px;
+    }
+}
+
+@layer components {
+    /*
+     * THE PARCEL — the signature move.
+     *
+     * A scholarship's capacity drawn as the thing it is: a bounded parcel
+     * subdivided into exactly as many lots as it has slots. Awarded lots are
+     * hatched; open lots keep a hairline boundary; the student's own lot is
+     * staked. A reader counts rather than estimates a length, which is why this
+     * is a parcel and not a progress bar.
+     */
+    .parcel {
+        --lot-edge: 0.8125rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2px;
+    }
+
+    .parcel--wide {
+        --lot-edge: 1.125rem;
+    }
+
+    /* Five lots that wrap as one unit, so a long parcel breaks on its own
+       tick rhythm instead of wherever the width runs out. */
+    .parcel__group {
+        display: flex;
+        gap: 2px;
+    }
+
+    .lot {
+        position: relative;
+        width: var(--lot-edge);
+        height: var(--lot-edge);
+        flex: none;
+        border: 1px solid theme('colors.rule.strong');
+        background-color: theme('colors.linen.DEFAULT');
+    }
+
+    /* Every fifth lot carries a heavier foot, so a parcel of 15 reads as 15
+       without counting one by one — the tick rhythm of a measured drawing. */
+    .lot:nth-child(5n) {
+        border-bottom-color: theme('colors.graphite');
+        border-bottom-width: 2px;
+    }
+
+    /*
+     * A lot whose slot is held by a claim that has not been decided yet. It is
+     * taken, so it is hatched — but in Graphite, plain drawing ink, because
+     * green in this system means granted and nothing about an undecided
+     * application is granted. Distinguishing held-from-awarded per row would
+     * cost a query per row, so a list states the honest fact it can afford:
+     * this lot is taken.
+     */
+    .lot--taken {
+        border-color: theme('colors.graphite');
+        background-color: theme('colors.linen.sunk');
+        background-image: repeating-linear-gradient(
+            45deg,
+            theme('colors.graphite') 0,
+            theme('colors.graphite') 1px,
+            transparent 1px,
+            transparent 3.5px
+        );
+    }
+
+    .lot--awarded {
+        border-color: theme('colors.grant.deep');
+        background-color: theme('colors.grant.wash');
+        background-image: repeating-linear-gradient(
+            45deg,
+            theme('colors.grant.DEFAULT') 0,
+            theme('colors.grant.DEFAULT') 1px,
+            transparent 1px,
+            transparent 3.5px
+        );
+    }
+
+    /* The student's own claim, pending a decision: staked, not yet hatched. */
+    .lot--staked {
+        border-color: theme('colors.gold.deep');
+        background-color: theme('colors.gold.wash');
+        box-shadow: inset 0 0 0 1px theme('colors.gold.DEFAULT');
+    }
+
+    .lot--staked::after {
+        content: '';
+        position: absolute;
+        inset: 2px;
+        background-color: theme('colors.gold.deep');
+        clip-path: polygon(0 0, 100% 0, 0 100%);
+    }
+
+    /* The student's own claim, awarded. */
+    .lot--staked-awarded {
+        border-color: theme('colors.grant.deep');
+        background-color: theme('colors.grant.wash');
+        box-shadow: inset 0 0 0 1px theme('colors.gold.DEFAULT');
+        background-image: repeating-linear-gradient(
+            45deg,
+            theme('colors.grant.DEFAULT') 0,
+            theme('colors.grant.DEFAULT') 1px,
+            transparent 1px,
+            transparent 3.5px
+        );
+    }
+
+    /*
+     * THE SEASON BAR — a parcel's closing date made measurable.
+     *
+     * The full width is the window from posting to deadline; --elapsed is how
+     * far through it today sits. Past the deadline the bar is struck through in
+     * oxide rather than filled.
+     */
+    .season {
+        position: relative;
+        height: 3px;
+        background-color: theme('colors.rule.DEFAULT');
+    }
+
+    .season::before {
+        content: '';
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: clamp(0%, var(--elapsed, 0%), 100%);
+        background-color: theme('colors.seal.DEFAULT');
+    }
+
+    .season::after {
+        content: '';
+        position: absolute;
+        top: -3px;
+        bottom: -3px;
+        left: clamp(0%, var(--elapsed, 0%), 100%);
+        width: 2px;
+        background-color: theme('colors.ink');
+    }
+
+    .season--lapsed::before {
+        width: 100%;
+        background-color: theme('colors.oxide.DEFAULT');
+    }
+
+    .season--lapsed::after {
+        display: none;
+    }
+
+    /*
+     * THE DRAFT — a page drawn before its records arrive (x-page-skeleton).
+     *
+     * The chrome is real; only the words to come are bars. A bar is square,
+     * because it stands in for part of the drawing, and its ink is tinted from
+     * the surface it sits on, never greyed: Rule Strong on paper, the panel's
+     * own hue on a coloured one. A .draft-line is one text line tall with its
+     * bar painted in the middle, so drafts keep the page's line rhythm and
+     * spacing utilities add real gaps. One light sweeps every bar at once:
+     * the gradient is fixed to the viewport, so it crosses the page as a
+     * single band rather than flickering bar by bar.
+     */
+    .draft {
+        --draft-ink: theme('colors.rule.strong');
+    }
+
+    .draft-on-seal {
+        --draft-ink: theme('colors.seal.DEFAULT');
+    }
+
+    .draft-on-blue {
+        --draft-ink: theme('colors.blue.700');
+    }
+
+    .draft-on-gold {
+        --draft-ink: theme('colors.gold.deep');
+    }
+
+    .draft-line,
+    .draft-block {
+        max-width: 100%;
+        background-color: theme('colors.rule.DEFAULT');
+        background-color: color-mix(in srgb, var(--draft-ink) 24%, transparent);
+    }
+
+    .draft-line,
+    .draft-block,
+    .draft-fill {
+        background-image: linear-gradient(100deg, transparent 38%, rgb(255 255 255 / 0.7) 50%, transparent 62%);
+        background-size: 100vw 100vh;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        animation: draft-sweep 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    }
+
+    .draft-line {
+        display: block;
+        height: 1.375rem;
+        padding-block: 0.375rem;
+        background-clip: content-box;
+    }
+
+    .draft-line--lead {
+        height: 1.625rem;
+        padding-block: 0.4375rem;
+    }
+
+    .draft-line--annot {
+        height: 1rem;
+        padding-block: 0.25rem;
+    }
+
+    .draft-line--figure {
+        height: 2rem;
+        padding-block: 0.25rem;
+    }
+
+    .draft-block {
+        display: block;
+    }
+}
+
+@keyframes draft-sweep {
+    from {
+        background-position: -100vw 0;
+    }
+
+    to {
+        background-position: 100vw 0;
+    }
+}
+
+@keyframes draft-breathe {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0.55;
+    }
+}
+
+@keyframes draft-arrive {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes busy-turn {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 /*
- * Cross-page transitions. Same-origin navigations crossfade instead of
- * flashing white; the record being opened (named record-title by the script
- * in layouts/app) grows from its row into the next page's heading; the step
- * register (cycle) keeps its place between a scholarship and its application;
- * the rail and the narrow-screen strip hold still. Browsers without
- * cross-document view transitions, Firefox among them, load pages as before.
+ * Loading states, after the utilities so they win over the colours and
+ * displays the markup already carries.
+ */
+
+/* While a draft stands in for the next page, the page in hand steps aside. */
+#main[data-drafting] > :not([data-draft]) {
+    display: none;
+}
+
+/* Without view transitions the draft fades in on its own. */
+.draft-arrive {
+    animation: draft-arrive 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Going nowhere new: the list about to be replaced dims and stops taking presses. */
+[data-results] {
+    transition: opacity 150ms ease-out;
+}
+
+#main[data-refreshing] [data-results] {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+/* The rail answers a press before the page does: the plate moves to the item pressed. */
+[data-rail-link][data-going] {
+    background-color: theme('colors.seal.deep');
+    color: #fff;
+    font-weight: 600;
+}
+
+[data-rail-link][data-leaving] {
+    background-color: transparent;
+    color: theme('colors.seal.tint');
+    font-weight: 500;
+}
+
+/*
+ * A submit button waiting on its answer gives up its label to a 16px ring in
+ * the label's own colour (--busy-ink, read when it was pressed), keeping its
+ * width and refusing a second press.
+ */
+button[data-busy] {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+button[data-busy] > * {
+    visibility: hidden;
+}
+
+button[data-busy]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 1rem;
+    height: 1rem;
+    margin: auto;
+    border: 2px solid transparent;
+    border: 2px solid color-mix(in srgb, var(--busy-ink) 30%, transparent);
+    border-top-color: var(--busy-ink);
+    border-radius: 9999px;
+    animation: busy-turn 0.7s linear infinite;
+}
+
+button[data-busy].text-left::after {
+    margin-left: 0.75rem;
+}
+
+/* With reduced motion nothing sweeps or turns; drafts and rings breathe in place. */
+@media (prefers-reduced-motion: reduce) {
+    .draft-line,
+    .draft-block,
+    .draft-fill {
+        background-image: none;
+        animation: draft-breathe 1.6s ease-in-out infinite alternate;
+    }
+
+    .draft-arrive {
+        animation: none;
+    }
+
+    button[data-busy]::after {
+        animation: draft-breathe 1.2s ease-in-out infinite alternate;
+    }
+}
+
+/*
+ * Cross-page transitions, carried over from the previous system because they
+ * were the most product-appropriate motion decision in it. Same-origin
+ * navigations crossfade instead of flashing white; the record being opened
+ * (named record-title by the script in layouts/app) grows from its row into the
+ * next page's heading; the title block (cycle) keeps its place between a
+ * scholarship and its claim; the rail and the narrow-screen strip hold still.
+ * Browsers without cross-document view transitions load pages as before.
  */
 @view-transition {
     navigation: auto;

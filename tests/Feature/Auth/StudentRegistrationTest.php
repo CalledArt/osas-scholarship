@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\StudentStatus;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -29,7 +30,7 @@ class StudentRegistrationTest extends TestCase
             'first_name' => 'Juan',
             'middle_name' => 'Santos',
             'last_name' => 'Dela Cruz',
-            'student_number' => '21-00123',
+            'student_number' => '202100123',
             'course' => 'BS Information Technology',
             'year_level' => 3,
             'program_years' => 5,
@@ -55,6 +56,7 @@ class StudentRegistrationTest extends TestCase
         $response->assertOk()->assertSee('Complete your registration')
             ->assertSee('juan@cvsu.edu.ph')
             ->assertSee('name="student_number"', false)
+            ->assertSee("x-on:input=\"\$el.value = \$el.value.replace(/[^0-9]/g, '')\"", false)
             ->assertSee('name="course"', false)
             ->assertSeeInOrder(['<optgroup label="College of Engineering and Information Technology (CEIT)">', '<option value="BS Information Technology"'], false)
             ->assertSee('name="year_level"', false)
@@ -85,6 +87,7 @@ class StudentRegistrationTest extends TestCase
         $this->assertNull($student->password);
         $this->assertNotNull($student->email_verified_at);
         $this->assertFalse($student->must_change_password);
+        $this->assertSame(StudentStatus::Active, $student->student_status);
         $this->assertDatabaseHas('users', Arr::except($this->studentDetails(), 'date_of_birth'));
         $this->assertSame('2003-05-14', $student->date_of_birth->toDateString());
         $this->get(route('dashboard'))->assertRedirect(route('tutorial'));
@@ -141,9 +144,47 @@ class StudentRegistrationTest extends TestCase
         $this->assertDatabaseCount('users', 0);
     }
 
+    #[TestWith(['21-00123'])]
+    #[TestWith(['20210012'])]
+    #[TestWith(['2021001234'])]
+    #[TestWith(['20210O123'])]
+    public function test_student_number_must_be_exactly_nine_digits(string $studentNumber): void
+    {
+        $this->withSession($this->googleRegistration())->from('/register')->post('/register', [
+            ...$this->studentDetails(),
+            'student_number' => $studentNumber,
+        ])->assertRedirect('/register')->assertSessionHasErrors(['student_number' => 'The student number field must be 9 digits.']);
+
+        $this->assertGuest();
+        $this->assertDatabaseCount('users', 0);
+    }
+
+    #[TestWith(['0917-123-4567'])]
+    #[TestWith(['+639171234567'])]
+    #[TestWith(['0917123456'])]
+    #[TestWith(['091712345678'])]
+    #[TestWith(['0917123456A'])]
+    public function test_contact_number_must_be_exactly_eleven_digits(string $contactNumber): void
+    {
+        $this->withSession($this->googleRegistration())->from('/register')->post('/register', [
+            ...$this->studentDetails(),
+            'contact_number' => $contactNumber,
+        ])->assertRedirect('/register')->assertSessionHasErrors(['contact_number' => 'The contact number field must be 11 digits.']);
+
+        $this->assertGuest();
+        $this->assertDatabaseCount('users', 0);
+    }
+
+    public function test_the_contact_number_field_drops_anything_but_digits_as_it_is_typed(): void
+    {
+        $response = $this->withSession($this->googleRegistration())->get('/register');
+
+        $this->assertMatchesRegularExpression('/<input[^>]*id="contact_number"[^>]*pattern="\[0-9\]\{11\}" maxlength="11" x-data="" x-on:input="\$el\.value = \$el\.value\.replace\(\/\[\^0-9\]\/g, \'\'\)"/', $response->getContent());
+    }
+
     public function test_a_duplicate_student_number_is_rejected_without_losing_google_verification(): void
     {
-        $existing = User::factory()->create(['student_number' => '21-00123']);
+        $existing = User::factory()->create(['student_number' => '202100123']);
 
         $this->withSession($this->googleRegistration())->from('/register')->post('/register', $this->studentDetails())
             ->assertRedirect('/register')->assertSessionHasErrors('student_number')

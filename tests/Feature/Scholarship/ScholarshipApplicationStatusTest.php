@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Scholarship;
 
+use App\Enums\ApplicationStatus;
 use App\Enums\ScholarshipStatus;
 use App\Models\Scholarship;
 use App\Models\ScholarshipApplication;
@@ -14,14 +15,14 @@ class ScholarshipApplicationStatusTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_approved_application_tells_the_student_it_counts_toward_their_limit(): void
+    public function test_approved_application_tells_the_student_it_is_their_one_active_scholarship(): void
     {
         $application = ScholarshipApplication::factory()->approved()->create();
 
         $response = $this->actingAs($application->user)->get(route('scholarship-applications.show', $application));
 
         $response->assertSee('You were approved');
-        $response->assertSee('This scholarship counts as one of the 2 you can hold until OSAS ends it.');
+        $response->assertSee('This is your active scholarship: a student can hold only one at a time, so you cannot apply to others until OSAS ends its grant period.');
     }
 
     public function test_approved_application_on_an_ended_scholarship_no_longer_counts_toward_the_limit(): void
@@ -33,7 +34,7 @@ class ScholarshipApplicationStatusTest extends TestCase
         $response = $this->actingAs($application->user)->get(route('scholarship-applications.show', $application));
 
         $response->assertSee('You were approved');
-        $response->assertSee('The grant period has since ended, so this scholarship no longer counts toward the 2 you can hold.');
+        $response->assertSee('The grant period has since ended, so it is no longer your active scholarship and you can apply to others again.');
     }
 
     public function test_rejected_application_tells_the_student_it_no_longer_counts_toward_their_limit(): void
@@ -43,7 +44,29 @@ class ScholarshipApplicationStatusTest extends TestCase
         $response = $this->actingAs($application->user)->get(route('scholarship-applications.show', $application));
 
         $response->assertSee('You were not approved');
-        $response->assertSee('This application no longer counts toward the 2 scholarships you can hold.');
+        $response->assertSee('Your name was not on the pass list. This application no longer counts toward the 2 applications you can have.');
+        $response->assertDontSee('Waiting for a decision');
+    }
+
+    public function test_rejection_for_already_holding_an_active_scholarship_tells_the_student_they_passed(): void
+    {
+        $application = ScholarshipApplication::factory()->rejected()->create(['passed_while_holding_active' => true]);
+
+        $response = $this->actingAs($application->user)->get(route('scholarship-applications.show', $application));
+
+        $response->assertSee('Your name was on the pass list, but you already held an active scholarship, and a student can hold only one at a time.');
+        $response->assertDontSee('Your name was not on the pass list.');
+    }
+
+    public function test_voided_application_tells_the_student_it_gave_up_its_slot_for_their_leave(): void
+    {
+        $application = ScholarshipApplication::factory()->create(['status' => ApplicationStatus::Voided]);
+
+        $response = $this->actingAs($application->user)->get(route('scholarship-applications.show', $application));
+
+        $response->assertSee('Your application left review when you went on leave of absence (LOA).');
+        $response->assertSee('OSAS put you on leave of absence (LOA) before this application was decided, so it gave up its slot for another student.');
+        $response->assertSee('You can still apply to other scholarships.');
         $response->assertDontSee('Waiting for a decision');
     }
 

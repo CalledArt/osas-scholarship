@@ -13,10 +13,15 @@ RUN apt-get update \
         curl \
         git \
         libicu-dev \
+        libjpeg62-turbo-dev \
+        libpng-dev \
         libpq-dev \
         libzip-dev \
+        qpdf \
         unzip \
+    && docker-php-ext-configure gd --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" \
+        gd \
         intl \
         opcache \
         pdo_pgsql \

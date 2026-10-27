@@ -1,80 +1,89 @@
 {{--
-    Every posted scholarship as a working table, ruled like the roster rather
-    than boxed: a list of records is the document. The title is the row's way
-    in; numbers sit right-aligned in tabular figures so they compare down the
-    column. Below 52rem the table scrolls sideways instead of folding.
+    Every posted scholarship under the dashboards' banner, as cards drawn like
+    the Fund Allocation cards (asked 2026-10-25). The title is the card's way
+    in and stretches over the whole card; Edit sits above that stretch so it
+    stays its own control. Slots left and Applicants are the figures OSAS
+    compares, pinned to the card's foot so they line up across a row.
 --}}
-<x-app-layout :sheet="true">
+<x-app-layout :title="__('Manage Scholarships')" :sheet="true">
     <div class="px-6 py-10 lg:px-10">
-        <div class="mx-auto max-w-7xl">
-            <div class="flex flex-wrap items-center justify-between gap-4">
-                <h1 class="text-xl font-semibold leading-tight text-gray-900">{{ __('Manage Scholarships') }}</h1>
+        <div class="mx-auto max-w-[100rem]">
+            <x-welcome-banner :heading="__('Manage Scholarships')">
+                @if ($scholarships->total() > 0)
+                    <span class="font-semibold tabular-nums text-ink">{{ $scholarships->total() }}</span>
+                    {{ trans_choice('scholarship posted.|scholarships posted.', $scholarships->total()) }}
+                @else
+                    {{ __('No scholarships have been posted yet.') }}
+                @endif
 
-                <a href="{{ route('admin.scholarships.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-cvsu-green px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-150 ease-in-out hover:bg-cvsu-green-dark focus:outline-none focus:ring-2 focus:ring-cvsu-gold focus:ring-offset-2">
-                    {{ __('Post Scholarship') }}
-                </a>
-            </div>
+                <x-slot:action>
+                    <a href="{{ route('admin.scholarships.create') }}"
+                       class="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-sheet bg-seal px-4 py-2.5 font-semibold text-white shadow-sm transition duration-150 ease-in-out hover:bg-seal-deep focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 sm:self-auto">
+                        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" d="M10 4v12M4 10h12" />
+                        </svg>
+                        {{ __('Post Scholarship') }}
+                    </a>
+                </x-slot:action>
+            </x-welcome-banner>
 
             @if (session('status'))
-                <div class="mt-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700" role="status">
+                <div class="mt-6 rounded-sheet border border-grant/30 bg-grant-wash px-4 py-3 text-grant-deep" role="status">
                     {{ session('status') }}
                 </div>
             @endif
 
-            <div class="mt-8 overflow-x-auto">
-                <table class="w-full min-w-[52rem] text-sm">
-                    <thead>
-                        <tr class="border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500">
-                            <th scope="col" class="py-2 pr-4 text-left font-medium">{{ __('Title') }}</th>
-                            <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Type') }}</th>
-                            <th scope="col" class="px-4 py-2 text-right font-medium">{{ __('Slots') }}</th>
-                            <th scope="col" class="px-4 py-2 text-right font-medium">{{ __('Applicants') }}</th>
-                            <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Deadline') }}</th>
-                            <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Status') }}</th>
-                            <th scope="col" class="py-2 pl-4"><span class="sr-only">{{ __('Actions') }}</span></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($scholarships as $scholarship)
-                            <tr class="border-b border-gray-100 transition-colors duration-150 ease-in-out hover:bg-gray-50">
-                                <td class="py-3 pr-4">
-                                    <a href="{{ route('admin.scholarships.show', $scholarship) }}" data-vt-title class="rounded font-medium text-gray-900 [overflow-wrap:anywhere] hover:text-cvsu-green focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2">{{ $scholarship->title }}</a>
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3 text-gray-600">
-                                    {{ $scholarship->type->label() }}
-                                    @if ($scholarship->stem_courses_only)
-                                        <span class="block text-xs text-gray-500">{{ __('STEM only') }}</span>
-                                    @endif
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3 text-right tabular-nums text-gray-600">{{ $scholarship->remainingSlots() }} / {{ $scholarship->slots }}</td>
-                                <td class="px-4 py-3 text-right tabular-nums text-gray-600">{{ $scholarship->applications_count }}</td>
-                                <td class="whitespace-nowrap px-4 py-3 tabular-nums text-gray-600">
-                                    @if ($scholarship->deadline)
-                                        {{ $scholarship->deadline->format('M j, Y') }}
-                                    @else
-                                        <span aria-hidden="true">&mdash;</span><span class="sr-only">{{ __('No deadline') }}</span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-3">
-                                    <x-badge :color="$scholarship->status->value === 'open' ? 'green' : 'gray'">
+            @if ($scholarships->isNotEmpty())
+                <ul data-results class="mt-8 grid gap-4 grid-cols-[repeat(auto-fill,minmax(min(20rem,100%),1fr))]" role="list">
+                    @foreach ($scholarships as $scholarship)
+                        <li>
+                            <article class="group relative flex h-full flex-col rounded-sheet border border-rule bg-white p-5 transition-colors duration-150 ease-in-out hover:border-seal/40">
+                                <div class="flex items-start justify-between gap-3">
+                                    <h2 class="min-w-0 text-lead font-semibold leading-snug text-ink [overflow-wrap:anywhere]">
+                                        <a href="{{ route('admin.scholarships.show', $scholarship) }}" data-vt-title
+                                           class="rounded after:absolute after:inset-0 after:content-[''] group-hover:text-seal focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ $scholarship->title }}</a>
+                                    </h2>
+                                    <x-badge class="shrink-0" :color="$scholarship->status->value === 'open' ? 'green' : 'gray'">
                                         {{ $scholarship->status->label() }}
                                     </x-badge>
-                                </td>
-                                <td class="whitespace-nowrap py-3 pl-4 text-right">
-                                    <a href="{{ route('admin.scholarships.show', $scholarship) }}" class="rounded font-semibold text-cvsu-green hover:text-cvsu-green-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2">{{ __('View') }}<span class="sr-only"> {{ $scholarship->title }}</span></a>
-                                    <a href="{{ route('admin.scholarships.edit', $scholarship) }}" class="ml-4 rounded font-medium text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2">{{ __('Edit') }}<span class="sr-only"> {{ $scholarship->title }}</span></a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="py-8 text-center text-gray-500">
-                                    {{ __('No scholarships have been posted yet.') }}
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                                </div>
+                                <p class="mt-1 text-slate">
+                                    {{ $scholarship->type->label() }}
+                                    @if ($scholarship->stem_courses_only)
+                                        <span aria-hidden="true">&middot;</span> {{ __('STEM only') }}
+                                    @endif
+                                </p>
+
+                                <div class="mt-auto pt-5">
+                                    <dl class="grid grid-cols-2 gap-3 border-t border-rule pt-4">
+                                        <div class="min-w-0">
+                                            <dt class="text-slate">{{ __('Slots left') }}</dt>
+                                            <dd class="mt-0.5 text-lead font-semibold tabular-nums text-ink">{{ __(':left of :total', ['left' => $scholarship->remainingSlots(), 'total' => $scholarship->slots]) }}</dd>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <dt class="text-slate">{{ __('Applicants') }}</dt>
+                                            <dd class="mt-0.5 text-lead font-semibold tabular-nums text-ink">{{ $scholarship->applications_count }}</dd>
+                                        </div>
+                                    </dl>
+
+                                    <p class="mt-4 font-semibold tabular-nums text-ink">
+                                        @if ($scholarship->deadline)
+                                            {{ __('Closes') }} <time datetime="{{ $scholarship->deadline->toDateString() }}">{{ $scholarship->deadline->format('M j, Y') }}</time>
+                                        @else
+                                            {{ __('No deadline') }}
+                                        @endif
+                                    </p>
+                                </div>
+
+                                <div class="mt-5 flex items-center justify-between gap-4">
+                                    <span class="font-semibold text-seal" aria-hidden="true">{{ __('View scholarship') }} &rarr;</span>
+                                    <a href="{{ route('admin.scholarships.edit', $scholarship) }}" class="relative z-10 rounded font-medium text-graphite underline-offset-4 hover:text-ink hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Edit') }}<span class="sr-only"> {{ $scholarship->title }}</span></a>
+                                </div>
+                            </article>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
 
             @if ($scholarships->hasPages())
                 <div class="mt-6">

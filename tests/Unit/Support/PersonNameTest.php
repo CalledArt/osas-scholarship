@@ -84,4 +84,24 @@ class PersonNameTest extends TestCase
     {
         $this->assertSame($expected, PersonName::assemble($firstName, $middleName, $lastName));
     }
+
+    /**
+     * @return array<string, array{0: ?string, 1: ?string, 2: ?string, 3: string}>
+     */
+    public static function surnameFirstNames(): array
+    {
+        return [
+            'all three parts' => ['Juan', 'Santos', 'Dela Cruz', 'Dela Cruz, Juan Santos'],
+            'a missing middle name' => ['Juan', null, 'Dela Cruz', 'Dela Cruz, Juan'],
+            'no surname leaves the given names' => ['Juan', 'Santos', '  ', 'Juan Santos'],
+            'only a surname' => [null, null, 'Dela Cruz', 'Dela Cruz'],
+            'no parts at all' => [null, null, null, ''],
+        ];
+    }
+
+    #[DataProvider('surnameFirstNames')]
+    public function test_assembles_parts_surname_first(?string $firstName, ?string $middleName, ?string $lastName, string $expected): void
+    {
+        $this->assertSame($expected, PersonName::surnameFirst($firstName, $middleName, $lastName));
+    }
 }

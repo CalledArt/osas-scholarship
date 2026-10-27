@@ -42,6 +42,24 @@ class DesignSystemTest extends TestCase
         $this->assertSame([], $offenders, 'Uppercase is reserved for table column headers and stat-tile captions. Button labels are sentence case.');
     }
 
+    public function test_links_to_downloads_say_so(): void
+    {
+        $offenders = [];
+
+        /** @var SplFileInfo $file */
+        foreach (File::allFiles(resource_path('views')) as $file) {
+            preg_match_all("/<a\s[^>]*href=\"\{\{ (?:route\('(?:admin\.fund-allocation\.report|admin\.scholarships\.applications\.report|scholarship-applications\.documents\.show|scholarships\.required-documents\.sample\.download)'|\\\$downloadUrl )[^>]*>/", $file->getContents(), $links);
+
+            foreach ($links[0] as $link) {
+                if (preg_match('/\sdownload[\s>]/', $link) !== 1) {
+                    $offenders[] = $file->getRelativePathname();
+                }
+            }
+        }
+
+        $this->assertSame([], $offenders, 'A link to a file must carry the download attribute. The page never unloads for a download, so without it the navigation progress bar runs on for 20 seconds.');
+    }
+
     public function test_button_components_share_one_disabled_treatment(): void
     {
         foreach (['primary-button', 'secondary-button', 'danger-button'] as $component) {

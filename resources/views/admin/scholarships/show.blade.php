@@ -4,66 +4,90 @@
     it, since that is what produced it), then the applicants it decides. What OSAS posted (the description
     and required documents) is reference, so from 1024px it moves to a side
     column instead of pushing the work down; below that it follows the
-    applicants, so source and focus order stay the visual order.
+    applicants, so source and focus order stay the visual order. Drawn like
+    the other admin pages (asked 2026-10-25): the dashboards' banner carries
+    the title, where it stands and its two actions, and each part of the work
+    is a bordered panel headed like the dashboard's postings table. From lg the
+    page fits the screen: the applicant list and the description each scroll
+    inside their own panel, under headers that stay in view.
 --}}
 @php
     $pendingCount = $scholarship->applications->where('status', \App\Enums\ApplicationStatus::Pending)->count();
+    $passedCount = $scholarship->applications->where('status', \App\Enums\ApplicationStatus::Approved)->count();
 @endphp
 
-<x-app-layout :sheet="true">
-    <div class="px-6 py-10 lg:px-10">
-        <div class="mx-auto max-w-5xl">
-            <a href="{{ route('admin.scholarships.index') }}" class="rounded text-sm font-medium text-gray-600 underline underline-offset-4 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2">{{ __('Back to scholarships') }}</a>
+<x-app-layout :title="$scholarship->title" :sheet="true">
+    <div class="px-6 py-10 lg:flex lg:h-screen lg:flex-col lg:px-10 lg:py-6">
+        <div class="mx-auto max-w-[100rem] lg:flex lg:min-h-0 lg:w-full lg:flex-col">
+            <a href="{{ route('admin.scholarships.index') }}" class="rounded font-medium lg:self-start text-graphite underline underline-offset-4 hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Back to scholarships') }}</a>
 
-            <div class="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-                <h1 data-vt-title class="min-w-0 text-xl font-semibold leading-tight text-gray-900 [overflow-wrap:anywhere]">{{ $scholarship->title }}</h1>
-                <a href="{{ route('admin.scholarships.edit', $scholarship) }}" class="inline-flex shrink-0 items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2">{{ __('Edit') }}</a>
-            </div>
+            <div class="mt-4">
+                <x-welcome-banner :heading="$scholarship->title" :vt-title="true">
+                    <x-badge class="me-1" :color="$scholarship->status->value === 'open' ? 'green' : 'gray'">
+                        {{ $scholarship->status->label() }}
+                    </x-badge>
+                    {{ $scholarship->type->label() }}
+                    @if ($scholarship->stem_courses_only)
+                        <span aria-hidden="true">&middot;</span> {{ __('STEM courses only') }}
+                    @endif
+                    <span class="tabular-nums"><span aria-hidden="true">&middot;</span> {{ $scholarship->remainingSlots() }} / {{ $scholarship->slots }} {{ __('slots remaining') }}</span>
+                    @if ($scholarship->deadline)
+                        <span class="tabular-nums"><span aria-hidden="true">&middot;</span> {{ __('Deadline') }}: {{ $scholarship->deadline->format('M j, Y') }}</span>
+                    @endif
 
-            <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
-                <x-badge :color="$scholarship->status->value === 'open' ? 'green' : 'gray'">
-                    {{ $scholarship->status->label() }}
-                </x-badge>
-                <span>{{ $scholarship->type->label() }}</span>
-                @if ($scholarship->stem_courses_only)
-                    <span><span aria-hidden="true">&middot;</span> {{ __('STEM courses only') }}</span>
-                @endif
-                <span class="tabular-nums"><span aria-hidden="true">&middot;</span> {{ $scholarship->remainingSlots() }} / {{ $scholarship->slots }} {{ __('slots remaining') }}</span>
-                @if ($scholarship->deadline)
-                    <span class="tabular-nums"><span aria-hidden="true">&middot;</span> {{ __('Deadline') }}: {{ $scholarship->deadline->format('M j, Y') }}</span>
-                @endif
+                    <x-slot:action>
+                        <div class="flex shrink-0 flex-wrap items-center gap-3">
+                            @if ($passedCount > 0)
+                                <a href="{{ route('admin.fund-allocation.show', $scholarship) }}" class="inline-flex items-center rounded-sheet border border-rule-strong bg-white px-4 py-2 font-semibold text-graphite shadow-seat transition duration-150 ease-in-out hover:bg-linen-sunk focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Fund Allocation') }}</a>
+                            @endif
+                            <a href="{{ route('admin.scholarships.edit', $scholarship) }}" class="inline-flex items-center rounded-sheet border border-rule-strong bg-white px-4 py-2 font-semibold text-graphite shadow-seat transition duration-150 ease-in-out hover:bg-linen-sunk focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Edit') }}</a>
+                        </div>
+                    </x-slot:action>
+                </x-welcome-banner>
             </div>
 
             @if (session('status'))
-                <div class="mt-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700" role="status">
+                <div class="mt-6 rounded-sheet border border-grant/30 bg-grant-wash px-4 py-3  text-grant-deep" role="status">
                     {{ session('status') }}
                 </div>
             @endif
 
             @if (session('error'))
-                <div class="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+                <div class="mt-6 rounded-sheet border border-oxide/30 bg-oxide-wash px-4 py-3  text-oxide-deep" role="alert">
                     {{ session('error') }}
                 </div>
             @endif
 
-            <div class="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-x-12">
-                <div class="min-w-0">
+            <div class="mt-6 grid gap-6 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[minmax(0,1fr)] xl:grid-cols-[minmax(0,1fr)_26rem]">
+                <div class="min-w-0 lg:flex lg:min-h-0 lg:flex-col">
                     @if (session('decisionResults'))
                         @php $results = session('decisionResults'); @endphp
-                        <section aria-labelledby="results-heading" class="mb-10 rounded-lg border border-gray-200 bg-gray-50 p-5 text-sm">
-                            <h2 id="results-heading" class="text-base font-semibold text-gray-900">{{ __('Pass List Results') }}</h2>
-                            <p class="mt-1 tabular-nums text-gray-700">
+                        <section aria-labelledby="results-heading" class="mb-6 rounded-lg border border-rule bg-linen-sunk p-5 lg:max-h-[40vh] lg:shrink-0 lg:overflow-y-auto">
+                            <h2 id="results-heading" class="text-lead font-semibold text-ink">{{ __('Pass List Results') }}</h2>
+                            <p class="mt-1 tabular-nums text-graphite">
                                 {{ __(':approved approved, :rejected rejected.', ['approved' => count($results['approved']), 'rejected' => count($results['rejected'])]) }}
                             </p>
 
-                            @if (! empty($results['skipped_capacity']) || ! empty($results['ambiguous']) || ! empty($results['unmatched']))
-                                <div class="mt-4 divide-y divide-gray-200 border-t border-gray-200">
+                            @if (! empty($results['already_active']) || ! empty($results['skipped_capacity']) || ! empty($results['ambiguous']) || ! empty($results['unmatched']))
+                                <div class="mt-4 divide-y divide-rule border-t border-rule">
+                                    @if (! empty($results['already_active']))
+                                        <div class="py-3">
+                                            <p class="font-semibold text-ink">{{ __('Passed but rejected — already holds an active scholarship:') }}</p>
+                                            <ul class="mt-1 list-inside list-disc text-graphite">
+                                                @foreach ($results['already_active'] as $row)
+                                                    <li><span class="uppercase">{{ $row['name'] }}</span> ({{ $row['email'] }}) — {{ __('holds :title', ['title' => $row['active_scholarship']]) }}</li>
+                                                @endforeach
+                                            </ul>
+                                            <p class="mt-2 text-slate">{{ __('A student can hold only one active scholarship at a time. They were emailed why, and their slots stay open.') }}</p>
+                                        </div>
+                                    @endif
+
                                     @if (! empty($results['skipped_capacity']))
                                         <div class="py-3">
-                                            <p class="font-semibold text-gray-900">{{ __('Matched but not approved — no slots remaining:') }}</p>
-                                            <ul class="mt-1 list-inside list-disc text-gray-600">
+                                            <p class="font-semibold text-ink">{{ __('Matched but not approved — no slots remaining:') }}</p>
+                                            <ul class="mt-1 list-inside list-disc text-graphite">
                                                 @foreach ($results['skipped_capacity'] as $row)
-                                                    <li>{{ $row['name'] }} ({{ $row['email'] }})</li>
+                                                    <li><span class="uppercase">{{ $row['name'] }}</span> ({{ $row['email'] }})</li>
                                                 @endforeach
                                             </ul>
                                         </div>
@@ -71,23 +95,23 @@
 
                                     @if (! empty($results['ambiguous']))
                                         <div class="py-3">
-                                            <p class="font-semibold text-gray-900">{{ __('Left pending — name matches more than one applicant:') }}</p>
-                                            <ul class="mt-1 list-inside list-disc text-gray-600">
+                                            <p class="font-semibold text-ink">{{ __('Left pending — name matches more than one applicant:') }}</p>
+                                            <ul class="mt-1 list-inside list-disc text-graphite">
                                                 @foreach ($results['ambiguous'] as $row)
-                                                    <li>{{ $row['name'] }} ({{ __(':count applicants', ['count' => $row['count']]) }})</li>
+                                                    <li><span class="uppercase">{{ $row['name'] }}</span> ({{ __(':count applicants', ['count' => $row['count']]) }})</li>
                                                 @endforeach
                                             </ul>
-                                            <p class="mt-2 text-gray-500">{{ __('Add their student numbers to the pass list and upload it again.') }}</p>
+                                            <p class="mt-2 text-slate">{{ __('Add their student numbers to the pass list and upload it again.') }}</p>
                                         </div>
                                     @endif
 
                                     @if (! empty($results['unmatched']))
                                         <div class="py-3">
-                                            <p class="font-semibold text-gray-900">{{ __("Rows in the file that didn't match any pending applicant:") }}</p>
-                                            <ul class="mt-1 list-inside list-disc text-gray-600">
+                                            <p class="font-semibold text-ink">{{ __("Rows in the file that didn't match any pending applicant:") }}</p>
+                                            <ul class="mt-1 list-inside list-disc text-graphite">
                                                 @foreach ($results['unmatched'] as $row)
                                                     <li>
-                                                        {{ $row['name'] ?? __('(no name)') }}
+                                                        @if ($row['name'] !== null)<span class="uppercase">{{ $row['name'] }}</span>@else{{ __('(no name)') }}@endif
                                                         @if ($row['student_number'])
                                                             — <span class="tabular-nums">{{ $row['student_number'] }}</span>
                                                         @endif
@@ -101,20 +125,25 @@
                         </section>
                     @endif
 
-                    <section aria-labelledby="pass-list-heading">
-                        <h2 id="pass-list-heading" class="text-base font-semibold text-gray-900">{{ __('Upload Pass List') }}</h2>
+                    <section aria-labelledby="pass-list-heading" class="rounded-lg border border-rule bg-white px-5 py-4">
+                        <h2 id="pass-list-heading" class="flex items-center gap-2.5 text-lead font-semibold text-ink">
+                            <svg class="h-5 w-5 shrink-0 text-seal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0-4 4m4-4 4 4M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" />
+                            </svg>
+                            {{ __('Upload Pass List') }}
+                        </h2>
 
                         @if ($pendingCount > 0)
-                            <p class="mt-1 max-w-prose text-sm text-gray-500">
-                                {{ __('Upload a CSV of who passed — a "student_number" column, a "name" column, or both (student number is matched first since it\'s unique; name is the fallback). A header-less single column of names also works. Every other pending applicant (:count) will be rejected automatically.', ['count' => $pendingCount]) }}
+                            <p class="mt-1 max-w-prose  text-slate">
+                                {{ __('Upload a CSV of who passed — a "student_number" column, a "name" column, or both (a row with a student number is matched by that number only; a name is matched only on rows without one). A header-less single column of names also works. Every other pending applicant (:count) will be rejected automatically.', ['count' => $pendingCount]) }}
                             </p>
 
                             <form
-                                method="POST"
-                                action="{{ route('admin.scholarships.applications.import-decisions', $scholarship) }}"
-                                enctype="multipart/form-data"
-                                class="mt-4 flex flex-col gap-3 rounded-lg border border-gray-200 p-4 sm:flex-row sm:items-center"
-                                x-data="{ sending: false }"
+ method="POST"
+ action="{{ route('admin.scholarships.applications.import-decisions', $scholarship) }}"
+ enctype="multipart/form-data"
+ class="mt-4 flex flex-col gap-3 rounded-sheet border border-rule p-4 sm:flex-row sm:items-center"
+ x-data="{ sending: false }"
                                 @submit="if (! confirm('{{ __('This will approve matched names and reject every other pending applicant. Continue?') }}')) { $event.preventDefault(); return; } sending = true"
                                 @pageshow.window="if ($event.persisted) sending = false"
                             >
@@ -136,32 +165,42 @@
                             </form>
                             <x-input-error :messages="$errors->get('file')" class="mt-2" />
                         @else
-                            <p class="mt-1 text-sm text-gray-500">
+                            <p class="mt-1  text-slate">
                                 {{ __('There are no pending applicants to decide on right now.') }}
                             </p>
                         @endif
                     </section>
 
-                    <section aria-labelledby="applicants-heading" class="mt-12">
-                        <h2 id="applicants-heading" class="text-base font-semibold text-gray-900">
-                            {{ __('Applicants') }} <span class="font-normal tabular-nums text-gray-500">({{ $scholarship->applications->count() }})</span>
-                        </h2>
+                    <section aria-labelledby="applicants-heading" class="mt-6 overflow-hidden rounded-lg border border-rule bg-white lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
+                        <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 py-4">
+                            <h2 id="applicants-heading" class="flex items-center gap-2.5 text-lead font-semibold text-ink">
+                                <svg class="h-5 w-5 shrink-0 text-seal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                                    <circle cx="9" cy="8" r="3" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.5 19a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.5M17.5 19a5.5 5.5 0 0 0-2.5-4.6" />
+                                </svg>
+                                {{ __('Applicants') }} <span class="font-normal tabular-nums text-slate">({{ $scholarship->applications->count() }})</span>
+                            </h2>
+                            @if ($scholarship->applications->isNotEmpty())
+                                <a href="{{ route('admin.scholarships.applications.report', $scholarship) }}" download class="rounded-sheet font-semibold text-seal underline underline-offset-4 hover:text-seal-deep focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Print report (PDF)') }}</a>
+                            @endif
+                        </div>
 
                         @if ($scholarship->applications->isEmpty())
-                            <p class="mt-3 border-y border-gray-200 py-6 text-sm text-gray-500">{{ __('No applications yet.') }}</p>
+                            <p class="border-t border-rule px-5 py-8 text-center text-slate">{{ __('No applications yet.') }}</p>
                         @else
-                            <ul class="mt-3 divide-y divide-gray-100 border-y border-gray-200">
+                            {{-- Relative, so the sr-only labels in its rows stay inside the scroll instead of stretching the page. --}}
+                            <ul class="relative divide-y divide-rule border-t border-rule lg:min-h-0 lg:overflow-y-auto">
                                 @foreach ($scholarship->applications as $application)
-                                    <li class="py-4">
+                                    <li class="px-5 py-4 transition-colors duration-150 ease-in-out hover:bg-linen-sunk/60">
                                         <div class="flex items-start justify-between gap-4">
                                             <div class="min-w-0">
-                                                <p class="text-sm font-semibold text-gray-900 [overflow-wrap:anywhere]">
-                                                    {{ $application->user->name }}
+                                                <p class="font-semibold text-ink [overflow-wrap:anywhere]">
+                                                    <span class="uppercase">{{ $application->user->surname_first_name }}</span>
                                                     @if ($application->user->student_number)
-                                                        <span class="ms-1 font-normal tabular-nums text-gray-500">({{ $application->user->student_number }})</span>
+                                                        <span class="ms-1 font-normal tabular-nums text-slate">({{ $application->user->student_number }})</span>
                                                     @endif
                                                 </p>
-                                                <p class="mt-1 text-sm text-gray-500 [overflow-wrap:anywhere]">
+                                                <p class="mt-1  text-slate [overflow-wrap:anywhere]">
                                                     {{ $application->user->email }}
                                                     @if ($application->user->course)
                                                         &middot; {{ $application->user->course }}
@@ -171,17 +210,24 @@
                                             <x-badge class="shrink-0" :color="match ($application->status->value) {
                                                 'approved' => 'green',
                                                 'rejected' => 'red',
+                                                'voided' => 'gray',
                                                 default => 'gold',
                                             }">
                                                 {{ $application->status->label() }}
                                             </x-badge>
                                         </div>
 
+                                        @if ($application->passed_while_holding_active)
+                                            <p class="mt-1 text-slate">{{ __('Passed, but already held an active scholarship.') }}</p>
+                                        @elseif ($application->status === \App\Enums\ApplicationStatus::Voided)
+                                            <p class="mt-1 text-slate">{{ __('Voided when the student went on leave of absence (LOA); the slot was freed.') }}</p>
+                                        @endif
+
                                         @if ($application->documents->isNotEmpty())
                                             <div class="mt-3 flex flex-wrap gap-2">
                                                 @foreach ($application->documents as $document)
-                                                    <a href="{{ route('scholarship-applications.documents.show', [$application, $document]) }}" class="inline-flex items-center gap-1 rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-600 transition-colors duration-150 ease-in-out hover:border-cvsu-green hover:text-cvsu-green focus:outline-none focus-visible:ring-2 focus-visible:ring-cvsu-green focus-visible:ring-offset-2">
-                                                        {{ $document->requiredDocument->name }}<span class="sr-only">, {{ $application->user->name }}</span>
+                                                    <a href="{{ route('scholarship-applications.documents.show', [$application, $document]) }}" download class="inline-flex items-center gap-1 rounded-sheet border border-rule px-2.5 py-1  font-medium text-graphite transition-colors duration-150 ease-in-out hover:border-seal hover:text-seal focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">
+                                                        {{ $document->requiredDocument->name }}<span class="sr-only">, {{ $application->user->surname_first_name }}</span>
                                                     </a>
                                                 @endforeach
                                             </div>
@@ -193,23 +239,32 @@
                     </section>
                 </div>
 
-                <aside aria-labelledby="about-heading" class="mt-12 lg:mt-0">
-                    <h2 id="about-heading" class="text-base font-semibold text-gray-900">{{ __('About this scholarship') }}</h2>
-                    <p class="mt-3 max-w-prose whitespace-pre-line text-sm leading-relaxed text-gray-700">{{ $scholarship->description }}</p>
+                {{-- The reference beside the work: a long description scrolls inside it (capped on a phone, the column's height from lg) instead of stretching the page. --}}
+                <aside aria-labelledby="about-heading" class="overflow-hidden rounded-lg border border-rule bg-white lg:flex lg:min-h-0 lg:flex-col">
+                    <h2 id="about-heading" class="flex items-center gap-2.5 px-5 py-4 text-lead font-semibold text-ink">
+                        <svg class="h-5 w-5 shrink-0 text-seal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 11v5M12 8h.01" />
+                        </svg>
+                        {{ __('About this scholarship') }}
+                    </h2>
+                    <div class="relative max-h-96 overflow-y-auto border-t border-rule lg:max-h-none lg:min-h-0 lg:flex-1">
+                        <p class="max-w-prose whitespace-pre-line text-justify px-5 py-4 leading-relaxed text-graphite">{{ $scholarship->description }}</p>
 
-                    @if ($scholarship->requiredDocuments->isNotEmpty())
-                        <h3 class="mt-8 text-sm font-semibold text-gray-900">{{ __('Required Documents') }}</h3>
-                        <ul class="mt-2 divide-y divide-gray-100 border-y border-gray-200">
-                            @foreach ($scholarship->requiredDocuments as $document)
-                                <li class="flex flex-col gap-3 py-3 sm:flex-row sm:items-start sm:justify-between lg:flex-col lg:items-stretch">
-                                    <p class="min-w-0 text-sm font-medium text-gray-900">{{ $document->name }}</p>
-                                    @if ($document->hasSample())
-                                        <x-sample-preview :document="$document" class="w-full shrink-0 sm:w-64 lg:w-full" />
-                                    @endif
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
+                        @if ($scholarship->requiredDocuments->isNotEmpty())
+                            <h3 class="border-t border-rule bg-linen-sunk px-5 py-2.5 font-semibold text-ink">{{ __('Required Documents') }}</h3>
+                            <ul class="divide-y divide-rule border-t border-rule px-5">
+                                @foreach ($scholarship->requiredDocuments as $document)
+                                    <li class="flex flex-col gap-3 py-3 sm:flex-row sm:items-start sm:justify-between lg:flex-col lg:items-stretch">
+                                        <p class="min-w-0  font-medium text-ink">{{ $document->name }}</p>
+                                        @if ($document->hasSample())
+                                            <x-sample-preview :document="$document" class="w-full shrink-0 sm:w-64 lg:w-full" />
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
                 </aside>
             </div>
         </div>

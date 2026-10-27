@@ -10,6 +10,7 @@ use App\Support\PersonName;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class StudentController extends Controller
@@ -54,15 +55,43 @@ class StudentController extends Controller
 
     /**
      * Update a student's details.
+     *
+     * A student on leave of absence gives up the slots their pending
+     * applications hold, so other students can apply for them; scholarships
+     * already approved stay theirs. The save says which scholarships were
+     * freed, and which of those OSAS must reopen before anyone can apply.
      */
     public function update(UpdateStudentRequest $request, User $student): RedirectResponse
     {
         $student->fill($request->validated());
         $student->name = PersonName::assemble($student->first_name, $student->middle_name, $student->last_name);
-        $student->save();
+
+        $freedScholarships = DB::transaction(function () use ($student) {
+            $student->save();
+
+            return $student->isOnLeaveOfAbsence() ? $student->voidPendingApplications() : collect();
+        });
+
+        $status = __('Student details saved.');
+
+        if ($freedScholarships->isNotEmpty()) {
+            $status .= ' '.trans_choice(
+                'Their pending application to :titles was voided, freeing its slot for another student.|Their pending applications to :titles were voided, freeing their slots for other students.',
+                $freedScholarships->count(),
+                ['titles' => $freedScholarships->pluck('title')->join(', ', ' and ')],
+            );
+
+            $notTakingApplications = $freedScholarships->reject->isOpenForApplications();
+
+            if ($notTakingApplications->isNotEmpty()) {
+                $status .= ' '.__('Reopen :titles, or extend the deadline, to take new applicants.', [
+                    'titles' => $notTakingApplications->pluck('title')->join(', ', ' and '),
+                ]);
+            }
+        }
 
         return redirect()
             ->route('admin.students.edit', $student)
-            ->with('status', __('Student details saved.'));
+            ->with('status', $status);
     }
 }

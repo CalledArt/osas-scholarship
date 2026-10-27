@@ -84,26 +84,99 @@ class ScholarshipBrowsingTest extends TestCase
 
         $response = $this->actingAs($student)->get(route('scholarships.show', $scholarship));
 
-        $response->assertSeeInOrder(['Full', '0 of 1 slots left', 'This scholarship is no longer accepting applications.']);
+        $response->assertSeeInOrder(['Full', 'This scholarship is no longer accepting applications.']);
+        $response->assertDontSee('slots left');
         $response->assertDontSee(route('scholarships.apply', $scholarship));
     }
 
     public function test_scholarships_page_lists_active_scholarships_above_the_ones_available_to_apply(): void
     {
         $student = User::factory()->create();
-        ScholarshipApplication::factory()->approved()->for($student)
-            ->for(Scholarship::factory()->create(['title' => 'Held Grant']))
-            ->create();
         Scholarship::factory()->create(['title' => 'Open Grant']);
         Scholarship::factory()->closed()->create(['title' => 'Closed Grant']);
 
         $response = $this->actingAs($student)->get(route('scholarships.index'));
 
-        $response->assertSeeInOrder(['Active scholarships', 'Republic Act No. 10931', 'Held Grant', 'Available to apply', 'Open Grant']);
+        $response->assertSeeInOrder(['Where you stand', 'Republic Act No. 10931', 'Available to apply', 'Open Grant']);
         $response->assertDontSee('Closed Grant');
+        $response->assertViewHas('hasOpenScholarships', true);
     }
 
-    public function test_scholarships_page_cards_give_slots_left_documents_and_deadline(): void
+    public function test_scholarships_banner_counts_the_scholarships_open_to_the_student(): void
+    {
+        $student = User::factory()->create();
+        Scholarship::factory()->count(2)->create();
+        Scholarship::factory()->closed()->create();
+
+        $response = $this->actingAs($student)->get(route('scholarships.index'));
+
+        $response->assertSeeInOrder(['scholarships are open to you.', 'Where you stand']);
+    }
+
+    public function test_a_student_holding_an_active_scholarship_is_offered_nothing_else_to_apply_to(): void
+    {
+        $student = User::factory()->create();
+        ScholarshipApplication::factory()->approved()->for($student)
+            ->for(Scholarship::factory()->create(['title' => 'Held Grant']))
+            ->create();
+        Scholarship::factory()->create(['title' => 'Open Grant']);
+
+        $response = $this->actingAs($student)->get(route('scholarships.index'));
+
+        $response->assertSeeInOrder(['Nothing is open for you to apply to right now.', 'Where you stand', 'Republic Act No. 10931', 'Held Grant', 'Available to apply', 'You hold an active scholarship. Apply again once it ends.']);
+        $response->assertDontSee('Open Grant');
+        $response->assertViewHas('hasOpenScholarships', false);
+    }
+
+    public function test_scholarship_details_are_marked_restricted_while_the_student_holds_an_active_scholarship(): void
+    {
+        $student = User::factory()->create();
+        ScholarshipApplication::factory()->approved()->for($student)->create();
+        $scholarship = Scholarship::factory()->create(['title' => 'Merit Grant']);
+
+        $response = $this->actingAs($student)->get(route('scholarships.show', $scholarship));
+
+        $response->assertSeeInOrder(['Merit Grant', 'Restricted', 'You currently hold an active scholarship. As a student may hold only one active scholarship at a time, applications to other scholarships are restricted until the grant period of your current scholarship has ended.']);
+        $response->assertDontSee(route('scholarships.apply', $scholarship));
+    }
+
+    public function test_scholarship_details_are_marked_restricted_while_the_student_is_on_leave_of_absence(): void
+    {
+        $student = User::factory()->onLeaveOfAbsence()->create();
+        $scholarship = Scholarship::factory()->create(['title' => 'Merit Grant']);
+
+        $response = $this->actingAs($student)->get(route('scholarships.show', $scholarship));
+
+        $response->assertSeeInOrder(['Merit Grant', 'Restricted', 'You are on leave of absence (LOA), so you can&#039;t apply to scholarships.'], false);
+        $response->assertDontSee(route('scholarships.apply', $scholarship));
+    }
+
+    public function test_the_active_scholarship_restriction_is_explained_before_the_stem_course_limit(): void
+    {
+        $student = User::factory()->create(['course' => 'BS Accountancy']);
+        ScholarshipApplication::factory()->approved()->for($student)->create();
+        $scholarship = Scholarship::factory()->stemCoursesOnly()->create();
+
+        $response = $this->actingAs($student)->get(route('scholarships.show', $scholarship));
+
+        $response->assertSee('Restricted');
+        $response->assertSee('You currently hold an active scholarship.');
+        $response->assertDontSee('Only students in a STEM course can apply');
+    }
+
+    public function test_the_scholarship_a_student_holds_is_not_marked_restricted(): void
+    {
+        $student = User::factory()->create();
+        $scholarship = Scholarship::factory()->create();
+        ScholarshipApplication::factory()->approved()->for($student)->for($scholarship)->create();
+
+        $response = $this->actingAs($student)->get(route('scholarships.show', $scholarship));
+
+        $response->assertSee('View your application');
+        $response->assertDontSee('Restricted');
+    }
+
+    public function test_scholarships_page_boxes_give_the_deadline_and_documents_but_no_slot_count(): void
     {
         $student = User::factory()->create();
         $scholarship = Scholarship::factory()->create(['title' => 'Merit Grant', 'slots' => 5, 'deadline' => now()->addMonth()->setDate(2026, 11, 8)]);
@@ -111,7 +184,11 @@ class ScholarshipBrowsingTest extends TestCase
 
         $response = $this->actingAs($student)->get(route('scholarships.index'));
 
-        $response->assertSeeInOrder(['Merit Grant', 'Slots left', '5', 'of 5', 'Documents', '2', 'Deadline', 'Nov 8']);
+        // Every box sets the same facts in the same cells, so two boxes compare at
+        // a glance: when it closes, then how many documents it wants beside the
+        // Apply cue. Slots left are not shown (decided 2026-10-24).
+        $response->assertSeeTextInOrder(['Merit Grant', 'Closes', 'Nov 8, 2026', '2 documents', 'Apply']);
+        $response->assertDontSeeText('Slots left');
     }
 
     public function test_scholarship_details_explain_the_limit_instead_of_offering_to_apply_when_the_student_is_at_it(): void
@@ -122,7 +199,7 @@ class ScholarshipBrowsingTest extends TestCase
 
         $response = $this->actingAs($student)->get(route('scholarships.show', $scholarship));
 
-        $response->assertSee('You already hold 2 scholarships');
+        $response->assertSee('You already have 2 applications waiting for a decision.');
         $response->assertDontSee(route('scholarships.apply', $scholarship));
     }
 
@@ -167,5 +244,69 @@ class ScholarshipBrowsingTest extends TestCase
         $response = $this->actingAs($student)->get(route('scholarships.show', $scholarship));
 
         $response->assertSee('Academic scholarship');
+    }
+
+    public function test_a_scholarship_closed_by_osas_states_the_reason_and_never_a_future_deadline(): void
+    {
+        $student = User::factory()->create();
+        $scholarship = Scholarship::factory()->closed()->create([
+            'title' => 'Tulong Dunong',
+            'slots' => 12,
+            'deadline' => now()->addDays(10),
+        ]);
+
+        $response = $this->actingAs($student)->get(route('scholarships.show', $scholarship));
+
+        $response->assertSee('Closed by OSAS');
+        $response->assertDontSee('Closes in 10 days');
+        $response->assertDontSee(route('scholarships.apply', $scholarship));
+    }
+
+    public function test_an_open_scholarship_counts_its_deadline_in_whole_calendar_days(): void
+    {
+        $student = User::factory()->create();
+        $scholarship = Scholarship::factory()->create(['deadline' => now()->addDays(2)]);
+
+        $response = $this->actingAs($student)->get(route('scholarships.show', $scholarship));
+
+        // Counted between day boundaries, so the time of day never rounds this down.
+        $response->assertSee('Closes in 2 days');
+    }
+
+    public function test_a_full_scholarship_states_full_rather_than_its_still_future_deadline(): void
+    {
+        $student = User::factory()->create();
+        $scholarship = Scholarship::factory()->create(['slots' => 1, 'deadline' => now()->addDays(30)]);
+        ScholarshipApplication::factory()->approved()->for($scholarship)->create();
+
+        $response = $this->actingAs($student)->get(route('scholarships.show', $scholarship));
+
+        $response->assertSee('Full');
+        $response->assertDontSee('Closes in 30 days');
+    }
+
+    public function test_a_posting_of_a_preset_the_student_holds_is_not_offered_to_apply_to(): void
+    {
+        $student = User::factory()->create();
+        ScholarshipApplication::factory()->for($student)->for(Scholarship::factory()->fromPreset('tdp')->closed())->create();
+        Scholarship::factory()->fromPreset('tdp')->create(['title' => 'TDP Second Call']);
+        Scholarship::factory()->create(['title' => 'Merit Grant']);
+
+        $response = $this->actingAs($student)->get(route('scholarships.index'));
+
+        $response->assertSee('Merit Grant');
+        $response->assertDontSee('TDP Second Call');
+    }
+
+    public function test_scholarship_details_explain_that_the_student_holds_another_posting_of_its_preset(): void
+    {
+        $student = User::factory()->create();
+        ScholarshipApplication::factory()->for($student)->for(Scholarship::factory()->fromPreset('tdp')->closed())->create();
+        $scholarship = Scholarship::factory()->fromPreset('tdp')->create();
+
+        $response = $this->actingAs($student)->get(route('scholarships.show', $scholarship));
+
+        $response->assertSeeInOrder(['Restricted', 'You already applied to another Tulong Dunong Program (TDP) posting. A student may hold only one at a time, so you can apply here only if that application is rejected or its grant period ends.']);
+        $response->assertDontSee(route('scholarships.apply', $scholarship));
     }
 }

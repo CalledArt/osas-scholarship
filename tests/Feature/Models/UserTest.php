@@ -77,4 +77,16 @@ class UserTest extends TestCase
         $this->assertSame($expectedYear, $yearOfStudy);
         $this->assertSame($expectedCovered, $isCovered);
     }
+
+    public function test_leave_of_absence_pauses_ra_10931_without_using_up_the_years_it_covers(): void
+    {
+        $this->travelTo('2026-10-12');
+        $student = User::factory()->onLeaveOfAbsence()->make(['student_number' => '202312345', 'program_years' => 4]);
+
+        $hasFreeTuition = $student->hasFreeTertiaryEducation();
+        $isWithinCoveredYears = $student->isWithinFreeTertiaryEducationYears();
+
+        $this->assertFalse($hasFreeTuition);
+        $this->assertTrue($isWithinCoveredYears);
+    }
 }

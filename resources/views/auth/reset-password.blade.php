@@ -1,7 +1,7 @@
-<x-guest-layout>
+<x-guest-layout :title="__('Reset password')">
     <div class="mb-8">
-        <h2 class="text-2xl font-bold text-gray-900">{{ __('Reset password') }}</h2>
-        <p class="mt-1 text-sm text-gray-500">{{ __('Choose a new password for your account.') }}</p>
+        <h2 class="text-lead font-semibold text-ink">{{ __('Reset password') }}</h2>
+        <p class="mt-1  text-slate">{{ __('Choose a new password for your account.') }}</p>
     </div>
 
     <form method="POST" action="{{ route('password.store') }}" class="space-y-5">
@@ -29,8 +29,8 @@
             <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
 
             <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                                type="password"
-                                name="password_confirmation" required autocomplete="new-password" />
+ type="password"
+ name="password_confirmation" required autocomplete="new-password" />
 
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>

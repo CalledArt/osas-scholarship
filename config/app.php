@@ -69,6 +69,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Display Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Timestamps are stored in the timezone above. Pages and reports that show
+    | when something happened convert to this one, where OSAS works, so a
+    | release marked at 7am in Indang does not read as the previous day.
+    |
+    */
+
+    'display_timezone' => 'Asia/Manila',
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
     |

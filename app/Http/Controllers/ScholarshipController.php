@@ -29,13 +29,23 @@ class ScholarshipController extends Controller
         // A student at the limit can't apply to anything, so skip the round trip.
         // The document count rides along as a subquery for the cards.
         $availableScholarships = $remainingPlaces > 0
-            ? Scholarship::availableTo($student)->withCount('requiredDocuments')->get()->filter->isOpenForApplications()->values()
+            ? Scholarship::availableTo($student)->withCount('requiredDocuments')->get()
+                ->filter->isOpenForApplications()
+                ->reject(fn (Scholarship $scholarship): bool => $student->holdsPlaceFromPreset($applications, $scholarship->preset))
+                ->values()
             : new Collection;
+
+        $activeLimitReached = $student->hasReachedActiveScholarshipLimit($applications);
+        $onLeave = $student->isOnLeaveOfAbsence();
 
         return view('scholarships.index', [
             'activeApplications' => $applications->filter->isActive()->values(),
             'availableScholarships' => $availableScholarships,
             'remainingPlaces' => $remainingPlaces,
+            'activeLimitReached' => $activeLimitReached,
+            'onLeave' => $onLeave,
+            // Only open boxes earn the Open pane its column; otherwise the Mine boxes take the width.
+            'hasOpenScholarships' => ! $onLeave && ! $activeLimitReached && $availableScholarships->isNotEmpty(),
         ]);
     }
 
@@ -58,6 +68,9 @@ class ScholarshipController extends Controller
             'application' => $applications->firstWhere('scholarship_id', $scholarship->id),
             'admitsCourse' => $scholarship->admitsCourse($request->user()->course),
             'remainingPlaces' => $request->user()->remainingScholarshipPlaces($applications),
+            'activeLimitReached' => $request->user()->hasReachedActiveScholarshipLimit($applications),
+            'onLeave' => $request->user()->isOnLeaveOfAbsence(),
+            'holdsPreset' => $request->user()->holdsPlaceFromPreset($applications, $scholarship->preset),
         ]);
     }
 }
