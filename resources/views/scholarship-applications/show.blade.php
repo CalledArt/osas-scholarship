@@ -38,7 +38,7 @@
 <x-app-layout :title="$scholarship->title" :sheet="true">
     <div class="px-6 py-10 lg:px-10">
         <div class="mx-auto max-w-[100rem]">
-            <a href="{{ route('scholarship-applications.index') }}" class="rounded-sheet font-medium text-seal underline underline-offset-4 hover:text-seal-deep focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Back to my applications') }}</a>
+            <x-back-link :href="route('scholarship-applications.index')">{{ __('Back to my applications') }}</x-back-link>
 
             <div class="mt-4">
                 <x-welcome-banner :heading="$scholarship->title" :vt-title="true">
@@ -91,7 +91,11 @@
                         </x-cycle-step>
 
                         <x-cycle-step :step="__('Apply')" :date="$application->submitted_at">
-                            {{ trans_choice('You sent :count document.|You sent :count documents.', $application->documents->count(), ['count' => $application->documents->count()]) }}
+                            @if ($application->documents->isEmpty())
+                                {{ __('You applied. No documents were required.') }}
+                            @else
+                                {{ trans_choice('You sent :count document.|You sent :count documents.', $application->documents->count(), ['count' => $application->documents->count()]) }}
+                            @endif
                         </x-cycle-step>
 
                         <x-cycle-step :step="__('Review')">

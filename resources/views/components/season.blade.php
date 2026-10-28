@@ -4,8 +4,9 @@
     THE SEASON BAR — a closing date made measurable.
 
     The full width is the window from the day OSAS posted the scholarship to its
-    deadline; the witness line marks where today sits in it. Once the deadline
-    has passed the whole run is struck in Oxide and the witness line goes.
+    deadline (the end of that day in Manila); the witness line marks where
+    today sits in it. Once the deadline has passed the whole run is struck in
+    Oxide and the witness line goes.
 
     It never carries the date on its own: the date is written out beside it. A
     degenerate window (a deadline on or before the posting date, which seed and
@@ -18,7 +19,7 @@
         $deadline = $scholarship->deadline;
         $lapsed = $scholarship->hasPassedDeadline();
 
-        $span = $posted && $deadline ? $deadline->getTimestamp() - $posted->getTimestamp() : 0;
+        $span = $posted ? $scholarship->deadlineClosesAt()->getTimestamp() - $posted->getTimestamp() : 0;
         $through = $posted ? now()->getTimestamp() - $posted->getTimestamp() : 0;
 
         $measurable = $span > 0;

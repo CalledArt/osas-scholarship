@@ -13,15 +13,9 @@
 
             <div class="mt-6 rounded-lg border border-rule bg-linen-sunk p-4">
                 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1.25fr)_auto] lg:items-end">
-                    <div>
-                        <span class="draft-line draft-line--annot w-24"></span>
-                        <span class="draft-block mt-1 h-[2.625rem] w-full rounded-sheet"></span>
-                    </div>
-                    @foreach (['w-14', 'w-16', 'w-12'] as $width)
-                        <div data-draft-part="filters">
-                            <span class="draft-line draft-line--annot {{ $width }}"></span>
-                            <span class="draft-block mt-1 h-[2.625rem] w-full rounded-sheet"></span>
-                        </div>
+                    <x-page-skeleton.field label="w-24" value="w-1/3" />
+                    @foreach (['w-14' => 'w-2/3', 'w-16' => 'w-3/4', 'w-12' => 'w-2/3'] as $label => $value)
+                        <x-page-skeleton.field data-draft-part="filters" :label="$label" :value="$value" />
                     @endforeach
                     <div class="sm:col-span-2 lg:col-span-1">
                         <span class="draft-block h-[2.625rem] w-24 rounded-sheet"></span>

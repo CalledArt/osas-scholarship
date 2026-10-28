@@ -65,4 +65,17 @@ class MyApplicationsTest extends TestCase
         ]);
         $response->assertDontSee('24 days waiting');
     }
+
+    public function test_a_card_says_when_its_scholarship_stopped_taking_applications_at_its_deadline(): void
+    {
+        $this->travelTo('2026-10-25 10:00');
+        $student = User::factory()->create();
+        ScholarshipApplication::factory()->for($student)
+            ->for(Scholarship::factory()->create(['title' => 'Merit Grant', 'deadline' => '2026-10-20']))
+            ->create();
+
+        $response = $this->actingAs($student)->get(route('scholarship-applications.index'));
+
+        $response->assertSeeInOrder(['Merit Grant', 'Pending', 'Past deadline']);
+    }
 }

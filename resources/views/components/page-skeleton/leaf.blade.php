@@ -50,11 +50,8 @@
             </div>
 
             <div data-draft-part="fields" class="mt-8 space-y-5">
-                @foreach (['w-24', 'w-16', 'w-32', 'w-20', 'w-28'] as $width)
-                    <div>
-                        <span class="draft-line draft-line--annot {{ $width }}"></span>
-                        <span class="draft-block mt-1 h-[2.625rem] w-full rounded-sheet"></span>
-                    </div>
+                @foreach (['w-24' => 'w-2/3', 'w-16' => 'w-1/3', 'w-32' => 'w-5/6', 'w-20' => 'w-1/4', 'w-28' => 'w-1/2'] as $label => $value)
+                    <x-page-skeleton.field :label="$label" :value="$value" />
                 @endforeach
             </div>
         </div>

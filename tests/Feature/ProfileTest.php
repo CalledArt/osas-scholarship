@@ -255,6 +255,13 @@ class ProfileTest extends TestCase
         $response->assertSee('value="Indang, Cavite"', false);
     }
 
+    public function test_the_profile_page_states_a_students_year_level_as_elsewhere(): void
+    {
+        $student = User::factory()->create(['year_level' => 3]);
+
+        $this->actingAs($student)->get('/profile')->assertSee('value="Year 3"', false);
+    }
+
     public function test_a_student_can_update_their_own_personal_details(): void
     {
         $student = User::factory()->named('Juan', null, 'Cruz')->create();

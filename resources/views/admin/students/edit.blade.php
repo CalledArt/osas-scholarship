@@ -8,7 +8,7 @@
 <x-app-layout :title="$student->surname_first_name" :sheet="true">
     <div class="px-6 py-10 lg:px-10">
         <div class="mx-auto max-w-[100rem]">
-            <a href="{{ route('admin.students.index') }}" class="rounded font-medium text-graphite underline underline-offset-4 hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Back to students') }}</a>
+            <x-back-link :href="route('admin.students.index')">{{ __('Back to students') }}</x-back-link>
 
             <div class="mt-4">
                 <x-welcome-banner :heading="mb_strtoupper($student->surname_first_name)">
@@ -104,7 +104,7 @@
                                     <option value="{{ $years }}" @selected((string) old('program_years', $student->program_years) === (string) $years)>{{ __(':years years', ['years' => $years]) }}</option>
                                 @endforeach
                             </select>
-                            <p id="program_years-hint" class="mt-1  text-slate">
+                            <p id="program_years-hint" class="mt-1 max-w-[60ch] text-slate">
                                 {{ __('RA 10931 covers the program’s length plus one year.') }}
                                 @if ($student->yearOfStudy() !== null && $student->freeTertiaryEducationYears() !== null)
                                     {{ __('This student is in year :year of :covered.', ['year' => $student->yearOfStudy(), 'covered' => $student->freeTertiaryEducationYears()]) }}
@@ -130,7 +130,7 @@
                                 <option value="{{ $status->value }}" @selected(old('student_status', $student->student_status->value) === $status->value)>{{ $status->label() }}</option>
                             @endforeach
                         </select>
-                        <p id="student_status-hint" class="mt-1 text-slate">
+                        <p id="student_status-hint" class="mt-1 max-w-[60ch] text-slate">
                             {{ __('While on leave of absence, a student\'s free tuition under RA 10931 is paused and they cannot apply to scholarships. Saving them as on leave voids their applications still waiting for a decision, freeing those slots for other students; setting them back to Active does not restore them. Scholarships already approved for them are kept.') }}
                         </p>
                         <x-input-error :messages="$errors->get('student_status')" class="mt-2" />

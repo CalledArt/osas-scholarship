@@ -4,7 +4,8 @@
     A scholarship's deadline as whole calendar days ("Closes in 2 days"), with the
     exact date on hover. Never diffForHumans(): it truncates fractional days, so a
     date two days out would read as one. Whether it has closed comes from
-    hasPassedDeadline(), the check that actually stops applications.
+    hasPassedDeadline(), the check that actually stops applications: the end
+    of the deadline day in Manila, so the day itself reads "Closes today".
 
     An urgent deadline is carried by colour and weight, so it also carries a
     spelled-out companion — the urgency is lost on anyone who cannot see the
@@ -16,9 +17,7 @@
     @php($isUrgent = $urgent && ! $hasClosed && $days <= 3)
     <span title="{{ $scholarship->deadline->format('F j, Y') }}"
           {{ $attributes->class([$isUrgent ? 'font-semibold text-oxide' : '']) }}>
-        @if ($hasClosed && $days === 0)
-            {{ __('Closed today') }}
-        @elseif ($hasClosed)
+        @if ($hasClosed)
             {{ trans_choice('Closed :count day ago|Closed :count days ago', abs($days), ['count' => abs($days)]) }}
         @elseif ($days === 0)
             {{ __('Closes today') }}

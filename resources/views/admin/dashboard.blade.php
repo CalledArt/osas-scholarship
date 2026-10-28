@@ -86,7 +86,8 @@
                     <a href="{{ route('admin.scholarships.index') }}" class="shrink-0 rounded font-semibold text-seal hover:text-seal-deep hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-seal">{{ __('View all') }}</a>
                 </div>
 
-                <div class="overflow-x-auto">
+                {{-- Relative, so the sr-only labels in its rows stay inside the scroll instead of widening a phone's page. --}}
+                <div class="relative overflow-x-auto">
                     <table class="w-full min-w-[48rem]">
                         <thead>
                             <tr class="bg-linen-sunk text-left text-graphite">

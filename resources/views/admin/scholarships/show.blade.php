@@ -19,7 +19,7 @@
 <x-app-layout :title="$scholarship->title" :sheet="true">
     <div class="px-6 py-10 lg:flex lg:h-screen lg:flex-col lg:px-10 lg:py-6">
         <div class="mx-auto max-w-[100rem] lg:flex lg:min-h-0 lg:w-full lg:flex-col">
-            <a href="{{ route('admin.scholarships.index') }}" class="rounded font-medium lg:self-start text-graphite underline underline-offset-4 hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Back to scholarships') }}</a>
+            <x-back-link :href="route('admin.scholarships.index')" class="lg:self-start">{{ __('Back to scholarships') }}</x-back-link>
 
             <div class="mt-4">
                 <x-welcome-banner :heading="$scholarship->title" :vt-title="true">
@@ -32,7 +32,7 @@
                     @endif
                     <span class="tabular-nums"><span aria-hidden="true">&middot;</span> {{ $scholarship->remainingSlots() }} / {{ $scholarship->slots }} {{ __('slots remaining') }}</span>
                     @if ($scholarship->deadline)
-                        <span class="tabular-nums"><span aria-hidden="true">&middot;</span> {{ __('Deadline') }}: {{ $scholarship->deadline->format('M j, Y') }}</span>
+                        <span class="tabular-nums"><span aria-hidden="true">&middot;</span> {{ $scholarship->hasPassedDeadline() ? __('Past deadline') : __('Deadline') }}: {{ $scholarship->deadline->format('M j, Y') }}</span>
                     @endif
 
                     <x-slot:action>
@@ -62,7 +62,7 @@
                 <div class="min-w-0 lg:flex lg:min-h-0 lg:flex-col">
                     @if (session('decisionResults'))
                         @php $results = session('decisionResults'); @endphp
-                        <section aria-labelledby="results-heading" class="mb-6 rounded-lg border border-rule bg-linen-sunk p-5 lg:max-h-[40vh] lg:shrink-0 lg:overflow-y-auto">
+                        <section aria-labelledby="results-heading" tabindex="0" class="mb-6 rounded-lg border border-rule bg-linen-sunk p-5 lg:max-h-[40vh] lg:shrink-0 lg:overflow-y-auto">
                             <h2 id="results-heading" class="text-lead font-semibold text-ink">{{ __('Pass List Results') }}</h2>
                             <p class="mt-1 tabular-nums text-graphite">
                                 {{ __(':approved approved, :rejected rejected.', ['approved' => count($results['approved']), 'rejected' => count($results['rejected'])]) }}
@@ -189,7 +189,7 @@
                             <p class="border-t border-rule px-5 py-8 text-center text-slate">{{ __('No applications yet.') }}</p>
                         @else
                             {{-- Relative, so the sr-only labels in its rows stay inside the scroll instead of stretching the page. --}}
-                            <ul class="relative divide-y divide-rule border-t border-rule lg:min-h-0 lg:overflow-y-auto">
+                            <ul tabindex="0" aria-labelledby="applicants-heading" class="relative divide-y divide-rule border-t border-rule lg:min-h-0 lg:overflow-y-auto focus-visible:-outline-offset-2">
                                 @foreach ($scholarship->applications as $application)
                                     <li class="px-5 py-4 transition-colors duration-150 ease-in-out hover:bg-linen-sunk/60">
                                         <div class="flex items-start justify-between gap-4">
@@ -248,7 +248,7 @@
                         </svg>
                         {{ __('About this scholarship') }}
                     </h2>
-                    <div class="relative max-h-96 overflow-y-auto border-t border-rule lg:max-h-none lg:min-h-0 lg:flex-1">
+                    <div tabindex="0" role="region" aria-labelledby="about-heading" class="relative max-h-96 overflow-y-auto border-t border-rule lg:max-h-none lg:min-h-0 lg:flex-1 focus-visible:-outline-offset-2">
                         <p class="max-w-prose whitespace-pre-line text-justify px-5 py-4 leading-relaxed text-graphite">{{ $scholarship->description }}</p>
 
                         @if ($scholarship->requiredDocuments->isNotEmpty())

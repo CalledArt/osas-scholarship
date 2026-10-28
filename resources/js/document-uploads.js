@@ -15,6 +15,14 @@
 
 const EXTENSIONS = ['jpg', 'jpeg', 'png', 'pdf'];
 
+/**
+ * The server turned an upload down and said why, in words meant for the
+ * student. Anything else thrown while asking for a link (no connection, a
+ * body that is not JSON) is the network's, and the student sees the plain
+ * "didn't finish" line rather than the browser's own wording.
+ */
+class UploadRefused extends Error {}
+
 export default ({ documentIds, linkUrl, maxBytes, labels }) => {
     // Kept outside Alpine's reactive state: a proxied File cannot be sent.
     const files = new Map();
@@ -132,13 +140,13 @@ export default ({ documentIds, linkUrl, maxBytes, labels }) => {
                 });
 
                 if (! response.ok) {
-                    throw new Error(await this.reason(response));
+                    throw new UploadRefused(await this.reason(response));
                 }
 
                 link = await response.json();
             } catch (error) {
                 if (current()) {
-                    this.fail(id, error.message || labels.failed);
+                    this.fail(id, error instanceof UploadRefused ? error.message : labels.failed);
                 }
 
                 return;
@@ -192,6 +200,10 @@ export default ({ documentIds, linkUrl, maxBytes, labels }) => {
 
             if (response.status === 419) {
                 return labels.expired;
+            }
+
+            if (response.status === 429) {
+                return labels.busy;
             }
 
             if (response.status === 422) {

@@ -18,11 +18,8 @@
                         <p class="text-lead font-semibold text-ink">{{ $heading }}</p>
 
                         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                            @foreach (array_slice(['w-20', 'w-24', 'w-28', 'w-16', 'w-24', 'w-20'], 0, $fields) as $width)
-                                <div>
-                                    <span class="draft-line draft-line--annot {{ $width }}"></span>
-                                    <span class="draft-block mt-1 h-[2.625rem] w-full rounded-sheet"></span>
-                                </div>
+                            @foreach (array_slice(['w-20', 'w-24', 'w-28', 'w-16', 'w-24', 'w-20'], 0, $fields) as $label)
+                                <x-page-skeleton.field :label="$label" :value="$loop->even ? 'w-1/2' : 'w-2/3'" />
                             @endforeach
                         </div>
                     </div>

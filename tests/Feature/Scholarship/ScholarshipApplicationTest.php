@@ -97,7 +97,7 @@ class ScholarshipApplicationTest extends TestCase
 
         $response = $this->actingAs($student)->post(route('scholarships.apply.store', $scholarship), [
             'documents' => [
-                $requiredDocument->id => UploadedFile::fake()->image('picture.jpg'),
+                $requiredDocument->id => UploadedFile::fake()->create('picture.jpg', 100, 'image/jpeg'),
             ],
             'certification' => '1',
         ]);
@@ -124,7 +124,7 @@ class ScholarshipApplicationTest extends TestCase
             'status' => 'approved',
             'certification' => '1',
             'documents' => [
-                $requiredDocument->id => UploadedFile::fake()->image('picture.jpg'),
+                $requiredDocument->id => UploadedFile::fake()->create('picture.jpg', 100, 'image/jpeg'),
             ],
         ]);
 
@@ -221,6 +221,18 @@ class ScholarshipApplicationTest extends TestCase
         $response->assertForbidden();
     }
 
+    public function test_student_can_still_apply_until_midnight_in_manila_on_the_deadline_day(): void
+    {
+        $student = User::factory()->create();
+        $scholarship = Scholarship::factory()->create(['deadline' => '2026-10-27']);
+
+        $this->travelTo('2026-10-27 15:59:00');
+        $this->actingAs($student)->get(route('scholarships.apply', $scholarship))->assertOk();
+
+        $this->travelTo('2026-10-27 16:00:00');
+        $this->actingAs($student)->get(route('scholarships.apply', $scholarship))->assertForbidden();
+    }
+
     public function test_student_cannot_apply_when_no_slots_remain(): void
     {
         $student = User::factory()->create();
@@ -308,6 +320,25 @@ class ScholarshipApplicationTest extends TestCase
         $this->actingAs($admin)
             ->get(route('scholarship-applications.documents.show', [$application, $document]))
             ->assertOk();
+    }
+
+    public function test_a_document_whose_file_is_gone_from_storage_returns_404_instead_of_a_broken_download(): void
+    {
+        Storage::fake('supabase');
+        $owner = User::factory()->create();
+        $scholarship = Scholarship::factory()->create();
+        $requiredDocument = $scholarship->requiredDocuments()->create(['name' => '2x2 Picture']);
+        $application = ScholarshipApplication::factory()->for($scholarship)->for($owner)->create();
+        $document = $application->documents()->create([
+            'scholarship_required_document_id' => $requiredDocument->id,
+            'disk' => 'supabase',
+            'path' => 'scholarship-applications/1/picture.jpg',
+            'original_name' => 'picture.jpg',
+        ]);
+
+        $response = $this->actingAs($owner)->get(route('scholarship-applications.documents.show', [$application, $document]));
+
+        $response->assertNotFound();
     }
 
     public function test_submission_confirms_with_the_application_reference_and_what_was_received(): void

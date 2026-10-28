@@ -12,7 +12,7 @@
 <x-app-layout :title="$scholarship->title" :sheet="true">
     <div class="px-6 py-10 lg:flex lg:h-screen lg:flex-col lg:px-10 lg:py-6">
         <div class="mx-auto max-w-[100rem] lg:flex lg:min-h-0 lg:w-full lg:flex-col">
-            <a href="{{ route('admin.fund-allocation.index') }}" class="rounded lg:self-start  font-medium text-graphite underline underline-offset-4 hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Back to fund allocation') }}</a>
+            <x-back-link :href="route('admin.fund-allocation.index')" class="lg:self-start">{{ __('Back to fund allocation') }}</x-back-link>
 
             <div class="mt-6 lg:mt-4">
                 <x-welcome-banner :heading="$scholarship->title" :vt-title="true">
@@ -93,11 +93,11 @@
 
             <dl class="mt-8 grid gap-px overflow-hidden rounded-sheet border border-rule bg-rule sm:grid-cols-3 lg:mt-4 lg:shrink-0">
                 <div class="bg-white px-4 py-4">
-                    <dt class="font-medium uppercase tracking-wider text-slate">{{ __('Total funds') }}</dt>
+                    <dt class="font-annot text-annot uppercase text-slate">{{ __('Total funds') }}</dt>
                     <dd class="mt-1 text-lead font-semibold tabular-nums text-ink">{{ $totalFunds !== null ? \App\Support\Peso::format($totalFunds) : __('Not set') }}</dd>
                 </div>
                 <div class="bg-white px-4 py-4">
-                    <dt class="font-medium uppercase tracking-wider text-slate">{{ __('Per student') }}</dt>
+                    <dt class="font-annot text-annot uppercase text-slate">{{ __('Per student') }}</dt>
                     <dd class="mt-1 text-lead font-semibold tabular-nums text-ink">
                         @if ($currentShare !== null)
                             {{ $currentShare }}
@@ -108,7 +108,7 @@
                     <dd class="text-slate">{{ trans_choice(':count student passed|:count students passed', $passedCount, ['count' => $passedCount]) }}</dd>
                 </div>
                 <div class="bg-white px-4 py-4">
-                    <dt class="font-medium uppercase tracking-wider text-slate">{{ __('Allocated') }}</dt>
+                    <dt class="font-annot text-annot uppercase text-slate">{{ __('Allocated') }}</dt>
                     <dd class="mt-1 text-lead font-semibold tabular-nums text-ink">
                         @if ($share !== null)
                             {{ \App\Support\Peso::format($share * $passedCount) }}
@@ -127,42 +127,44 @@
                     {{ __('Students who passed') }} <span class="font-normal tabular-nums text-slate">({{ $passedCount }})</span>
                 </h2>
 
-                <div class="relative mt-3 overflow-x-auto lg:min-h-0 lg:overflow-y-auto">
-                    <table class="w-full min-w-[44rem] ">
-                        <thead class="sticky top-0 z-10 bg-white">
-                            <tr class="whitespace-nowrap uppercase tracking-wider text-slate [&>th]:shadow-[inset_0_-1px_0_theme(colors.rule.DEFAULT)]">
-                                <th scope="col" class="py-2 pr-4 text-left font-medium">{{ __('Name') }}</th>
-                                <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Student no.') }}</th>
-                                <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Course') }}</th>
-                                <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Year level') }}</th>
-                                <th scope="col" class="py-2 pl-4 text-right font-medium">{{ __('Amount') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($passedApplications as $application)
-                                <tr class="border-b border-rule align-top">
-                                    <td class="py-3 pr-4 font-medium uppercase text-ink [overflow-wrap:anywhere]">{{ $application->user->surname_first_name }}</td>
-                                    <td class="whitespace-nowrap px-4 py-3 tabular-nums text-slate">@if ($application->user->student_number){{ $application->user->student_number }}@else<span aria-hidden="true">&mdash;</span><span class="sr-only">{{ __('No student number') }}</span>@endif</td>
-                                    <td class="px-4 py-3 text-slate [overflow-wrap:anywhere]">@if ($application->user->course){{ $application->user->course }}@else<span aria-hidden="true">&mdash;</span><span class="sr-only">{{ __('No course recorded') }}</span>@endif</td>
-                                    <td class="whitespace-nowrap px-4 py-3 text-slate">@if ($application->user->year_level){{ __('Year :level', ['level' => $application->user->year_level]) }}@else<span aria-hidden="true">&mdash;</span><span class="sr-only">{{ __('No year level recorded') }}</span>@endif</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 text-right tabular-nums text-ink">
-                                        @if ($currentShare !== null)
-                                            {{ $currentShare }}
-                                        @else
-                                            <span aria-hidden="true">&mdash;</span><span class="sr-only">{{ __('No share until the fund is set') }}</span>
-                                        @endif
-                                    </td>
+                @if ($passedApplications->isEmpty())
+                    {{-- Said beneath the heading, not as a row of the table: the table is wider than a phone and scrolls sideways, which cut the sentence off. --}}
+                    <p class="mt-3 border-y border-rule py-8 text-center text-slate">
+                        {{ __('No students have passed this scholarship yet. They appear here once a pass list approves them.') }}
+                    </p>
+                @else
+                    {{-- Its rows hold no links, so the scroll itself takes focus and arrow keys can move it. A group, not a second region: the section around it is already the landmark of that name. --}}
+                    <div tabindex="0" role="group" aria-labelledby="students-heading" class="relative mt-3 overflow-x-auto lg:min-h-0 lg:overflow-y-auto focus-visible:-outline-offset-2">
+                        <table class="w-full min-w-[44rem] ">
+                            <thead class="sticky top-0 z-10 bg-white">
+                                <tr class="whitespace-nowrap font-annot text-annot uppercase text-slate [&>th]:shadow-[inset_0_-1px_0_theme(colors.rule.DEFAULT)]">
+                                    <th scope="col" class="py-2 pr-4 text-left font-medium">{{ __('Name') }}</th>
+                                    <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Student no.') }}</th>
+                                    <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Course') }}</th>
+                                    <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Year level') }}</th>
+                                    <th scope="col" class="py-2 pl-4 text-right font-medium">{{ __('Amount') }}</th>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="py-8 text-center text-slate">
-                                        {{ __('No students have passed this scholarship yet. They appear here once a pass list approves them.') }}
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                @foreach ($passedApplications as $application)
+                                    <tr class="border-b border-rule align-top">
+                                        <td class="py-3 pr-4 font-medium uppercase text-ink [overflow-wrap:anywhere]">{{ $application->user->surname_first_name }}</td>
+                                        <td class="whitespace-nowrap px-4 py-3 tabular-nums text-slate">@if ($application->user->student_number){{ $application->user->student_number }}@else<span aria-hidden="true">&mdash;</span><span class="sr-only">{{ __('No student number') }}</span>@endif</td>
+                                        <td class="px-4 py-3 text-slate [overflow-wrap:anywhere]">@if ($application->user->course){{ $application->user->course }}@else<span aria-hidden="true">&mdash;</span><span class="sr-only">{{ __('No course recorded') }}</span>@endif</td>
+                                        <td class="whitespace-nowrap px-4 py-3 text-slate">@if ($application->user->year_level){{ __('Year :level', ['level' => $application->user->year_level]) }}@else<span aria-hidden="true">&mdash;</span><span class="sr-only">{{ __('No year level recorded') }}</span>@endif</td>
+                                        <td class="whitespace-nowrap py-3 pl-4 text-right tabular-nums text-ink">
+                                            @if ($currentShare !== null)
+                                                {{ $currentShare }}
+                                            @else
+                                                <span aria-hidden="true">&mdash;</span><span class="sr-only">{{ __('No share until the fund is set') }}</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
             </section>
         </div>
     </div>

@@ -331,7 +331,7 @@
                     <span class="shrink-0 font-semibold text-seal">{{ __('View all') }}</span>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div tabindex="0" role="region" aria-label="{{ __('Recent scholarship postings') }}" class="relative overflow-x-auto focus-visible:-outline-offset-2">
                     <table class="w-full min-w-[48rem]">
                         <thead>
                             <tr class="bg-linen-sunk text-left text-graphite">
@@ -708,16 +708,16 @@
 
                 <dl class="mt-6 grid gap-px overflow-hidden rounded-sheet border border-rule bg-rule sm:grid-cols-3">
                     <div class="bg-white px-4 py-4">
-                        <dt class="font-medium uppercase tracking-wider text-slate">{{ __('Total funds') }}</dt>
+                        <dt class="font-annot text-annot uppercase text-slate">{{ __('Total funds') }}</dt>
                         <dd class="mt-1 text-lead font-semibold tabular-nums text-ink" x-text="state.fund.saved ? '₱50,000.00' : @js(__('Not set'))"></dd>
                     </div>
                     <div class="bg-white px-4 py-4">
-                        <dt class="font-medium uppercase tracking-wider text-slate">{{ __('Per student') }}</dt>
+                        <dt class="font-annot text-annot uppercase text-slate">{{ __('Per student') }}</dt>
                         <dd class="mt-1 text-lead font-semibold tabular-nums text-ink" x-text="state.fund.saved ? @js($share) : '—'"></dd>
                         <dd class="text-slate">{{ trans_choice(':count student passed|:count students passed', 2, ['count' => 2]) }}</dd>
                     </div>
                     <div class="bg-white px-4 py-4">
-                        <dt class="font-medium uppercase tracking-wider text-slate">{{ __('Allocated') }}</dt>
+                        <dt class="font-annot text-annot uppercase text-slate">{{ __('Allocated') }}</dt>
                         <dd class="mt-1 text-lead font-semibold tabular-nums text-ink" x-text="state.fund.saved ? '₱50,000.00' : '—'"></dd>
                     </div>
                 </dl>
@@ -725,10 +725,10 @@
                 <section class="mt-8">
                     <h2 class="text-lead font-semibold text-ink">{{ __('Students who passed') }} <span class="font-normal tabular-nums text-slate">(2)</span></h2>
 
-                    <div class="mt-3 overflow-x-auto">
+                    <div tabindex="0" role="region" aria-label="{{ __('Students who passed') }}" class="relative mt-3 overflow-x-auto focus-visible:-outline-offset-2">
                         <table class="w-full min-w-[44rem]">
                             <thead>
-                                <tr class="whitespace-nowrap uppercase tracking-wider text-slate [&>th]:shadow-[inset_0_-1px_0_theme(colors.rule.DEFAULT)]">
+                                <tr class="whitespace-nowrap font-annot text-annot uppercase text-slate [&>th]:shadow-[inset_0_-1px_0_theme(colors.rule.DEFAULT)]">
                                     <th scope="col" class="py-2 pr-4 text-left font-medium">{{ __('Name') }}</th>
                                     <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Student no.') }}</th>
                                     <th scope="col" class="px-4 py-2 text-left font-medium">{{ __('Course') }}</th>
@@ -769,7 +769,7 @@
                     </div>
                     <div>
                         <x-input-label for="tour-roster-course" :value="__('Course')" />
-                        <x-text-input id="tour-roster-course" type="text" class="mt-1 block w-full" readonly tabindex="-1" :placeholder="__('Any course, e.g. Information Technology')" />
+                        <x-text-input id="tour-roster-course" type="text" class="mt-1 block w-full" readonly tabindex="-1" :placeholder="__('Any course, e.g. Nursing')" />
                     </div>
                     <div>
                         <x-input-label for="tour-roster-year" :value="__('Year level')" />
@@ -797,7 +797,7 @@
                     <p class="text-graphite"><span class="font-semibold tabular-nums text-ink" x-text="found().length"></span> <span x-text="found().length === 1 ? @js(__('student found')) : @js(__('students found'))"></span></p>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div tabindex="0" role="region" aria-label="{{ __('Registered students') }}" class="relative overflow-x-auto focus-visible:-outline-offset-2">
                     <table class="w-full min-w-[52rem]">
                         <thead>
                             <tr class="whitespace-nowrap bg-linen-sunk text-left text-graphite">
@@ -854,7 +854,7 @@
                     <p class="text-graphite">{!! $count(count($roster)) !!} {{ trans_choice('student found|students found', count($roster)) }}</p>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div tabindex="0" role="region" aria-label="{{ __('Registered students') }}" class="relative overflow-x-auto focus-visible:-outline-offset-2">
                     <table class="w-full min-w-[52rem]">
                         <thead>
                             <tr class="whitespace-nowrap bg-linen-sunk text-left text-graphite">

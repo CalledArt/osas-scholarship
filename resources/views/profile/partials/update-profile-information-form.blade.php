@@ -23,20 +23,20 @@
         <div class="grid gap-3 sm:grid-cols-3">
             <div>
                 <x-input-label for="last_name" :value="__('Last Name')" />
-                <x-text-input id="last_name" name="last_name" type="text" class="mt-1 block w-full" :value="old('last_name', $user->last_name)" required autofocus autocomplete="family-name" />
+                <x-text-input id="last_name" name="last_name" maxlength="255" type="text" class="mt-1 block w-full" :value="old('last_name', $user->last_name)" required autofocus autocomplete="family-name" />
                 <x-input-error class="mt-2" :messages="$errors->get('last_name')" />
                 <p class="mt-1 text-slate">{{ __('Include the full surname, for example "Dela Cruz".') }}</p>
             </div>
 
             <div>
                 <x-input-label for="first_name" :value="__('First Name')" />
-                <x-text-input id="first_name" name="first_name" type="text" class="mt-1 block w-full" :value="old('first_name', $user->first_name)" required autocomplete="given-name" />
+                <x-text-input id="first_name" name="first_name" maxlength="255" type="text" class="mt-1 block w-full" :value="old('first_name', $user->first_name)" required autocomplete="given-name" />
                 <x-input-error class="mt-2" :messages="$errors->get('first_name')" />
             </div>
 
             <div>
                 <x-input-label for="middle_name" :value="__('Middle Name')" />
-                <x-text-input id="middle_name" name="middle_name" type="text" class="mt-1 block w-full" :value="old('middle_name', $user->middle_name)" autocomplete="additional-name" />
+                <x-text-input id="middle_name" name="middle_name" maxlength="255" type="text" class="mt-1 block w-full" :value="old('middle_name', $user->middle_name)" autocomplete="additional-name" />
                 <x-input-error class="mt-2" :messages="$errors->get('middle_name')" />
                 <p class="mt-1 text-slate">{{ __('Optional. Leave blank if you do not use one.') }}</p>
             </div>
@@ -108,7 +108,7 @@
 
             <div>
                 <x-input-label for="year_level" :value="__('Year Level')" />
-                <x-text-input id="year_level" type="text" class="mt-1 block w-full bg-linen-sunk text-slate" :value="$user->year_level ?? __('Not set')" aria-describedby="enrollment-hint" disabled />
+                <x-text-input id="year_level" type="text" class="mt-1 block w-full bg-linen-sunk text-slate" :value="$user->year_level ? __('Year :level', ['level' => $user->year_level]) : __('Not set')" aria-describedby="enrollment-hint" disabled />
             </div>
 
             <div>

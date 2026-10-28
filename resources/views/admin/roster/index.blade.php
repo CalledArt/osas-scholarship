@@ -22,7 +22,7 @@
 
                     <div>
                         <x-input-label for="course" :value="__('Course')" />
-                        <x-text-input id="course" name="course" type="search" :value="$course" placeholder="{{ __('Any course, e.g. Information Technology') }}" class="mt-1 block w-full" />
+                        <x-text-input id="course" name="course" type="search" :value="$course" placeholder="{{ __('Any course, e.g. Nursing') }}" class="mt-1 block w-full" />
                     </div>
 
                     <div>
@@ -69,7 +69,8 @@
                     </p>
                 </div>
 
-                <div class="relative overflow-x-auto lg:min-h-0 lg:overflow-y-auto">
+                {{-- Its rows hold no links, so the scroll itself takes focus and arrow keys can move it. A group, not a second region: the section around it is already the landmark of that name. --}}
+                <div tabindex="0" role="group" aria-labelledby="students-heading" class="relative overflow-x-auto lg:min-h-0 lg:overflow-y-auto focus-visible:-outline-offset-2">
                     <table class="w-full min-w-[52rem]">
                         <thead class="sticky top-0 z-10">
                             <tr class="whitespace-nowrap bg-linen-sunk text-left text-graphite">

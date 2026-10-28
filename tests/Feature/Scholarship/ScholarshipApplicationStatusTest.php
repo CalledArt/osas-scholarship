@@ -131,4 +131,14 @@ class ScholarshipApplicationStatusTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    public function test_an_application_to_a_scholarship_needing_no_documents_says_so_instead_of_counting_none(): void
+    {
+        $application = ScholarshipApplication::factory()->create();
+
+        $response = $this->actingAs($application->user)->get(route('scholarship-applications.show', $application));
+
+        $response->assertSee('You applied. No documents were required.');
+        $response->assertDontSee('You sent 0 documents.');
+    }
 }

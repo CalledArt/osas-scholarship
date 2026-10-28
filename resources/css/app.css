@@ -209,6 +209,40 @@
     }
 
     /*
+     * A heading sets its lines to even lengths, so a name or a title never
+     * strands one word on a phone ("Welcome back, DELA CRUZ, JUAN / SANTOS!"),
+     * and running text never ends a paragraph on a lone word. Neither adds a
+     * line, so nothing moves on a screen wide enough for one.
+     */
+    h1,
+    h2,
+    h3 {
+        text-wrap: balance;
+    }
+
+    p,
+    dd {
+        text-wrap: pretty;
+    }
+
+    /*
+     * Records are typed by people, and a title, a file name or an address can
+     * be one long unbroken word. In the content column such a word breaks
+     * instead of pushing a phone's page sideways. Tables keep normal wrapping:
+     * they scroll inside their own panels, and breaking anywhere would let
+     * their columns squeeze words they have room for. Measured on every page
+     * against the real records, the rule moves nothing until a word is too
+     * long for its box.
+     */
+    #main {
+        overflow-wrap: anywhere;
+    }
+
+    #main table {
+        overflow-wrap: normal;
+    }
+
+    /*
      * A floor, not the design. Components state their own ring; this guarantees
      * nothing is ever left wearing the user agent's default outline.
      */

@@ -35,7 +35,7 @@
 <x-app-layout :title="__('Apply for :title', ['title' => $scholarship->title])" :sheet="true">
     <div class="px-6 py-10 lg:px-10">
         <div class="mx-auto max-w-leaf">
-            <a href="{{ route('scholarships.show', $scholarship) }}" class="rounded-sheet font-medium text-seal underline underline-offset-4 hover:text-seal-deep focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Back to scholarship') }}</a>
+            <x-back-link :href="route('scholarships.show', $scholarship)">{{ __('Back to scholarship') }}</x-back-link>
 
             <h1 class="mt-6 text-lead font-semibold text-ink [overflow-wrap:anywhere]">{{ __('Apply for :title', ['title' => $scholarship->title]) }}</h1>
 
@@ -76,6 +76,7 @@
                           'failed' => __("The upload didn't finish. Check your connection and try again."),
                           'forbidden' => __('This scholarship is no longer taking your application. Reload the page to see why.'),
                           'expired' => __('Your session expired. Reload the page, then choose the file again.'),
+                          'busy' => __('Too many uploads at once. Wait a minute, then choose the file again.'),
                       ],
                   ]))"
                   @submit="submit($event)"
@@ -113,7 +114,10 @@
 
                                         <div id="document-{{ $document->id }}-status" aria-live="polite">
                                             <div x-show="['uploading', 'done', 'failed'].includes(rows[{{ $document->id }}].state)" x-cloak class="mt-3 flex items-center gap-3">
-                                                <img x-show="rows[{{ $document->id }}].preview" x-bind:src="rows[{{ $document->id }}].preview" alt="" class="h-10 w-10 shrink-0 rounded-sheet border border-rule object-cover">
+                                                {{-- Built only once there is a preview, so no image ever stands without a source. --}}
+                                                <template x-if="rows[{{ $document->id }}].preview">
+                                                    <img x-bind:src="rows[{{ $document->id }}].preview" alt="" class="h-10 w-10 shrink-0 rounded-sheet border border-rule object-cover">
+                                                </template>
                                                 <svg x-show="! rows[{{ $document->id }}].preview" class="h-10 w-10 shrink-0 rounded-sheet border border-rule bg-linen-sunk p-2 text-slate" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                                                 </svg>

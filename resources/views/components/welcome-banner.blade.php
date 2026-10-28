@@ -12,7 +12,8 @@
     cross-page title transition.
 --}}
 <div class="flex flex-col gap-4 rounded-lg border border-seal-tint bg-seal-wash px-5 py-4 sm:flex-row sm:items-center sm:px-6">
-    <div class="flex min-w-0 flex-1 items-center gap-4">
+    {{-- On a phone the heading wraps, so the disc sits at its first line rather than floating beside the middle of the block. --}}
+    <div class="flex min-w-0 flex-1 items-start gap-4 sm:items-center">
         <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-seal-tint/60 text-seal" aria-hidden="true">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4 2.5 9 12 14l9.5-5L12 4Z" />

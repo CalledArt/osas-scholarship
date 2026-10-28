@@ -30,12 +30,15 @@ class ScholarshipRequiredDocumentSampleController extends Controller
     }
 
     /**
-     * Only a posted sample, reached through its own scholarship, can be served.
+     * Only a posted sample, reached through its own scholarship and still in
+     * storage, can be served.
      */
     private function authorizeSample(Scholarship $scholarship, ScholarshipRequiredDocument $requiredDocument): void
     {
         abort_unless($requiredDocument->scholarship_id === $scholarship->id && $requiredDocument->hasSample(), 404);
 
         Gate::authorize('view', $scholarship);
+
+        abort_unless($requiredDocument->sampleIsStored(), 404);
     }
 }

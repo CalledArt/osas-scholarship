@@ -19,7 +19,7 @@ class PageSkeletonTest extends TestCase
 
         $pages = $this->pageSkeletons($response);
         $this->assertSame(['shape' => 'panes', 'heading' => 'Welcome back, DELA CRUZ, JUAN SANTOS!', 'label' => 'Dashboard'], $this->drafted($pages, route('dashboard')));
-        $this->assertSame('record', $this->drafted($pages, route('scholarships.republic-act-10931'))['shape']);
+        $this->assertSame(['shape' => 'record', 'hide' => ['action']], $this->drafted($pages, route('scholarships.republic-act-10931')));
         $this->assertSame(['shape' => 'leaf', 'hide' => ['fields']], $this->drafted($pages, route('scholarships.show', 7)));
         $this->assertSame('leaf', $this->drafted($pages, route('scholarships.apply', 7))['shape']);
         $this->assertSame('cards', $this->drafted($pages, route('scholarship-applications.index', ['page' => 2]))['shape']);

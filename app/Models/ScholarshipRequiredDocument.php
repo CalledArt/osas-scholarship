@@ -84,6 +84,15 @@ class ScholarshipRequiredDocument extends Model
     }
 
     /**
+     * Whether the sample's file is still in storage, asked before streaming it
+     * (see ScholarshipApplicationDocument::isStored()).
+     */
+    public function sampleIsStored(): bool
+    {
+        return $this->hasSample() && Storage::disk($this->sample_disk)->exists($this->sample_path);
+    }
+
+    /**
      * Stream the sample: "inline" to preview it in the browser, "attachment" to save a copy.
      */
     public function sampleResponse(string $disposition = 'inline'): StreamedResponse

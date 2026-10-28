@@ -222,6 +222,16 @@ class ScholarshipRequiredDocumentSampleTest extends TestCase
         $response->assertStreamedContent('sample-content');
     }
 
+    public function test_a_sample_whose_file_is_gone_from_storage_returns_404_instead_of_a_broken_download(): void
+    {
+        Storage::fake('supabase');
+        $student = User::factory()->create();
+        $document = ScholarshipRequiredDocument::factory()->withSample()->create();
+
+        $this->actingAs($student)->get(route('scholarships.required-documents.sample', [$document->scholarship_id, $document]))->assertNotFound();
+        $this->actingAs($student)->get(route('scholarships.required-documents.sample.download', [$document->scholarship_id, $document]))->assertNotFound();
+    }
+
     public function test_downloading_a_sample_returns_404_when_none_is_posted(): void
     {
         $student = User::factory()->create();

@@ -25,6 +25,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | resources/views/admin/scholarships/index.blade.php, resources/views/admin/scholarships/show.blade.php | .ai/rules/scholarships.md |
 | resources/views/admin/students/index.blade.php | .ai/rules/students.md |
 | app/Support/**, app/Support/FundAllocationSheet.php | .ai/rules/support.md |
+| tests/** | .ai/rules/tests.md |
 | resources/views/tutorial/** | .ai/rules/tutorial.md |
 | resources/views/admin/dashboard.blade.php | .ai/rules/views-admin.md |
 | resources/views/auth/login.blade.php | .ai/rules/views-auth.md |

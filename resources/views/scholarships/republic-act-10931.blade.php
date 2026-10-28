@@ -21,7 +21,7 @@
 <x-app-layout :title="__('Republic Act No. 10931')" :sheet="true">
     <div class="px-6 py-10 lg:flex lg:h-screen lg:flex-col lg:px-10 lg:py-6">
         <div class="mx-auto max-w-[100rem] lg:flex lg:min-h-0 lg:w-full lg:flex-col">
-            <a href="{{ route('scholarships.index') }}" class="rounded font-medium lg:self-start text-graphite underline underline-offset-4 hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Back to scholarships') }}</a>
+            <x-back-link :href="route('scholarships.index')" class="lg:self-start">{{ __('Back to scholarships') }}</x-back-link>
 
             <div class="mt-4">
                 <x-welcome-banner :heading="__('Republic Act No. 10931')" :vt-title="true">
@@ -47,7 +47,7 @@
                     </div>
 
                     {{-- From lg the heading stays put and only what follows it scrolls. --}}
-                    <div class="relative lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+                    <div tabindex="0" role="group" aria-labelledby="coverage-heading" class="relative lg:min-h-0 lg:flex-1 lg:overflow-y-auto focus-visible:-outline-offset-2">
 
                         <p class="mt-2  leading-relaxed text-graphite">
                             @if ($isCovered)
@@ -107,7 +107,7 @@
                     </h2>
 
                     {{-- Relative and scroll-padded, so a section link from the panel beside it lands with its heading in view. --}}
-                    <div class="relative scroll-pt-4 border-t border-rule px-6 pb-6 leading-relaxed text-graphite [&_h3]:mt-8 [&_h3]:font-semibold [&_h3]:text-ink [&_p]:mt-3 [&_ol]:mt-3 [&_ol]:space-y-2 [&_ol]:pl-6 [&_ol_ol]:mt-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+                    <div tabindex="0" role="region" aria-labelledby="text-heading" class="relative scroll-pt-4 focus-visible:-outline-offset-2 border-t border-rule px-6 pb-6 leading-relaxed text-graphite [&_h3]:mt-8 [&_h3]:font-semibold [&_h3]:text-ink [&_p]:mt-3 [&_ol]:mt-3 [&_ol]:space-y-2 [&_ol]:pl-6 [&_ol_ol]:mt-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
                         <p class="!mt-5 italic leading-relaxed text-slate">
                             An Act promoting universal access to quality tertiary education by providing for free tuition and other school fees in state universities and colleges, local universities and colleges and state-run technical-vocational institutions, establishing the tertiary education subsidy and student loan program, strengthening the Unified Student Financial Assistance System for Tertiary Education, and appropriating funds therefor
                         </p>

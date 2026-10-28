@@ -43,7 +43,7 @@
                                     @endif
                                 </div>
                                 <p class="mt-1  text-slate">
-                                    {{ $scholarship->type->label() }} <span aria-hidden="true">&middot;</span> {{ $scholarship->status->label() }}
+                                    {{ $scholarship->type->label() }} <span aria-hidden="true">&middot;</span> {{ $scholarship->statusLabel() }}
                                 </p>
 
                                 <div class="mt-auto pt-5">

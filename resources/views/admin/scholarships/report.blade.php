@@ -16,7 +16,7 @@
     <x-slot:styles>
         .records { table-layout: fixed; }
         .document { padding: 1px 0; }
-        .filename { color: #6B7280; }
+        .filename { color: #5A6472; }
     </x-slot:styles>
 
     <table class="summary">

@@ -6,12 +6,19 @@
     $downloadUrl = route('scholarships.required-documents.sample.download', [$document->scholarship_id, $document]);
 @endphp
 
-{{-- An image sample is drafted (the light sweeps its frame) until it has loaded or failed; a PDF's viewer gives no load signal everywhere, so it is not. --}}
-<figure x-data="{ previewLoaded: true }" {{ $attributes->merge(['class' => 'overflow-hidden border border-rule bg-white']) }}>
+{{--
+    An image sample is drafted (the light sweeps its frame) until it has
+    loaded; one that fails says so instead of showing a broken image. A PDF's
+    viewer gives no load signal everywhere, so it is not drafted.
+--}}
+<figure x-data="{ previewLoaded: true, previewFailed: false }" {{ $attributes->merge(['class' => 'overflow-hidden border border-rule bg-white']) }}>
     <div class="relative h-48 bg-linen-sunk" :class="{ 'draft-fill': ! previewLoaded }">
         @if ($document->sampleIsImage())
             <img src="{{ $previewUrl }}" alt="{{ __('Sample of :document', ['document' => $document->name]) }}" loading="lazy" class="h-full w-full object-contain"
-                 x-init="previewLoaded = $el.complete" x-on:load="previewLoaded = true" x-on:error="previewLoaded = true">
+                 x-show="! previewFailed"
+                 x-init="previewLoaded = $el.complete && $el.naturalWidth > 0; previewFailed = $el.complete && $el.naturalWidth === 0"
+                 x-on:load="previewLoaded = true" x-on:error="previewLoaded = true; previewFailed = true">
+            <p x-show="previewFailed" x-cloak class="flex h-full items-center justify-center px-4 text-center text-slate">{{ __('This sample could not be loaded.') }}</p>
         @else
             <object data="{{ $previewUrl }}#toolbar=0&amp;navpanes=0&amp;view=FitH" type="application/pdf" tabindex="-1" class="block h-full w-full">
                 <div class="flex h-full flex-col items-center justify-center gap-2 px-4 text-center">

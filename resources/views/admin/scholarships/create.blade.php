@@ -8,7 +8,7 @@
 <x-app-layout :title="__('Post Scholarship')" :sheet="true">
     <div class="px-6 py-10 lg:px-10">
         <div class="mx-auto max-w-leaf">
-            <a href="{{ route('admin.scholarships.index') }}" class="rounded  font-medium text-graphite underline underline-offset-4 hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Back to scholarships') }}</a>
+            <x-back-link :href="route('admin.scholarships.index')">{{ __('Back to scholarships') }}</x-back-link>
 
             <h1 class="mt-6 text-lead font-semibold leading-tight text-ink">{{ __('Post Scholarship') }}</h1>
 
@@ -54,7 +54,7 @@
 
                     <div>
                         <x-input-label for="title" :value="__('Title')" />
-                        <x-text-input id="title" name="title" type="text" class="mt-1 block w-full" :value="old('title')" x-model="title" required />
+                        <x-text-input id="title" name="title" maxlength="255" type="text" class="mt-1 block w-full" :value="old('title')" x-model="title" required />
                         <x-input-error :messages="$errors->get('title')" class="mt-2" />
                     </div>
 
@@ -117,8 +117,8 @@
                         <template x-for="(document, index) in documents" :key="document.key">
                             <div class="flex items-start gap-3 rounded-sheet border border-rule p-4">
                                 <div class="min-w-0 flex-1 space-y-3">
-                                    <input type="text" :name="'required_documents[' + index + '][name]'" x-model="document.name" placeholder="{{ __('Document name (e.g. 2x2 Picture)') }}" aria-label="{{ __('Document name') }}" class="block w-full rounded-sheet border-rule-strong shadow-sm focus:border-seal focus:ring-seal" required>
-                                    <input type="text" :name="'required_documents[' + index + '][description]'" x-model="document.description" placeholder="{{ __('Notes for applicants (optional)') }}" aria-label="{{ __('Notes for applicants') }}" class="block w-full rounded-sheet border-rule-strong shadow-sm focus:border-seal focus:ring-seal">
+                                    <input type="text" :name="'required_documents[' + index + '][name]'" maxlength="255" x-model="document.name" placeholder="{{ __('Document name (e.g. 2x2 Picture)') }}" aria-label="{{ __('Document name') }}" class="block w-full rounded-sheet border-rule-strong shadow-sm focus:border-seal focus:ring-seal" required>
+                                    <input type="text" :name="'required_documents[' + index + '][description]'" maxlength="1000" x-model="document.description" placeholder="{{ __('Notes for applicants (optional)') }}" aria-label="{{ __('Notes for applicants') }}" class="block w-full rounded-sheet border-rule-strong shadow-sm focus:border-seal focus:ring-seal">
                                     <div>
                                         <label class="font-medium text-graphite" :for="'document-sample-' + document.key">{{ __('Sample for applicants (optional): JPG, PNG, or PDF, max 5MB') }}</label>
                                         <x-file-input ::id="'document-sample-' + document.key" ::name="'required_documents[' + index + '][sample]'" accept=".jpg,.jpeg,.png,.pdf" class="mt-1 w-full" />

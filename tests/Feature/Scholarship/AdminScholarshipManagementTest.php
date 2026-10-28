@@ -57,6 +57,19 @@ class AdminScholarshipManagementTest extends TestCase
         ]);
     }
 
+    public function test_a_scholarship_left_open_past_its_deadline_says_so_on_its_card_and_page(): void
+    {
+        $this->travelTo('2026-10-25 10:00');
+        $admin = User::factory()->admin()->create();
+        $scholarship = Scholarship::factory()->create(['title' => 'Merit Grant', 'deadline' => '2026-10-20']);
+
+        $this->actingAs($admin)->get(route('admin.scholarships.index'))
+            ->assertSeeInOrder(['Merit Grant', 'Open', 'Past deadline', 'Oct 20, 2026'])
+            ->assertDontSee('Closes');
+        $this->actingAs($admin)->get(route('admin.scholarships.show', $scholarship))
+            ->assertSee('Past deadline: Oct 20, 2026');
+    }
+
     public function test_scholarships_banner_says_none_are_posted_before_the_first(): void
     {
         $response = $this->actingAs(User::factory()->admin()->create())->get(route('admin.scholarships.index'));

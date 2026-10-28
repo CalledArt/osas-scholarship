@@ -13,11 +13,8 @@
                         </div>
 
                         <div class="grid gap-3 sm:grid-cols-3">
-                            @foreach (['w-20', 'w-24', 'w-24'] as $label)
-                                <div>
-                                    <span class="draft-line draft-line--annot {{ $label }}"></span>
-                                    <span class="draft-block mt-1 h-[2.625rem] w-full rounded-sheet"></span>
-                                </div>
+                            @foreach ([['w-20', 'w-2/3'], ['w-24', 'w-1/2'], ['w-24', 'w-1/3']] as [$label, $value])
+                                <x-page-skeleton.field :label="$label" :value="$value" />
                             @endforeach
                         </div>
                     </div>

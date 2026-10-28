@@ -7,7 +7,7 @@
 <x-app-layout :title="__('Edit Scholarship')" :sheet="true">
     <div class="px-6 py-10 lg:px-10">
         <div class="mx-auto max-w-leaf">
-            <a href="{{ route('admin.scholarships.show', $scholarship) }}" class="rounded  font-medium text-graphite underline underline-offset-4 hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Back to scholarship') }}</a>
+            <x-back-link :href="route('admin.scholarships.show', $scholarship)">{{ __('Back to scholarship') }}</x-back-link>
 
             <h1 class="mt-6 text-lead font-semibold leading-tight text-ink">{{ __('Edit Scholarship') }}</h1>
 
@@ -17,7 +17,7 @@
 
                 <div>
                     <x-input-label for="title" :value="__('Title')" />
-                    <x-text-input id="title" name="title" type="text" class="mt-1 block w-full" :value="old('title', $scholarship->title)" required autofocus />
+                    <x-text-input id="title" name="title" maxlength="255" type="text" class="mt-1 block w-full" :value="old('title', $scholarship->title)" required autofocus />
                     <x-input-error :messages="$errors->get('title')" class="mt-2" />
                 </div>
 
@@ -136,8 +136,8 @@
                 <form method="POST" action="{{ route('admin.scholarships.required-documents.store', $scholarship) }}" enctype="multipart/form-data" class="mt-6 rounded-sheet border border-rule p-4">
                     @csrf
                     <div class="space-y-3">
-                        <x-text-input name="name" type="text" class="block w-full" placeholder="{{ __('Document name (e.g. 2x2 Picture)') }}" aria-label="{{ __('Document name') }}" required />
-                        <x-text-input name="description" type="text" class="block w-full" placeholder="{{ __('Notes for applicants (optional)') }}" aria-label="{{ __('Notes for applicants') }}" />
+                        <x-text-input name="name" maxlength="255" type="text" class="block w-full" placeholder="{{ __('Document name (e.g. 2x2 Picture)') }}" aria-label="{{ __('Document name') }}" required />
+                        <x-text-input name="description" maxlength="1000" type="text" class="block w-full" placeholder="{{ __('Notes for applicants (optional)') }}" aria-label="{{ __('Notes for applicants') }}" />
                         <div>
                             <x-input-label for="new-document-sample" :value="__('Sample for applicants (optional)')" />
                             <x-file-input id="new-document-sample" name="sample" accept=".jpg,.jpeg,.png,.pdf" class="mt-1 w-full" />

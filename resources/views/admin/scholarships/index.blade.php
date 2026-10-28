@@ -67,8 +67,9 @@
                                     </dl>
 
                                     <p class="mt-4 font-semibold tabular-nums text-ink">
+                                        {{-- The mark is the status OSAS set; past its deadline a scholarship marked Open takes no applications, so the date says so. --}}
                                         @if ($scholarship->deadline)
-                                            {{ __('Closes') }} <time datetime="{{ $scholarship->deadline->toDateString() }}">{{ $scholarship->deadline->format('M j, Y') }}</time>
+                                            {{ $scholarship->hasPassedDeadline() ? __('Past deadline') : __('Closes') }} <time datetime="{{ $scholarship->deadline->toDateString() }}">{{ $scholarship->deadline->format('M j, Y') }}</time>
                                         @else
                                             {{ __('No deadline') }}
                                         @endif

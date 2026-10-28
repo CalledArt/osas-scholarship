@@ -44,7 +44,7 @@
 <x-app-layout :title="$scholarship->title" :sheet="true">
     <div class="px-6 py-10 lg:px-10">
         <div class="mx-auto max-w-leaf">
-            <a href="{{ route('scholarships.index') }}" class="rounded-sheet font-medium text-seal underline underline-offset-4 hover:text-seal-deep focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Back to scholarships') }}</a>
+            <x-back-link :href="route('scholarships.index')">{{ __('Back to scholarships') }}</x-back-link>
 
             <h1 data-vt-title class="mt-6 text-lead font-semibold text-ink [overflow-wrap:anywhere]">{{ $scholarship->title }}</h1>
 

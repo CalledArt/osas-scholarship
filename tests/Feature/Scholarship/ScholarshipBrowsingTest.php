@@ -273,6 +273,23 @@ class ScholarshipBrowsingTest extends TestCase
         $response->assertSee('Closes in 2 days');
     }
 
+    public function test_on_its_deadline_day_in_manila_a_scholarship_is_still_offered_and_closes_today(): void
+    {
+        $student = User::factory()->create();
+        $scholarship = Scholarship::factory()->create(['title' => 'Merit Grant', 'deadline' => '2026-10-27']);
+
+        // 7 AM on October 27 in Manila, still October 26 in UTC.
+        $this->travelTo('2026-10-26 23:00:00');
+        $this->actingAs($student)->get(route('scholarships.index'))->assertSeeInOrder(['Merit Grant', 'Closes today']);
+
+        // 11:30 PM on October 27 in Manila.
+        $this->travelTo('2026-10-27 15:30:00');
+        $this->actingAs($student)->get(route('scholarships.index'))->assertSeeInOrder(['Merit Grant', 'Closes today']);
+        $this->actingAs($student)->get(route('scholarships.show', $scholarship))
+            ->assertSee('Applications close on October 27, 2026.')
+            ->assertDontSee('Applications closed on');
+    }
+
     public function test_a_full_scholarship_states_full_rather_than_its_still_future_deadline(): void
     {
         $student = User::factory()->create();

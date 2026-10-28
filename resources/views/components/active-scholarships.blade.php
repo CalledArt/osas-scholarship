@@ -23,7 +23,7 @@
         'border-grant/30 bg-grant-wash hover:border-grant' => ! $isPaused,
         'border-rule bg-white hover:border-seal' => $isPaused,
     ])>
-        <h3 @class(['font-semibold', 'text-grant-deep' => ! $isPaused, 'text-ink group-hover:text-seal' => $isPaused])>{{ __('Republic Act No. 10931') }}</h3>
+        <h3 data-vt-title @class(['font-semibold', 'text-grant-deep' => ! $isPaused, 'text-ink group-hover:text-seal' => $isPaused])>{{ __('Republic Act No. 10931') }}</h3>
 
         @if ($isPaused)
             <p class="mt-0.5 text-slate">{{ __('Free tuition paused during leave of absence (LOA).') }}</p>

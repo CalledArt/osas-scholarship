@@ -18,6 +18,8 @@ class ScholarshipApplicationDocumentController extends Controller
 
         Gate::authorize('view', $document);
 
+        abort_unless($document->isStored(), 404);
+
         return $document->download();
     }
 }

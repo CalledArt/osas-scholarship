@@ -13,7 +13,9 @@
     with the URL, the method and the link or button that started it, and
     page-staying when it came to nothing (Escape, the back-forward cache, or
     20s without an answer). The button that submits a form gives up its label
-    to a 16px ring until the next page, unless it draws its own progress.
+    to a 16px ring until the next page, unless it draws its own progress, and
+    a form that posts is not sent a second time until the page answers, or
+    Escape or the back-forward cache puts the page back.
 --}}
 <div id="page-progress" class="group pointer-events-none fixed inset-x-0 top-0 z-[70] h-1.5 opacity-0 transition-opacity duration-200 ease-out lg:left-rail" aria-hidden="true">
     <div id="page-progress-bar"
@@ -81,6 +83,10 @@
                 button.removeAttribute('data-busy');
                 button.removeAttribute('aria-disabled');
                 button.style.removeProperty('--busy-ink');
+            });
+
+            document.querySelectorAll('form[data-sending]').forEach(function (form) {
+                form.removeAttribute('data-sending');
             });
         };
 
@@ -205,6 +211,17 @@
 
             if (event.defaultPrevented || method === 'dialog' || (form.target && form.target !== '_self')) {
                 return;
+            }
+
+            // A form already on its way is not sent twice: a second press, or Enter in a field, would post it again.
+            if (method !== 'get' && form.hasAttribute('data-sending')) {
+                event.preventDefault();
+
+                return;
+            }
+
+            if (method !== 'get') {
+                form.setAttribute('data-sending', '');
             }
 
             var action = (submitter && submitter.getAttribute('formaction')) || form.getAttribute('action') || window.location.href;

@@ -26,6 +26,16 @@ class ScholarshipApplicationDocument extends Model
         return $this->belongsTo(ScholarshipRequiredDocument::class, 'scholarship_required_document_id');
     }
 
+    /**
+     * Whether the uploaded file is still in storage. Laravel only finds out a
+     * file is gone once the download has started streaming, too late to send
+     * anything but a broken response, so the controller asks first.
+     */
+    public function isStored(): bool
+    {
+        return Storage::disk($this->disk)->exists($this->path);
+    }
+
     public function download(): StreamedResponse
     {
         return Storage::disk($this->disk)->download($this->path, $this->original_name);

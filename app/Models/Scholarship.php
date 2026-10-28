@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -141,16 +142,41 @@ class Scholarship extends Model
         return intdiv($totalFunds, $passedCount);
     }
 
+    /**
+     * The last moment applications are taken: the end of the deadline day on
+     * the office's calendar (app.display_timezone), so the date OSAS gives is
+     * a day students can still apply on, until midnight in Manila.
+     */
+    public function deadlineClosesAt(): ?Carbon
+    {
+        return $this->deadlineDay()?->endOfDay();
+    }
+
     public function hasPassedDeadline(): bool
     {
-        return $this->deadline !== null && $this->deadline->isPast();
+        return $this->deadline !== null && $this->deadlineClosesAt()->isPast();
+    }
+
+    /**
+     * The status OSAS set, except that one still set to Open whose deadline
+     * has passed reads "Past deadline", since it takes no applications.
+     *
+     * Unlike availability() it never counts the slots held, so a list can
+     * print it on every row without a query per row.
+     */
+    public function statusLabel(): string
+    {
+        return $this->status === ScholarshipStatus::Open && $this->hasPassedDeadline()
+            ? __('Past deadline')
+            : $this->status->label();
     }
 
     /**
      * Whole calendar days until the deadline; negative once it has passed.
      *
-     * Counted between day boundaries rather than instants, so a deadline two
-     * dates away always reads as two days regardless of the time of day.
+     * Counted between day boundaries on the office's calendar rather than
+     * between instants, so a deadline two dates away always reads as two days
+     * regardless of the time of day, and the deadline day itself reads as 0.
      */
     public function daysUntilDeadline(): ?int
     {
@@ -158,7 +184,19 @@ class Scholarship extends Model
             return null;
         }
 
-        return (int) now()->startOfDay()->diffInDays($this->deadline->startOfDay());
+        return (int) now(config('app.display_timezone'))->startOfDay()->diffInDays($this->deadlineDay());
+    }
+
+    /**
+     * The start of the deadline date on the office's calendar. The column is a
+     * bare date, which the cast would otherwise read as midnight UTC: 8 AM in
+     * Manila, closing applications most of a day early.
+     */
+    private function deadlineDay(): ?Carbon
+    {
+        return $this->deadline === null
+            ? null
+            : Carbon::parse($this->deadline->toDateString(), config('app.display_timezone'));
     }
 
     /**
@@ -220,7 +258,7 @@ class Scholarship extends Model
     protected function availableTo(Builder $query, User $student): void
     {
         $query->where('status', ScholarshipStatus::Open)
-            ->where(fn (Builder $query) => $query->whereNull('deadline')->orWhere('deadline', '>', now()))
+            ->where(fn (Builder $query) => $query->whereNull('deadline')->orWhere('deadline', '>=', now(config('app.display_timezone'))->toDateString()))
             ->unless(CvsuPrograms::isStem($student->course), fn (Builder $query) => $query->where('stem_courses_only', false))
             ->whereDoesntHave('applications', fn (Builder $query) => $query->whereBelongsTo($student))
             ->withCount([

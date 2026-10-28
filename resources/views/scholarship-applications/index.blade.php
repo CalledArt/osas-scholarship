@@ -27,7 +27,8 @@
             @endif
 
             @if ($applications->isEmpty())
-                <p class="mt-8 border-y border-rule py-6 text-slate">
+                {{-- The student panes' empty box: one white box, one centred Slate sentence. --}}
+                <p class="mt-8 border border-rule bg-white px-5 py-8 text-center text-slate shadow-seat">
                     {{ __("You haven't applied to any scholarships yet.") }}
                     <a href="{{ route('scholarships.index') }}" class="rounded-sheet font-semibold text-seal underline underline-offset-4 hover:text-seal-deep focus:outline-none focus-visible:ring-2 focus-visible:ring-seal focus-visible:ring-offset-2">{{ __('Browse scholarships') }}</a>
                 </p>
@@ -50,7 +51,7 @@
                                     </x-badge>
                                 </div>
                                 <p class="mt-1 text-slate">
-                                    {{ $application->scholarship->type->label() }} <span aria-hidden="true">&middot;</span> {{ $application->scholarship->status->label() }}
+                                    {{ $application->scholarship->type->label() }} <span aria-hidden="true">&middot;</span> {{ $application->scholarship->statusLabel() }}
                                 </p>
 
                                 <div class="mt-auto pt-5">

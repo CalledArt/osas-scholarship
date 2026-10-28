@@ -35,6 +35,69 @@
         ],
         "createdAt": "2026-10-23T11:10:32.351Z",
         "reason": "agent: decision-round sketch, not shipping; DESIGN.md Four Sizes Rule ranks by weight within 15/18/32px"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "dejavu sans",
+        "files": [
+          "resources/views/components/pdf-report.blade.php"
+        ],
+        "createdAt": "2026-10-27T11:44:05.872Z",
+        "reason": "agent: dompdf's bundled face, the only one it carries with the peso sign; see .ai/rules/components.md. Printed reports only, never the app."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "*",
+        "files": [
+          "resources/views/components/pdf-report.blade.php"
+        ],
+        "createdAt": "2026-10-27T11:44:05.884Z",
+        "reason": "agent: print sizes for an A4 PDF (9.5px body, 8px captions); DESIGN.md's four sizes govern the screen, not paper."
+      },
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "**/{login,register,forgot-password,confirm-password,verify-email,password/change,reset-password/*}"
+        ],
+        "createdAt": "2026-10-27T12:04:27.810Z",
+        "reason": "agent: the guest layout's blind-embossed seal (aria-hidden SVG inscription at 8% white on Seal Deep) is decoration by design, exempt under WCAG 1.4.3; the sign-in forms use the audited tokens"
+      },
+      {
+        "rule": "text-occlusion",
+        "value": "*",
+        "files": [
+          "**/{login,register,forgot-password,confirm-password,verify-email,password/change,reset-password/*}"
+        ],
+        "createdAt": "2026-10-27T12:04:27.825Z",
+        "reason": "agent: the same embossed seal sits behind the front door's display heading on purpose; it is aria-hidden decoration, not text to read"
+      },
+      {
+        "rule": "nested-cards",
+        "value": "*",
+        "files": [
+          "**/login"
+        ],
+        "createdAt": "2026-10-27T12:04:27.837Z",
+        "reason": "agent: Google's own Sign in with Google button markup (GSI classes nsm7Bb-*) inside the sign-in card; not ours to restyle"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "**/admin/scholarships"
+        ],
+        "createdAt": "2026-10-27T12:04:37.290Z",
+        "reason": "agent: DESIGN.md's Four Sizes Rule sets body 15px and lead 18px and ranks headings by weight, case and rule; the card titles here are lead-size h2s by that rule, not a missed step"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "**/admin/roster"
+        ],
+        "createdAt": "2026-10-27T12:04:37.302Z",
+        "reason": "agent: flags the app shell's column (div.flex.min-h-screen), which main fills to the foot by design on a page that fits the screen; the roster panel itself keeps 24px below it (measured)"
       }
     ]
   }

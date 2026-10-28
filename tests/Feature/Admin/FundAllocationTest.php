@@ -172,6 +172,27 @@ class FundAllocationTest extends TestCase
             ->assertDontSee('students who passed =');
     }
 
+    public function test_allocation_list_without_passed_students_draws_no_empty_table(): void
+    {
+        $scholarship = Scholarship::factory()->funded('90000.00')->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->get(route('admin.fund-allocation.show', $scholarship))
+            ->assertSee('No students have passed this scholarship yet. They appear here once a pass list approves them.')
+            ->assertDontSee('<table', false);
+    }
+
+    public function test_a_fund_allocation_card_says_when_its_scholarship_is_past_its_deadline(): void
+    {
+        $this->travelTo('2026-10-25 10:00');
+        $scholarship = Scholarship::factory()->funded('90000.00')->create(['title' => 'CHED Merit Grant', 'deadline' => '2026-10-20']);
+        ScholarshipApplication::factory()->for($scholarship)->approved()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->get(route('admin.fund-allocation.index'))
+            ->assertSeeInOrder(['CHED Merit Grant', 'Past deadline', '₱90,000.00']);
+    }
+
     public function test_allocation_list_names_missing_student_details_for_screen_readers(): void
     {
         $scholarship = Scholarship::factory()->funded('90000.00')->create();

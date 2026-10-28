@@ -69,4 +69,40 @@ class DesignSystemTest extends TestCase
             $this->assertStringNotContainsString('disabled:opacity-25', $contents);
         }
     }
+
+    public function test_uppercase_tracking_is_only_ever_annotation(): void
+    {
+        $offenders = [];
+
+        /** @var SplFileInfo $file */
+        foreach (File::allFiles(resource_path('views')) as $file) {
+            preg_match_all('/class="([^"]*\buppercase\b[^"]*\btracking-[a-z]+\b[^"]*)"/', $file->getContents(), $classes);
+
+            foreach ($classes[1] as $class) {
+                if (! str_contains($class, 'font-annot')) {
+                    $offenders[] = $file->getRelativePathname();
+                }
+            }
+        }
+
+        $this->assertSame([], array_values(array_unique($offenders)), 'Uppercase with tracking belongs to Archivo Narrow at Annot size (font-annot text-annot). Set in Archivo at body size it reads as shouting.');
+    }
+
+    public function test_pages_link_back_through_the_shared_back_link(): void
+    {
+        $offenders = [];
+
+        /** @var SplFileInfo $file */
+        foreach (File::allFiles(resource_path('views')) as $file) {
+            if (str_starts_with($file->getRelativePathname(), 'auth/')) {
+                continue;
+            }
+
+            if (preg_match("/<a\s[^>]*>\s*\{\{ __\('Back to /", $file->getContents()) === 1) {
+                $offenders[] = $file->getRelativePathname();
+            }
+        }
+
+        $this->assertSame([], $offenders, 'A "Back to …" link is x-back-link: one colour on every page, and a hit area a thumb can find on a phone.');
+    }
 }

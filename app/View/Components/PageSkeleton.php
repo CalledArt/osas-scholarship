@@ -14,7 +14,8 @@ class PageSkeleton extends Component
      * drawn while it loads. The first matching path wins, so a fixed path
      * sits ahead of the wildcard that would also match it; `*` stands for one
      * path segment. A heading or strip label is given only where the page's
-     * own is fixed; a record's heading comes from the link that opens it.
+     * own is fixed; a record's heading comes from the link that opens it,
+     * and so does the Act's, which only a student it covers should see.
      * `hide` names the parts of the shape that page does not have.
      *
      * @var list<array{path: string, shape: string, heading?: string, label?: string, hide?: list<string>}>
@@ -43,7 +44,7 @@ class PageSkeleton extends Component
     {
         return [
             ['path' => route('dashboard', [], false), 'shape' => 'panes', 'heading' => $this->welcome($student), 'label' => __('Dashboard')],
-            ['path' => route('scholarships.republic-act-10931', [], false), 'shape' => 'record', 'heading' => __('Republic Act No. 10931'), 'hide' => ['action']],
+            ['path' => route('scholarships.republic-act-10931', [], false), 'shape' => 'record', 'hide' => ['action']],
             ['path' => route('scholarships.index', [], false), 'shape' => 'panes', 'heading' => __('Scholarships'), 'hide' => ['id-box']],
             ['path' => route('scholarships.show', '*', false), 'shape' => 'leaf', 'hide' => ['fields']],
             ['path' => route('scholarships.apply', '*', false), 'shape' => 'leaf', 'hide' => ['mark', 'prose']],

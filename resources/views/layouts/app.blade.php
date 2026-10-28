@@ -129,7 +129,7 @@
                  class="flex min-h-screen min-w-0 flex-1 flex-col {{ $sheet ? 'bg-white' : 'bg-linen' }}">
                 {{-- Below the rail's breakpoint: the disclosure control, the seal,
                      and the name of the screen you are on. No links, by rule. --}}
-                <div data-strip class="flex h-14 items-center gap-3 border-b border-rule bg-seal px-4 [view-transition-name:strip] lg:hidden">
+                <header data-strip class="flex h-14 items-center gap-3 border-b border-rule bg-seal px-4 [view-transition-name:strip] lg:hidden">
                     <button type="button"
                             @click="openNav($event)"
                             class="relative -ml-2 inline-flex items-center justify-center rounded-sheet p-2 text-seal-tint transition duration-150 ease-in-out hover:bg-seal-deep hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-seal"
@@ -144,7 +144,7 @@
                     <span data-strip-label class="truncate font-annot text-annot uppercase text-seal-tint">
                         {{ $title ?? __('OSAS Scholarships') }}
                     </span>
-                </div>
+                </header>
 
                 <main id="main" class="flex-1">
                     {{ $slot }}
